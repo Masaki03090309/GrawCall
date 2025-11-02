@@ -100,32 +100,32 @@
 
 #### M1.1: 開発環境構築（1週間）
 
-- [ ] Next.js 14プロジェクト初期化
-- [ ] TypeScript + ESLint + Prettier設定
+- [x] Next.js 14プロジェクト初期化
+- [x] TypeScript + ESLint + Prettier設定
 - [ ] Supabaseプロジェクト作成
 - [ ] GCPプロジェクト作成
 - [ ] GitHub Repositoryセットアップ
 - [ ] CI/CD基本設定（GitHub Actions）
 
 **成果物**:
-- `package.json` 完成
-- `.env.example` 完成
-- `README.md` セットアップ手順記載
+- [x] `package.json` 完成
+- [x] `.env.example` 完成
+- [x] `README.md` セットアップ手順記載
 
 ---
 
 #### M1.2: データベース構築（1週間）
 
-- [ ] Supabase拡張機能有効化（uuid-ossp, pgvector, pg_cron）
-- [ ] 全11テーブル作成
-- [ ] インデックス作成
-- [ ] RLSポリシー設定
-- [ ] トリガー実装（updated_at自動更新等）
-- [ ] マイグレーションスクリプト作成
+- [x] Supabase拡張機能有効化（uuid-ossp, pgvector, pg_cron）
+- [x] 全11テーブル作成
+- [x] インデックス作成
+- [x] RLSポリシー設定
+- [x] トリガー実装（updated_at自動更新等）
+- [x] マイグレーションスクリプト作成
 
 **成果物**:
-- `supabase/migrations/` 配下のSQLファイル
-- データベース設計書との整合性確認
+- [x] `supabase/migrations/` 配下のSQLファイル
+- [x] データベース設計書との整合性確認
 
 ---
 

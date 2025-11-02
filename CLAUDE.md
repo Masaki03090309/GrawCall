@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 3. **RAG検索による学習資料参照** - Retrieval Augmented Generation using pgvector and OpenAI Embeddings
 4. **NG理由永久保存とトレンド分析** - Permanent storage of rejection reasons for long-term trend analysis
 
-**Current Status**: Documentation phase complete. No implementation code exists yet.
+**Current Status**: Phase 1 - M1.1 (開発環境構築) and M1.2 (データベース構築) completed. Development server running on port 7000. Next: User needs to complete Supabase project setup before proceeding to M1.3 (認証機能実装).
 
 ---
 
@@ -189,6 +189,44 @@ THEN 根本原因: クロージング不足
 3. **Review API Spec**: `docs/api_specification.md` for endpoint design
 4. **Follow Coding Standards**: `docs/technical_guidelines.md` for TypeScript/Next.js patterns
 5. **Reference Task Breakdown**: `docs/task_breakdown.md` for P0-P3 prioritization and dependencies
+
+### Task Tracking Workflow
+
+**IMPORTANT**: Whenever you complete a task, milestone, or phase, you MUST update the task checklists in the documentation files.
+
+1. **After Completing Each Task**:
+   - Open `docs/implementation_plan.md`
+   - Find the corresponding task in the checklist
+   - Change `- [ ]` to `- [x]` to mark it as completed
+   - Commit the documentation update
+
+2. **After Completing a Milestone**:
+   - Review all tasks in the milestone section
+   - Ensure all completed tasks are marked with `[x]`
+   - Update the milestone completion date if tracking
+   - Update `docs/task_breakdown.md` if applicable
+
+3. **After Completing a Phase**:
+   - Mark all phase completion criteria as `[x]`
+   - Update the "Current Status" in CLAUDE.md (line 16)
+   - Create a summary of what was accomplished
+   - Note any deviations from the original plan
+
+4. **Example of Task Update**:
+   ```markdown
+   # Before
+   - [ ] Next.js 14プロジェクト初期化
+
+   # After
+   - [x] Next.js 14プロジェクト初期化
+   ```
+
+5. **Documentation Files to Update**:
+   - `docs/implementation_plan.md` - Main task checklist (7 phases)
+   - `docs/task_breakdown.md` - Detailed 200+ tasks
+   - `CLAUDE.md` - Current status (line 16)
+
+**Always keep documentation in sync with actual implementation progress.**
 
 ### TypeScript Patterns
 
