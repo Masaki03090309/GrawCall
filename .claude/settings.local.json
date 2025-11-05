@@ -90,7 +90,9 @@
       "Bash(npm run format:*)",
       "Bash(if exist nul del nul)",
       "Bash(git reset:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(.git/info/exclude)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": [],
     "ask": []
