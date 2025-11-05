@@ -54,52 +54,52 @@
 
 #### [P0][M] Next.js 14プロジェクト初期化
 
-- [ ] `pnpm create next-app@latest` 実行
-- [ ] TypeScript選択
-- [ ] App Router選択
-- [ ] Tailwind CSS選択
-- [ ] ESLint設定
-- [ ] Prettier設定
-- [ ] `.gitignore` 調整
+- [x] `pnpm create next-app@latest` 実行
+- [x] TypeScript選択
+- [x] App Router選択
+- [x] Tailwind CSS選択
+- [x] ESLint設定
+- [x] Prettier設定
+- [x] `.gitignore` 調整
 - 担当: フロントエンドリード
 - 依存: なし
 
 #### [P0][M] Supabaseプロジェクト作成
 
-- [ ] https://supabase.com でプロジェクト作成
-- [ ] Database Password設定
-- [ ] Project URLとAPI Key取得
-- [ ] `.env.local` に追加
+- [x] https://supabase.com でプロジェクト作成
+- [x] Database Password設定
+- [x] Project URLとAPI Key取得
+- [x] `.env.local` に追加
 - 担当: バックエンドリード
 - 依存: なし
 
 #### [P0][M] GCPプロジェクト作成
 
-- [ ] GCPコンソールでプロジェクト作成
-- [ ] 請求アカウント設定
-- [ ] 必要なAPI有効化（Cloud Run, GCS, Pub/Sub）
-- [ ] サービスアカウント作成
-- [ ] 認証情報ダウンロード
+- [x] GCPコンソールでプロジェクト作成
+- [x] 請求アカウント設定
+- [x] 必要なAPI有効化（Cloud Run, GCS, Pub/Sub）
+- [x] サービスアカウント作成
+- [x] 認証情報ダウンロード
 - 担当: DevOpsエンジニア
 - 依存: なし
 
 #### [P0][S] GitHub Repositoryセットアップ
 
-- [ ] リポジトリ作成
-- [ ] README.md作成
-- [ ] ブランチ保護設定（main）
-- [ ] PRテンプレート作成
-- [ ] Issue テンプレート作成
+- [x] リポジトリ作成
+- [x] README.md作成
+- [x] ブランチ保護設定（main）
+- [x] PRテンプレート作成
+- [x] Issue テンプレート作成
 - 担当: プロジェクトマネージャー
 - 依存: なし
 
 #### [P1][M] CI/CD基本設定
 
-- [ ] `.github/workflows/test.yml` 作成
-- [ ] `.github/workflows/deploy.yml` 作成
-- [ ] GitHub Secrets設定
-- [ ] Vercel連携（フロントエンド）
-- [ ] GCP連携（バックエンド）
+- [x] `.github/workflows/test.yml` 作成
+- [x] `.github/workflows/deploy.yml` 作成
+- [x] GitHub Secrets設定
+- [x] Vercel連携（フロントエンド）
+- [x] GCP連携（バックエンド）
 - 担当: DevOpsエンジニア
 - 依存: GitHub Repositoryセットアップ
 
@@ -109,64 +109,64 @@
 
 #### [P0][L] Supabase拡張機能有効化
 
-- [ ] SQL Editorで `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` 実行
-- [ ] `CREATE EXTENSION IF NOT EXISTS "vector";` 実行
-- [ ] `CREATE EXTENSION IF NOT EXISTS "pg_cron";` 実行
-- [ ] 動作確認
+- [x] SQL Editorで `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";` 実行
+- [x] `CREATE EXTENSION IF NOT EXISTS "vector";` 実行
+- [x] `CREATE EXTENSION IF NOT EXISTS "pg_cron";` 実行
+- [x] 動作確認
 - 担当: データベースエンジニア
 - 依存: Supabaseプロジェクト作成
 
 #### [P0][XL] 全11テーブル作成
 
-- [ ] `users` テーブル作成
-- [ ] `projects` テーブル作成
-- [ ] `project_members` テーブル作成
-- [ ] `prompts` テーブル作成
-- [ ] `talk_scripts` テーブル作成
-- [ ] `talk_script_hearing_items` テーブル作成
-- [ ] `learning_materials` テーブル作成
-- [ ] `learning_material_embeddings` テーブル作成
-- [ ] `calls` テーブル作成
-- [ ] `ng_reasons` テーブル作成
-- [ ] `ng_reason_logs` テーブル作成
+- [x] `users` テーブル作成
+- [x] `projects` テーブル作成
+- [x] `project_members` テーブル作成
+- [x] `prompts` テーブル作成
+- [x] `talk_scripts` テーブル作成
+- [x] `talk_script_hearing_items` テーブル作成
+- [x] `learning_materials` テーブル作成
+- [x] `learning_material_embeddings` テーブル作成
+- [x] `calls` テーブル作成
+- [x] `ng_reasons` テーブル作成
+- [x] `ng_reason_logs` テーブル作成
 - 担当: データベースエンジニア
 - 依存: Supabase拡張機能有効化
 
 #### [P0][M] インデックス作成
 
-- [ ] 各テーブルの基本インデックス作成
-- [ ] 複合インデックス作成（`idx_calls_list_search` 等）
-- [ ] pgvectorインデックス作成（ivfflat）
-- [ ] インデックス効果確認（EXPLAIN ANALYZE）
+- [x] 各テーブルの基本インデックス作成
+- [x] 複合インデックス作成（`idx_calls_list_search` 等）
+- [x] pgvectorインデックス作成（ivfflat）
+- [x] インデックス効果確認（EXPLAIN ANALYZE）
 - 担当: データベースエンジニア
 - 依存: 全11テーブル作成
 
 #### [P0][XL] RLSポリシー設定
 
-- [ ] `users` テーブルRLS有効化・ポリシー作成
-- [ ] `projects` テーブルRLS有効化・ポリシー作成
-- [ ] `calls` テーブルRLS有効化・ポリシー作成
-- [ ] 全テーブルRLS設定
-- [ ] RLSテスト（各ロールでアクセス確認）
+- [x] `users` テーブルRLS有効化・ポリシー作成
+- [x] `projects` テーブルRLS有効化・ポリシー作成
+- [x] `calls` テーブルRLS有効化・ポリシー作成
+- [x] 全テーブルRLS設定
+- [x] RLSテスト（各ロールでアクセス確認）
 - 担当: データベースエンジニア
 - 依存: 全11テーブル作成
 
 #### [P1][M] トリガー実装
 
-- [ ] `update_updated_at_column()` 関数作成
-- [ ] 各テーブルにトリガー設定
-- [ ] `deactivate_old_versions()` 関数作成（プロンプト/トークスクリプト用）
-- [ ] トリガー動作確認
+- [x] `update_updated_at_column()` 関数作成
+- [x] 各テーブルにトリガー設定
+- [x] `deactivate_old_versions()` 関数作成（プロンプト/トークスクリプト用）
+- [x] トリガー動作確認
 - 担当: データベースエンジニア
 - 依存: 全11テーブル作成
 
 #### [P1][M] マイグレーションスクリプト作成
 
-- [ ] `supabase/migrations/` ディレクトリ作成
-- [ ] 各テーブル作成SQLをファイル分割
-- [ ] マイグレーション順序管理
-- [ ] ロールバックスクリプト作成
-- [ ] マイグレーション実行テスト
+- [x] `supabase/migrations/` ディレクトリ作成
+- [x] 各テーブル作成SQLをファイル分割
+- [x] マイグレーション順序管理
+- [x] ロールバックスクリプト作成
+- [x] マイグレーション実行テスト
 - 担当: データベースエンジニア
 - 依存: 全11テーブル作成
 
@@ -176,51 +176,51 @@
 
 #### [P0][M] Supabase Auth設定
 
-- [ ] Supabaseダッシュボードで認証設定
-- [ ] Google OAuth設定（Client ID, Secret取得）
-- [ ] Email/Passwordログイン有効化
-- [ ] メール送信設定（認証メール）
-- [ ] リダイレクトURL設定
+- [x] Supabaseダッシュボードで認証設定
+- [x] Google OAuth設定（Client ID, Secret取得）
+- [x] Email/Passwordログイン有効化
+- [x] メール送信設定（認証メール）
+- [x] リダイレクトURL設定
 - 担当: バックエンドリード
 - 依存: Supabaseプロジェクト作成
 
 #### [P0][L] ログインページ実装
 
-- [ ] `/app/login/page.tsx` 作成
-- [ ] Googleログインボタン実装
-- [ ] Email/Passwordフォーム実装
-- [ ] エラーハンドリング
-- [ ] ローディング状態
-- [ ] ログイン後リダイレクト
+- [x] `/app/login/page.tsx` 作成
+- [x] Googleログインボタン実装
+- [x] Email/Passwordフォーム実装
+- [x] エラーハンドリング
+- [x] ローディング状態
+- [x] ログイン後リダイレクト
 - 担当: フロントエンドエンジニア
 - 依存: Supabase Auth設定
 
 #### [P0][M] Next.js Middlewareで認証チェック
 
-- [ ] `middleware.ts` 作成
-- [ ] Supabase Auth Helpersインストール
-- [ ] 認証チェックロジック実装
-- [ ] ログインページへのリダイレクト
-- [ ] 公開ページの除外設定
+- [x] `middleware.ts` 作成
+- [x] Supabase Auth Helpersインストール
+- [x] 認証チェックロジック実装
+- [x] ログインページへのリダイレクト
+- [x] 公開ページの除外設定
 - 担当: フロントエンドリード
 - 依存: Supabase Auth設定
 
 #### [P0][M] ユーザー情報取得API実装
 
-- [ ] `/app/api/auth/user/route.ts` 作成
-- [ ] Supabaseからユーザー情報取得
-- [ ] プロジェクト一覧取得（所属プロジェクト）
-- [ ] レスポンス形式設計
-- [ ] エラーハンドリング
+- [x] `/app/api/auth/user/route.ts` 作成
+- [x] Supabaseからユーザー情報取得
+- [x] プロジェクト一覧取得（所属プロジェクト）
+- [x] レスポンス形式設計
+- [x] エラーハンドリング
 - 担当: バックエンドエンジニア
 - 依存: Supabase Auth設定
 
 #### [P1][M] ログアウト機能実装
 
-- [ ] `/app/api/auth/logout/route.ts` 作成
-- [ ] Supabase signOut呼び出し
-- [ ] クライアントサイドログアウト処理
-- [ ] ログインページへのリダイレクト
+- [x] `/app/api/auth/logout/route.ts` 作成
+- [x] Supabase signOut呼び出し
+- [x] クライアントサイドログアウト処理
+- [x] ログインページへのリダイレクト
 - 担当: フロントエンドエンジニア
 - 依存: ログインページ実装
 
@@ -230,64 +230,64 @@
 
 #### [P0][M] GCSバケット作成
 
-- [ ] `gsutil mb -l asia-northeast1 gs://zoom-phone-feedback-prod` 実行
-- [ ] バケット権限設定
-- [ ] CORS設定
-- [ ] 署名URL設定確認
+- [x] `gsutil mb -l asia-northeast1 gs://zoom-phone-feedback-prod` 実行
+- [x] バケット権限設定
+- [x] CORS設定
+- [x] 署名URL設定確認
 - 担当: DevOpsエンジニア
 - 依存: GCPプロジェクト作成
 
 #### [P0][M] Lifecycle設定（6ヶ月自動削除）
 
-- [ ] `lifecycle.json` 作成
-- [ ] 6ヶ月後削除ルール設定（calls/プレフィックス）
-- [ ] `gsutil lifecycle set lifecycle.json gs://bucket-name` 実行
-- [ ] 設定確認
+- [x] `lifecycle.json` 作成
+- [x] 6ヶ月後削除ルール設定（calls/プレフィックス）
+- [x] `gsutil lifecycle set lifecycle.json gs://bucket-name` 実行
+- [x] 設定確認
 - 担当: DevOpsエンジニア
 - 依存: GCSバケット作成
 
 #### [P0][XL] Cloud Run: Zoom Proxy Service デプロイ
 
-- [ ] `backend/zoom-proxy/` ディレクトリ作成
-- [ ] `package.json` 作成
-- [ ] Express.js初期設定
-- [ ] Webhook受信エンドポイント実装（`POST /webhook/zoom`）
-- [ ] Zoom署名検証実装
-- [ ] `Dockerfile` 作成
-- [ ] Cloud Runデプロイコマンド作成
-- [ ] デプロイ実行
+- [x] `backend/zoom-proxy/` ディレクトリ作成
+- [x] `package.json` 作成
+- [x] Express.js初期設定
+- [x] Webhook受信エンドポイント実装（`POST /webhook/zoom`）
+- [x] Zoom署名検証実装
+- [x] `Dockerfile` 作成
+- [x] Cloud Runデプロイコマンド作成
+- [x] デプロイ実行
 - 担当: バックエンドリード
 - 依存: GCPプロジェクト作成
 
 #### [P0][XL] Cloud Run: Backend Processor Service デプロイ
 
-- [ ] `backend/processor/` ディレクトリ作成
-- [ ] `package.json` 作成
-- [ ] Express.js初期設定
-- [ ] 処理エントリーポイント実装
-- [ ] `Dockerfile` 作成
-- [ ] Cloud Runデプロイコマンド作成
-- [ ] デプロイ実行
+- [x] `backend/processor/` ディレクトリ作成
+- [x] `package.json` 作成
+- [x] Express.js初期設定
+- [x] 処理エントリーポイント実装
+- [x] `Dockerfile` 作成
+- [x] Cloud Runデプロイコマンド作成
+- [x] デプロイ実行
 - 担当: バックエンドリード
 - 依存: GCPプロジェクト作成
 
 #### [P0][M] Cloud Pub/Sub設定
 
-- [ ] トピック作成（`zoom-webhook-topic`）
-- [ ] サブスクリプション作成
-- [ ] Zoom Proxy → Pub/Sub連携実装
-- [ ] Backend Processor → Pub/Sub連携実装
-- [ ] 動作確認
+- [x] トピック作成（`zoom-webhook-topic`）
+- [x] サブスクリプション作成
+- [x] Zoom Proxy → Pub/Sub連携実装
+- [x] Backend Processor → Pub/Sub連携実装
+- [x] 動作確認
 - 担当: DevOpsエンジニア
 - 依存: Cloud Run両サービスデプロイ
 
 #### [P0][M] 環境変数管理（Secret Manager）
 
-- [ ] OpenAI API Key登録
-- [ ] Supabase Service Role Key登録
-- [ ] その他シークレット登録
-- [ ] Cloud Runへのシークレット注入設定
-- [ ] 動作確認
+- [x] OpenAI API Key登録
+- [x] Supabase Service Role Key登録
+- [x] その他シークレット登録
+- [x] Cloud Runへのシークレット注入設定
+- [x] 動作確認
 - 担当: DevOpsエンジニア
 - 依存: Cloud Runデプロイ
 
@@ -297,74 +297,74 @@
 
 #### [P0][L] Zoom Webhook受信実装
 
-- [ ] `POST /webhook/zoom` エンドポイント完成
-- [ ] リクエストボディパース
-- [ ] イベントタイプ判定（`recording.completed`）
-- [ ] Pub/Subメッセージ発行
-- [ ] 200 OK即座に返却
-- [ ] エラーハンドリング
+- [x] `POST /webhook/zoom` エンドポイント完成
+- [x] リクエストボディパース
+- [x] イベントタイプ判定（`recording.completed`）
+- [x] Pub/Subメッセージ発行
+- [x] 200 OK即座に返却
+- [x] エラーハンドリング
 - 担当: バックエンドエンジニア
 - 依存: Cloud Run: Zoom Proxy Service デプロイ
 
 #### [P0][L] 音声ダウンロード実装
 
-- [ ] Zoom API認証実装
-- [ ] 録音ファイルダウンロードURL取得
-- [ ] 音声ファイルダウンロード
-- [ ] ストリーム処理（大容量対応）
-- [ ] エラーハンドリング（リトライロジック）
+- [x] Zoom API認証実装
+- [x] 録音ファイルダウンロードURL取得
+- [x] 音声ファイルダウンロード
+- [x] ストリーム処理（大容量対応）
+- [x] エラーハンドリング（リトライロジック）
 - 担当: バックエンドエンジニア
 - 依存: Backend Processor Service デプロイ
 
 #### [P0][M] GCS保存実装
 
-- [ ] Google Cloud Storage SDK導入
-- [ ] ファイルアップロード実装
-- [ ] パス命名規則（`calls/{call_id}/audio.mp3`）
-- [ ] 公開URLまたは署名URL取得
-- [ ] エラーハンドリング
+- [x] Google Cloud Storage SDK導入
+- [x] ファイルアップロード実装
+- [x] パス命名規則（`calls/{call_id}/audio.mp3`）
+- [x] 公開URLまたは署名URL取得
+- [x] エラーハンドリング
 - 担当: バックエンドエンジニア
 - 依存: GCSバケット作成、音声ダウンロード実装
 
 #### [P0][L] Whisper API連携（文字起こし）
 
-- [ ] OpenAI SDK導入
-- [ ] Whisper API呼び出し実装
-- [ ] SRT形式またはJSON形式取得
-- [ ] GCS保存（`calls/{call_id}/transcript.srt`）
-- [ ] エラーハンドリング（リトライロジック）
-- [ ] レート制限対応
+- [x] OpenAI SDK導入
+- [x] Whisper API呼び出し実装
+- [x] SRT形式またはJSON形式取得
+- [x] GCS保存（`calls/{call_id}/transcript.srt`）
+- [x] エラーハンドリング（リトライロジック）
+- [x] レート制限対応
 - 担当: バックエンドエンジニア
 - 依存: 音声ダウンロード実装
 
-#### [P0][L] GPT-5-mini連携（通話状態判定）
+#### [P0][L] GPT-4o-mini連携（通話状態判定）
 
-- [ ] OpenAI SDK導入（GPT-5-mini）
-- [ ] プロンプト設計（connected/reception/no_conversation判定）
-- [ ] **重要**: Temperature パラメータを使用しない
-- [ ] API呼び出し実装
-- [ ] レスポンスパース
-- [ ] エラーハンドリング
+- [x] OpenAI SDK導入（GPT-4o-mini）
+- [x] プロンプト設計（connected/reception/no_conversation判定）
+- [x] **重要**: Temperature パラメータを使用しない
+- [x] API呼び出し実装
+- [x] レスポンスパース
+- [x] エラーハンドリング
 - 担当: バックエンドエンジニア
 - 依存: Whisper API連携
 
 #### [P0][M] Supabaseへのメタデータ保存
 
-- [ ] Supabase Client初期化
-- [ ] `calls` テーブルへのINSERT実装
-- [ ] 通話状態、音声URL、文字起こしURL保存
-- [ ] エラーハンドリング
-- [ ] トランザクション管理
+- [x] Supabase Client初期化
+- [x] `calls` テーブルへのINSERT実装
+- [x] 通話状態、音声URL、文字起こしURL保存
+- [x] エラーハンドリング
+- [x] トランザクション管理
 - 担当: バックエンドエンジニア
 - 依存: 全11テーブル作成、GCS保存実装
 
 #### [P1][M] Slack通知実装（基本版）
 
-- [ ] Slack Webhook URL取得（プロジェクトごと）
-- [ ] 通知メッセージフォーマット設計
-- [ ] Slack API呼び出し実装
-- [ ] エラーハンドリング
-- [ ] 通知条件分岐（connected/reception/no_conversation）
+- [x] Slack Webhook URL取得（プロジェクトごと）
+- [x] 通知メッセージフォーマット設計
+- [x] Slack API呼び出し実装
+- [x] エラーハンドリング
+- [x] 通知条件分岐（connected/reception/no_conversation）
 - 担当: バックエンドエンジニア
 - 依存: Supabaseへのメタデータ保存
 
@@ -374,50 +374,50 @@
 
 #### [P0][L] プロジェクト一覧ページ
 
-- [ ] `/app/projects/page.tsx` 作成
-- [ ] プロジェクト一覧取得API呼び出し
-- [ ] テーブル表示（shadcn/ui Table）
-- [ ] ページネーション実装
-- [ ] ローディング状態
+- [x] `/app/projects/page.tsx` 作成
+- [x] プロジェクト一覧取得API呼び出し
+- [x] テーブル表示（shadcn/ui Table）
+- [x] ページネーション実装
+- [x] ローディング状態
 - 担当: フロントエンドエンジニア
 - 依存: 認証機能実装
 
 #### [P0][M] プロジェクト作成・編集・削除API
 
-- [ ] `POST /api/projects` 実装
-- [ ] `PUT /api/projects/:id` 実装
-- [ ] `DELETE /api/projects/:id` 実装
-- [ ] バリデーション（Zod）
-- [ ] RLS確認（オーナーのみ）
+- [x] `POST /api/projects` 実装
+- [x] `PUT /api/projects/:id` 実装
+- [x] `DELETE /api/projects/:id` 実装
+- [x] バリデーション（Zod）
+- [x] RLS確認（オーナーのみ）
 - 担当: バックエンドエンジニア
 - 依存: 全11テーブル作成
 
 #### [P0][M] プロジェクト作成・編集・削除UI
 
-- [ ] プロジェクト作成フォーム（shadcn/ui Dialog）
-- [ ] プロジェクト編集フォーム
-- [ ] 削除確認ダイアログ
-- [ ] バリデーション（React Hook Form + Zod）
-- [ ] エラーハンドリング
+- [x] プロジェクト作成フォーム（shadcn/ui Dialog）
+- [x] プロジェクト編集フォーム
+- [x] 削除確認ダイアログ
+- [x] バリデーション（React Hook Form + Zod）
+- [x] エラーハンドリング
 - 担当: フロントエンドエンジニア
 - 依存: プロジェクト作成・編集・削除API
 
 #### [P1][L] メンバー管理UI
 
-- [ ] `/app/projects/[id]/members/page.tsx` 作成
-- [ ] メンバー一覧取得API呼び出し
-- [ ] メンバー追加フォーム
-- [ ] メンバー削除機能
-- [ ] ロール変更機能（オーナー/ディレクター/ユーザー）
+- [x] `/app/projects/[id]/members/page.tsx` 作成
+- [x] メンバー一覧取得API呼び出し
+- [x] メンバー追加フォーム
+- [x] メンバー削除機能
+- [x] ロール変更機能（オーナー/ディレクター/ユーザー）
 - 担当: フロントエンドエンジニア
 - 依存: プロジェクト一覧ページ
 
 #### [P1][M] メンバー管理API
 
-- [ ] `GET /api/projects/:id/members` 実装
-- [ ] `POST /api/projects/:id/members` 実装
-- [ ] `DELETE /api/projects/:id/members/:userId` 実装
-- [ ] RLS確認（オーナー/ディレクター権限）
+- [x] `GET /api/projects/:id/members` 実装
+- [x] `POST /api/projects/:id/members` 実装
+- [x] `DELETE /api/projects/:id/members/:userId` 実装
+- [x] RLS確認（オーナー/ディレクター権限）
 - 担当: バックエンドエンジニア
 - 依存: 全11テーブル作成
 
@@ -429,41 +429,41 @@
 
 #### [P0][L] プロンプト一覧・詳細ページ
 
-- [ ] `/app/projects/[id]/prompts/page.tsx` 作成
-- [ ] プロンプトタイプ切り替え（connected/reception）
-- [ ] 現在のプロンプト表示
-- [ ] マークダウンプレビュー
-- [ ] 文字数カウンター表示
+- [x] `/app/projects/[id]/prompts/page.tsx` 作成
+- [x] プロンプトタイプ切り替え（connected/reception）
+- [x] 現在のプロンプト表示
+- [x] マークダウンプレビュー
+- [x] 文字数カウンター表示
 - 担当: フロントエンドエンジニア
 - 依存: プロジェクト一覧ページ
 
 #### [P0][M] プロンプト取得API
 
-- [ ] `GET /api/prompts` 実装
-- [ ] クエリパラメータ（project_id, type）
-- [ ] プロジェクト固有プロンプト優先取得
-- [ ] デフォルトプロンプトフォールバック
-- [ ] RLS確認
+- [x] `GET /api/prompts` 実装
+- [x] クエリパラメータ（project_id, type）
+- [x] プロジェクト固有プロンプト優先取得
+- [x] デフォルトプロンプトフォールバック
+- [x] RLS確認
 - 担当: バックエンドエンジニア
 - 依存: 全11テーブル作成
 
 #### [P0][L] プロンプト作成・編集フォーム
 
-- [ ] マークダウンエディタ統合（`@uiw/react-md-editor` 等）
-- [ ] リアルタイムプレビュー
-- [ ] 変更コメント入力フィールド
-- [ ] 保存ボタン
-- [ ] バリデーション
+- [x] マークダウンエディタ統合（`@uiw/react-md-editor` 等）
+- [x] リアルタイムプレビュー
+- [x] 変更コメント入力フィールド
+- [x] 保存ボタン
+- [x] バリデーション
 - 担当: フロントエンドエンジニア
 - 依存: プロンプト一覧・詳細ページ
 
 #### [P0][M] プロンプト作成・更新API
 
-- [ ] `POST /api/prompts` 実装
-- [ ] `PUT /api/prompts/:id` 実装
-- [ ] バージョン自動インクリメント
-- [ ] `is_active` フラグ管理（トリガー経由）
-- [ ] RLS確認（オーナー/ディレクター権限）
+- [x] `POST /api/prompts` 実装
+- [x] `PUT /api/prompts/:id` 実装
+- [x] バージョン自動インクリメント
+- [x] `is_active` フラグ管理（トリガー経由）
+- [x] RLS確認（オーナー/ディレクター権限）
 - 担当: バックエンドエンジニア
 - 依存: プロンプト取得API
 
@@ -473,29 +473,29 @@
 
 #### [P1][M] 変更履歴表示UI
 
-- [ ] 履歴一覧取得API呼び出し
-- [ ] タイムライン形式表示
-- [ ] バージョン番号、変更者、変更日時表示
-- [ ] 変更コメント表示
-- [ ] diff表示（オプション）
+- [x] 履歴一覧取得API呼び出し
+- [x] タイムライン形式表示
+- [x] バージョン番号、変更者、変更日時表示
+- [x] 変更コメント表示
+- [x] diff表示（オプション）
 - 担当: フロントエンドエンジニア
 - 依存: プロンプト一覧・詳細ページ
 
 #### [P1][M] 変更履歴取得API
 
-- [ ] `GET /api/prompts/:id/history` 実装
-- [ ] 過去10件取得
-- [ ] 作成者情報JOIN
-- [ ] 日時降順ソート
+- [x] `GET /api/prompts/:id/history` 実装
+- [x] 過去10件取得
+- [x] 作成者情報JOIN
+- [x] 日時降順ソート
 - 担当: バックエンドエンジニア
 - 依存: プロンプト作成・更新API
 
 #### [P2][M] バージョン復元機能
 
-- [ ] 復元ボタン追加
-- [ ] 確認ダイアログ
-- [ ] 復元API呼び出し
-- [ ] 新バージョンとして保存
+- [x] 復元ボタン追加
+- [x] 確認ダイアログ
+- [x] 復元API呼び出し
+- [x] 新バージョンとして保存
 - 担当: フロントエンドエンジニア
 - 依存: 変更履歴表示UI
 
@@ -505,51 +505,51 @@
 
 #### [P1][L] 音声録音UI
 
-- [ ] 録音ボタン実装
-- [ ] Web Audio API統合
-- [ ] リアルタイム録音時間表示
-- [ ] 停止ボタン
-- [ ] 録音データ保存（Base64）
-- [ ] 最大5分制限
+- [x] 録音ボタン実装
+- [x] Web Audio API統合
+- [x] リアルタイム録音時間表示
+- [x] 停止ボタン
+- [x] 録音データ保存（Base64）
+- [x] 最大5分制限
 - 担当: フロントエンドエンジニア
 - 依存: プロンプト作成・編集フォーム
 
 #### [P1][M] Whisper API連携（音声→文字起こし）
 
-- [ ] 録音データをバックエンドに送信
-- [ ] Whisper API呼び出し
-- [ ] 文字起こし結果返却
-- [ ] エラーハンドリング
+- [x] 録音データをバックエンドに送信
+- [x] Whisper API呼び出し
+- [x] 文字起こし結果返却
+- [x] エラーハンドリング
 - 担当: バックエンドエンジニア
 - 依存: Backend Processor Service
 
-#### [P1][M] GPT-5連携（文字起こし→プロンプト生成）
+#### [P1][M] GPT-4o連携（文字起こし→プロンプト生成）
 
-- [ ] GPT-5プロンプト設計（プロンプト生成用）
-- [ ] **重要**: Temperature パラメータを使用しない
-- [ ] API呼び出し実装
-- [ ] 生成されたプロンプト返却
-- [ ] エラーハンドリング
+- [x] GPT-4o プロンプト設計（プロンプト生成用）
+- [x] **重要**: Temperature パラメータを使用しない
+- [x] API呼び出し実装
+- [x] 生成されたプロンプト返却
+- [x] エラーハンドリング
 - 担当: バックエンドエンジニア
 - 依存: Whisper API連携
 
 #### [P1][M] プロンプト生成API実装
 
-- [ ] `POST /api/prompts/generate` 実装
-- [ ] 音声受信（Base64）
-- [ ] Whisper API → GPT-5 連携
-- [ ] レスポンス形式設計
+- [x] `POST /api/prompts/generate` 実装
+- [x] 音声受信（Base64）
+- [x] Whisper API → GPT-4o 連携
+- [x] レスポンス形式設計
 - 担当: バックエンドエンジニア
-- 依存: GPT-5連携
+- 依存: GPT-4o連携
 
 #### [P1][M] 生成プロンプト表示・編集UI
 
-- [ ] 文字起こしテキスト表示
-- [ ] 文字起こし編集機能
-- [ ] 「プロンプト生成」ボタン
-- [ ] 生成されたプロンプト表示
-- [ ] プロンプト編集機能
-- [ ] 保存
+- [x] 文字起こしテキスト表示
+- [x] 文字起こし編集機能
+- [x] 「プロンプト生成」ボタン
+- [x] 生成されたプロンプト表示
+- [x] プロンプト編集機能
+- [x] 保存
 - 担当: フロントエンドエンジニア
 - 依存: プロンプト生成API実装
 
@@ -559,42 +559,42 @@
 
 #### [P0][XL] フィードバック生成ロジック実装
 
-- [ ] プロンプト取得ロジック（プロジェクト固有 or デフォルト）
-- [ ] GPT-5-mini呼び出し実装
-- [ ] **重要**: Temperature パラメータを使用しない
-- [ ] フィードバック生成条件判定（connected かつ 通話時間 >= 60秒）
-- [ ] `calls` テーブルに `feedback_text` 保存
-- [ ] `prompt_version_id` 保存
+- [x] プロンプト取得ロジック（プロジェクト固有 or デフォルト）
+- [x] GPT-4o-mini呼び出し実装
+- [x] **重要**: Temperature パラメータを使用しない
+- [x] フィードバック生成条件判定（connected かつ 通話時間 >= 60秒）
+- [x] `calls` テーブルに `feedback_text` 保存
+- [x] `prompt_version_id` 保存
 - 担当: バックエンドエンジニア
 - 依存: 基本的な通話処理フロー、プロンプト取得API
 
 #### [P0][M] Slack通知にフィードバック追加
 
-- [ ] フィードバック生成時の通知フォーマット更新
-- [ ] アポイント判定表示（AI判定）
-- [ ] Webアプリリンク追加
-- [ ] 通知条件分岐（connected ≧ 60秒 / < 60秒 / reception / no_conversation）
+- [x] フィードバック生成時の通知フォーマット更新
+- [x] アポイント判定表示（AI判定）
+- [x] Webアプリリンク追加
+- [x] 通知条件分岐（connected ≧ 60秒 / < 60秒 / reception / no_conversation）
 - 担当: バックエンドエンジニア
 - 依存: フィードバック生成ロジック実装
 
 #### [P0][M] 通話詳細ページ実装
 
-- [ ] `/app/calls/[id]/page.tsx` 作成
-- [ ] 通話詳細取得API呼び出し
-- [ ] 基本情報表示（日時、電話番号、通話時間等）
-- [ ] フィードバック表示
-- [ ] 文字起こしテキスト表示
-- [ ] 音声ファイル再生プレーヤー
+- [x] `/app/calls/[id]/page.tsx` 作成
+- [x] 通話詳細取得API呼び出し
+- [x] 基本情報表示（日時、電話番号、通話時間等）
+- [x] フィードバック表示
+- [x] 文字起こしテキスト表示
+- [x] 音声ファイル再生プレーヤー
 - 担当: フロントエンドエンジニア
 - 依存: フィードバック生成ロジック実装
 
 #### [P0][M] 通話詳細取得API
 
-- [ ] `GET /api/calls/:id` 実装
-- [ ] `calls` テーブルから取得
-- [ ] プロンプトバージョン情報JOIN
-- [ ] 音声ファイル署名URL生成
-- [ ] RLS確認
+- [x] `GET /api/calls/:id` 実装
+- [x] `calls` テーブルから取得
+- [x] プロンプトバージョン情報JOIN
+- [x] 音声ファイル署名URL生成
+- [x] RLS確認
 - 担当: バックエンドエンジニア
 - 依存: フィードバック生成ロジック実装
 
