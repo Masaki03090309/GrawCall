@@ -18,6 +18,7 @@ Zoom Phone通話録音を自動処理し、営業フィードバック生成、�
 ## 技術スタック
 
 ### Frontend
+
 - Next.js 14 (App Router)
 - TypeScript
 - shadcn/ui + Tailwind CSS
@@ -25,17 +26,20 @@ Zoom Phone通話録音を自動処理し、営業フィードバック生成、�
 - Zustand
 
 ### Backend
+
 - Cloud Run (Node.js/TypeScript)
 - Express.js
 - Supabase (PostgreSQL + Auth + pgvector)
 
 ### AI/ML
+
 - OpenAI Whisper (transcription)
 - OpenAI GPT-5 (talk script analysis, RAG-enhanced feedback)
 - OpenAI GPT-5-mini (status detection, basic feedback, NG reason classification)
 - OpenAI text-embedding-3-small (RAG embeddings)
 
 ### Infrastructure
+
 - Google Cloud Storage (audio files)
 - Cloud Pub/Sub (async processing)
 - Vercel (frontend deployment)
@@ -113,7 +117,44 @@ npm run dev
 - `npm run format` - Prettier実行
 - `npm run type-check` - TypeScript型チェック
 - `npm run test` - Jest単体テスト
+- `npm run test:coverage` - テストカバレッジレポート生成
 - `npm run e2e` - Playwright E2Eテスト
+
+## CI/CD
+
+本プロジェクトはGitHub Actionsを使用した自動化されたCI/CDパイプラインを実装しています。
+
+### 自動テスト (`.github/workflows/test.yml`)
+
+Pull Requestまたはpushイベント時に自動実行:
+
+- ESLint (コード品質チェック)
+- TypeScript 型チェック
+- Jest 単体テスト (カバレッジレポート付き)
+- Next.js ビルドチェック
+- バックエンドサービス (zoom-proxy, processor) のテスト
+
+### 自動デプロイ (`.github/workflows/deploy-backend.yml`)
+
+`main` ブランチへのマージ時に自動実行:
+
+- Dockerイメージのビルド & プッシュ (Artifact Registry)
+- Cloud Runへの自動デプロイ (zoom-proxy, backend-processor)
+- Pub/Subサブスクリプションの更新
+
+### 必要なGitHub Secrets
+
+CI/CDを有効化するには、以下のシークレットを設定してください:
+
+| Secret                          | 説明                                  |
+| ------------------------------- | ------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase URL                          |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Anon Key                     |
+| `GCP_PROJECT_ID`                | Google Cloud Project ID               |
+| `GCP_SA_KEY`                    | Service Account JSON Key              |
+| `GCP_PUBSUB_INVOKER_SA`         | Pub/Sub Invoker Service Account Email |
+
+詳細は [.github/SECRETS.md](./.github/SECRETS.md) を参照してください。
 
 ## ドキュメント
 
@@ -132,6 +173,7 @@ npm run dev
 ### GPT-5 推論モデルの注意点
 
 GPT-5/GPT-5-mini では以下のサンプリングパラメータは**サポートされていません**:
+
 - `temperature`
 - `top_p`
 - `presence_penalty`
@@ -142,6 +184,7 @@ GPT-5/GPT-5-mini では以下のサンプリングパラメータは**サポー�
 これらのパラメータを指定すると `400 Bad Request` エラーが発生します。
 
 ✅ 正しい呼び出し:
+
 ```typescript
 const completion = await openai.chat.completions.create({
   model: 'gpt-5',

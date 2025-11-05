@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 3. **RAG検索による学習資料参照** - Retrieval Augmented Generation using pgvector and OpenAI Embeddings
 4. **NG理由永久保存とトレンド分析** - Permanent storage of rejection reasons for long-term trend analysis
 
-**Current Status**: Phase 1 - M1.1 (開発環境構築) and M1.2 (データベース構築) completed. Development server running on port 7000. Next: User needs to complete Supabase project setup before proceeding to M1.3 (認証機能実装).
+**Current Status**: Phase 1 COMPLETED + M2.1 COMPLETED + M2.2 COMPLETED + M2.4 COMPLETED - M1.1 (開発環境構築 + CI/CD設定), M1.2 (データベース構築), M1.3 (認証機能実装), M1.4 (GCS・Cloud Run構築), M1.5 (基本的な通話処理フロー - 統合テスト完了 2025-11-04), M1.6 (プロジェクト・ユーザー管理 + Zoom User ID機能 + 通話一覧/詳細UI + JST表示対応), M2.1 (プロンプト管理UI), M2.2 (プロンプトバージョン管理 + 復元機能 - 完了 2025-01-05), and M2.4 (フィードバック生成実装) all completed. **統合テスト成功**: Zoom Webhook → Cloud Run Proxy → Pub/Sub → Cloud Run Processor → Whisper API → GPT-4o-mini (Status Detection + Feedback Generation) → Supabase保存フロー全て動作確認済み。**CI/CD構築完了**: GitHub Actions自動テスト・デプロイパイプライン実装済み。**Zoom User ID自動紐付け機能追加完了** (2025-11-04)。Development server running on port 7000. Full feedback system operational with AI-powered analysis using GPT-4o-mini. Call list and detail pages with JST timezone support. Prompt version history with restore functionality. Next: M2.3 (AIプロンプトアシスタント) or Phase 3 (トークスクリプト管理).
 
 ---
 
@@ -41,6 +41,7 @@ All project documentation is in `docs/`:
 ## Technology Stack
 
 ### Frontend
+
 - Next.js 14 App Router
 - TypeScript
 - shadcn/ui + Tailwind CSS
@@ -48,18 +49,21 @@ All project documentation is in `docs/`:
 - Zustand (state management)
 
 ### Backend
+
 - Cloud Run (Node.js/TypeScript)
 - Express.js
 - Supabase (PostgreSQL + Auth + Realtime)
 - pgvector (RAG implementation)
 
 ### AI/ML
+
 - OpenAI Whisper (transcription)
 - OpenAI GPT-5 (talk script analysis, RAG-enhanced feedback)
 - OpenAI GPT-5-mini (status detection, basic feedback, NG reason classification)
 - OpenAI text-embedding-3-small (RAG embeddings)
 
 ### Infrastructure
+
 - Google Cloud Storage (audio files, 6-month auto-deletion)
 - Cloud Pub/Sub (async processing)
 - Vercel (frontend deployment)
@@ -120,6 +124,7 @@ Zoom Webhook → Cloud Run (Proxy) → Cloud Pub/Sub → Cloud Run (Processor)
 ### Database Key Design Patterns
 
 **11 Tables with RLS**:
+
 - `users`, `projects`, `project_members` - User/project management
 - `prompts`, `talk_scripts`, `talk_script_hearing_items` - Content management with versioning
 - `learning_materials`, `learning_material_embeddings` - RAG implementation
@@ -127,6 +132,7 @@ Zoom Webhook → Cloud Run (Proxy) → Cloud Pub/Sub → Cloud Run (Processor)
 - `ng_reasons`, `ng_reason_logs` - NG reason master + permanent logs (`ON DELETE SET NULL`)
 
 **RLS Pattern**:
+
 ```sql
 -- Users can only see their own calls, or:
 -- Directors see all calls in their projects, or:
@@ -142,6 +148,7 @@ USING (
 ### トークスクリプト因果関係ロジック
 
 **Pattern A: ヒアリング不足が根本原因**
+
 ```
 IF hearing < 60% AND (proposal < 30% OR closing < 30%)
 THEN 根本原因: ヒアリング不足
@@ -149,6 +156,7 @@ THEN 根本原因: ヒアリング不足
 ```
 
 **Pattern B: 提案力不足**
+
 ```
 IF hearing >= 60% AND proposal < 50%
 THEN 根本原因: 提案力不足
@@ -156,6 +164,7 @@ THEN 根本原因: 提案力不足
 ```
 
 **Pattern C: クロージング不足**
+
 ```
 IF hearing >= 60% AND proposal >= 60% AND closing < 50%
 THEN 根本原因: クロージング不足
@@ -213,11 +222,14 @@ THEN 根本原因: クロージング不足
    - Note any deviations from the original plan
 
 4. **Example of Task Update**:
+
    ```markdown
    # Before
+
    - [ ] Next.js 14プロジェクト初期化
 
    # After
+
    - [x] Next.js 14プロジェクト初期化
    ```
 
@@ -231,18 +243,20 @@ THEN 根本原因: クロージング不足
 ### TypeScript Patterns
 
 **Always use Zod for validation**:
+
 ```typescript
 import { z } from 'zod'
 
 const CreateProjectSchema = z.object({
   name: z.string().min(1).max(255),
-  slack_webhook_url: z.string().url().optional()
+  slack_webhook_url: z.string().url().optional(),
 })
 
 type CreateProjectInput = z.infer<typeof CreateProjectSchema>
 ```
 
 **API Route Pattern**:
+
 ```typescript
 export async function POST(request: NextRequest) {
   try {
@@ -265,6 +279,7 @@ export async function POST(request: NextRequest) {
 ### Supabase Query Patterns
 
 **Always leverage RLS**:
+
 ```typescript
 // RLS automatically filters based on auth.uid()
 const { data } = await supabase
@@ -275,12 +290,13 @@ const { data } = await supabase
 ```
 
 **RAG Search with pgvector**:
+
 ```typescript
 const { data } = await supabase.rpc('match_learning_materials', {
   query_embedding: embedding, // from OpenAI Embedding API
   match_threshold: 0.7,
   match_count: 5,
-  project_id: projectId
+  project_id: projectId,
 })
 ```
 
@@ -300,6 +316,7 @@ const { data } = await supabase.rpc('match_learning_materials', {
    - Talk script hearing items: Max 10 items (including default "現在の課題")
 
 4. **Feedback Generation Conditions**:
+
    ```
    IF status == 'connected' AND duration >= 60 seconds:
      Generate feedback (GPT-5 with RAG OR GPT-5-mini without RAG)
@@ -330,11 +347,13 @@ const { data } = await supabase.rpc('match_learning_materials', {
 ## Testing Requirements
 
 **Coverage Goals**:
+
 - Unit tests: 80%+
 - Integration tests: 100% of critical flows
 - E2E tests: 100% of critical user paths
 
 **Test Stack**:
+
 - Jest + React Testing Library (frontend unit)
 - Jest + Supertest (backend unit)
 - Playwright (E2E)

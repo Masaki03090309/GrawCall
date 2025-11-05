@@ -28,6 +28,9 @@ yarn-error.log*
 .env*.local
 .env.production
 
+# MCP Configuration (contains sensitive tokens)
+.mcp.json
+
 # Vercel
 .vercel
 
@@ -44,6 +47,8 @@ next-env.d.ts
 
 # GCP
 service-account-key.json
+gcp-service-account.json
+zoom-phone-feedback-*.json
 *.json.key
 
 # Supabase
@@ -54,3 +59,9 @@ supabase/.temp
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Windows reserved files
+nul
+*temp*.txt
+*temp*.json
+[C-Z]:temp*

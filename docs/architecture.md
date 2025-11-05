@@ -22,6 +22,7 @@
 Zoom Phone通話録音を自動処理し、営業フィードバック生成、感情分析、KPI管理を統合したWebアプリケーション。
 
 ### アーキテクチャパターン
+
 - **フロントエンド**: SPA（Single Page Application）
 - **バックエンド**: マイクロサービス + サーバーレス
 - **データベース**: PostgreSQL（Supabase）
@@ -92,12 +93,14 @@ Zoom Phone通話録音を自動処理し、営業フィードバック生成、�
 ### 1. フロントエンド（Next.js）
 
 **責務**:
+
 - ユーザーインターフェース提供
 - クライアントサイドルーティング
 - サーバーサイドレンダリング
 - API Routesによるバックエンド連携
 
 **主要ページ**:
+
 ```
 /app
 ├── (auth)
@@ -119,6 +122,7 @@ Zoom Phone通話録音を自動処理し、営業フィードバック生成、�
 ```
 
 **API Routes**:
+
 ```
 /app/api
 ├── auth/
@@ -137,16 +141,19 @@ Zoom Phone通話録音を自動処理し、営業フィードバック生成、�
 #### 2.1 Zoom Proxy Service
 
 **責務**:
+
 - Zoom Webhook受信・検証
 - イベント振り分け
 - Backend Processorへの非同期処理依頼
 
 **技術**:
+
 - Node.js / TypeScript
 - Express.js
 - Cloud Pub/Sub（非同期キュー）
 
 **処理フロー**:
+
 ```
 1. Zoom Webhookを受信
 2. 署名検証
@@ -160,42 +167,39 @@ Zoom Phone通話録音を自動処理し、営業フィードバック生成、�
 #### 2.2 Backend Processor Service
 
 **責務**:
+
 - 通話録音の処理
 - AI分析（文字起こし、判定、フィードバック生成）
 - データベース保存
 - Slack通知
 
 **技術**:
+
 - Node.js / TypeScript
 - OpenAI SDK
 - Google Cloud Storage SDK
 - Supabase Client
 
 **処理フロー**:
+
 ```typescript
 async function processCall(callId: string) {
   // 1. 音声ダウンロード
-  const audioBuffer = await downloadAudioFromZoom(callId);
-  await uploadToGCS(audioBuffer, `calls/${callId}.mp3`);
+  const audioBuffer = await downloadAudioFromZoom(callId)
+  await uploadToGCS(audioBuffer, `calls/${callId}.mp3`)
 
   // 2. 文字起こし（Whisper API）
-  const transcript = await transcribeAudio(audioBuffer);
-  await uploadToGCS(transcript, `calls/${callId}.srt`);
+  const transcript = await transcribeAudio(audioBuffer)
+  await uploadToGCS(transcript, `calls/${callId}.srt`)
 
   // 3. 並列処理
-  const [
-    status,
-    emotionAnalysis,
-    ragResults,
-    ngReasonTrends,
-    scriptAnalysis
-  ] = await Promise.all([
-    determineStatus(transcript),          // GPT-5-mini
-    analyzeEmotion(audioBuffer),          // 音声周波数解析
-    searchLearningMaterials(transcript),  // RAG検索
-    getNgReasonTrends(projectId),         // NG理由集計
-    analyzeTalkScript(transcript, talkScript) // GPT-5
-  ]);
+  const [status, emotionAnalysis, ragResults, ngReasonTrends, scriptAnalysis] = await Promise.all([
+    determineStatus(transcript), // GPT-5-mini
+    analyzeEmotion(audioBuffer), // 音声周波数解析
+    searchLearningMaterials(transcript), // RAG検索
+    getNgReasonTrends(projectId), // NG理由集計
+    analyzeTalkScript(transcript, talkScript), // GPT-5
+  ])
 
   // 4. フィードバック生成判定
   if (status === 'connected' && duration >= 60) {
@@ -204,15 +208,15 @@ async function processCall(callId: string) {
       scriptAnalysis,
       ragResults,
       ngReasonTrends,
-      useGPT5: ragResults.length > 0
-    });
+      useGPT5: ragResults.length > 0,
+    })
 
     // 5. AI判定
     const [appointment, validLead, ngReason] = await Promise.all([
       judgeAppointment(transcript),
       judgeValidLead(transcript),
-      judgeNgReason(transcript, existingReasons)
-    ]);
+      judgeNgReason(transcript, existingReasons),
+    ])
 
     // 6. データベース保存
     await saveCall({
@@ -221,21 +225,21 @@ async function processCall(callId: string) {
       scriptAnalysis,
       appointment,
       validLead,
-      ngReason
-    });
+      ngReason,
+    })
 
     // 7. Slack通知
     await notifySlack(projectWebhookUrl, {
       status: 'connected',
       feedback,
-      callUrl: `https://app.com/calls/${callId}`
-    });
+      callUrl: `https://app.com/calls/${callId}`,
+    })
   } else {
     // フィードバック生成なし
     await notifySlack(projectWebhookUrl, {
       status: status === 'connected' ? 'つながっただけ' : status,
-      callUrl: `https://app.com/calls/${callId}`
-    });
+      callUrl: `https://app.com/calls/${callId}`,
+    })
   }
 }
 ```
@@ -245,21 +249,20 @@ async function processCall(callId: string) {
 #### 2.3 Worker Jobs Service
 
 **責務**:
+
 - 定期実行ジョブ
 - データクリーンアップ
 - 集計処理
 
 **ジョブ一覧**:
+
 ```typescript
 // 1. 6ヶ月後のデータ削除（毎日2時実行）
 async function cleanupOldCalls() {
-  const sixMonthsAgo = new Date();
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  const sixMonthsAgo = new Date()
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
-  await supabase
-    .from('calls')
-    .delete()
-    .lt('call_time', sixMonthsAgo.toISOString());
+  await supabase.from('calls').delete().lt('call_time', sixMonthsAgo.toISOString())
 }
 
 // 2. GCS Lifecycle設定（自動）
@@ -435,18 +438,21 @@ sequenceDiagram
 ### 水平スケーリング
 
 **Cloud Run**:
+
 - 最小インスタンス: 1
 - 最大インスタンス: 100
 - 同時リクエスト数: 80/インスタンス
 - オートスケーリング: CPU使用率60%
 
 **Supabase**:
+
 - Connection pooling: PgBouncer
 - Read replica: 必要に応じて追加
 
 ### 垂直スケーリング
 
 **Cloud Run**:
+
 - CPU: 2 vCPU
 - Memory: 4 GiB
 - リクエストタイムアウト: 300秒

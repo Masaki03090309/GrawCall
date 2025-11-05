@@ -40,7 +40,7 @@ Supabase Authを使用してトークンを取得します。
 ```javascript
 const { data, error } = await supabase.auth.signInWithPassword({
   email: 'user@example.com',
-  password: 'password'
+  password: 'password',
 })
 
 // data.session.access_token を使用
@@ -60,6 +60,7 @@ Authorization: Bearer <access_token>
 ### レスポンス形式
 
 **成功時**:
+
 ```json
 {
   "success": true,
@@ -68,6 +69,7 @@ Authorization: Bearer <access_token>
 ```
 
 **エラー時**:
+
 ```json
 {
   "success": false,
@@ -81,18 +83,18 @@ Authorization: Bearer <access_token>
 
 ### HTTPステータスコード
 
-| コード | 説明 |
-|--------|------|
-| 200 | 成功 |
-| 201 | 作成成功 |
-| 204 | 削除成功（レスポンスボディなし） |
-| 400 | リクエストエラー |
-| 401 | 認証エラー |
-| 403 | 権限エラー |
-| 404 | リソースが見つからない |
-| 409 | 競合エラー |
-| 422 | バリデーションエラー |
-| 500 | サーバーエラー |
+| コード | 説明                             |
+| ------ | -------------------------------- |
+| 200    | 成功                             |
+| 201    | 作成成功                         |
+| 204    | 削除成功（レスポンスボディなし） |
+| 400    | リクエストエラー                 |
+| 401    | 認証エラー                       |
+| 403    | 権限エラー                       |
+| 404    | リソースが見つからない           |
+| 409    | 競合エラー                       |
+| 422    | バリデーションエラー             |
+| 500    | サーバーエラー                   |
 
 ### ページネーション
 
@@ -103,6 +105,7 @@ Authorization: Bearer <access_token>
 ```
 
 **レスポンス例**:
+
 ```json
 {
   "success": true,
@@ -123,11 +126,13 @@ Authorization: Bearer <access_token>
 ## エンドポイント一覧
 
 ### 認証
+
 - `POST /api/auth/login` - ログイン
 - `POST /api/auth/logout` - ログアウト
 - `GET /api/auth/user` - ユーザー情報取得
 
 ### プロジェクト管理
+
 - `GET /api/projects` - プロジェクト一覧
 - `POST /api/projects` - プロジェクト作成
 - `GET /api/projects/:id` - プロジェクト詳細
@@ -138,6 +143,7 @@ Authorization: Bearer <access_token>
 - `DELETE /api/projects/:id/members/:userId` - メンバー削除
 
 ### プロンプト管理
+
 - `GET /api/prompts` - プロンプト取得
 - `POST /api/prompts` - プロンプト作成
 - `PUT /api/prompts/:id` - プロンプト更新
@@ -145,6 +151,7 @@ Authorization: Bearer <access_token>
 - `POST /api/prompts/generate` - AIプロンプト生成
 
 ### トークスクリプト管理
+
 - `GET /api/talk-scripts` - トークスクリプト取得
 - `POST /api/talk-scripts` - トークスクリプト作成
 - `PUT /api/talk-scripts/:id` - トークスクリプト更新
@@ -156,12 +163,14 @@ Authorization: Bearer <access_token>
 - `DELETE /api/talk-scripts/hearing-items/:itemId` - ヒアリング項目削除
 
 ### 学習資料管理
+
 - `GET /api/learning-materials` - 学習資料一覧
 - `POST /api/learning-materials` - 学習資料アップロード
 - `DELETE /api/learning-materials/:id` - 学習資料削除
 - `GET /api/learning-materials/:id/preview` - プレビュー
 
 ### 通話データ
+
 - `GET /api/calls` - 通話一覧
 - `GET /api/calls/:id` - 通話詳細
 - `GET /api/calls/:id/script-analysis` - トークスクリプト分析取得
@@ -170,10 +179,12 @@ Authorization: Bearer <access_token>
 - `GET /api/calls/:id/audio-url` - 音声ファイルURL取得
 
 ### KPI
+
 - `GET /api/kpi` - KPI取得
 - `GET /api/kpi/ng-reasons` - NG理由集計
 
 ### Webhook
+
 - `POST /webhook/zoom` - Zoom Webhook受信
 
 ---
@@ -185,6 +196,7 @@ Authorization: Bearer <access_token>
 ログイン（Supabase Authを使用）
 
 **リクエスト**:
+
 ```json
 {
   "email": "user@example.com",
@@ -193,6 +205,7 @@ Authorization: Bearer <access_token>
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -219,6 +232,7 @@ Authorization: Bearer <access_token>
 ログアウト
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -235,6 +249,7 @@ Authorization: Bearer <access_token>
 現在のユーザー情報取得
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -263,10 +278,12 @@ Authorization: Bearer <access_token>
 プロジェクト一覧取得
 
 **クエリパラメータ**:
+
 - `page`: ページ番号（デフォルト: 1）
 - `limit`: 1ページあたりの件数（デフォルト: 20）
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -297,6 +314,7 @@ Authorization: Bearer <access_token>
 プロジェクト作成（オーナーのみ）
 
 **リクエスト**:
+
 ```json
 {
   "name": "新規プロジェクト",
@@ -305,6 +323,7 @@ Authorization: Bearer <access_token>
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -324,6 +343,7 @@ Authorization: Bearer <access_token>
 プロジェクトメンバー一覧
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -351,6 +371,7 @@ Authorization: Bearer <access_token>
 メンバー追加
 
 **リクエスト**:
+
 ```json
 {
   "user_id": "uuid",
@@ -361,6 +382,7 @@ Authorization: Bearer <access_token>
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -382,10 +404,12 @@ Authorization: Bearer <access_token>
 プロンプト取得
 
 **クエリパラメータ**:
+
 - `project_id`: プロジェクトID（必須）
 - `type`: プロンプトタイプ（connected/reception）
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -411,6 +435,7 @@ Authorization: Bearer <access_token>
 プロンプト作成
 
 **リクエスト**:
+
 ```json
 {
   "project_id": "uuid",
@@ -421,6 +446,7 @@ Authorization: Bearer <access_token>
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -442,6 +468,7 @@ Authorization: Bearer <access_token>
 プロンプト変更履歴取得（過去10件）
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -470,6 +497,7 @@ Authorization: Bearer <access_token>
 AIプロンプト生成（音声入力から）
 
 **リクエスト**:
+
 ```json
 {
   "audio_base64": "data:audio/wav;base64,...",
@@ -478,6 +506,7 @@ AIプロンプト生成（音声入力から）
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -497,9 +526,11 @@ AIプロンプト生成（音声入力から）
 トークスクリプト取得
 
 **クエリパラメータ**:
+
 - `project_id`: プロジェクトID（必須）
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -542,6 +573,7 @@ AIプロンプト生成（音声入力から）
 トークスクリプト作成
 
 **リクエスト**:
+
 ```json
 {
   "project_id": "uuid",
@@ -561,6 +593,7 @@ AIプロンプト生成（音声入力から）
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -579,6 +612,7 @@ AIプロンプト生成（音声入力から）
 PDF取り込み（GPT-5による自動フェーズ判定）
 
 **リクエスト**:
+
 ```json
 {
   "project_id": "uuid",
@@ -588,6 +622,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -614,6 +649,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 ヒアリング項目追加
 
 **リクエスト**:
+
 ```json
 {
   "item_name": "導入時期",
@@ -623,6 +659,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -643,10 +680,12 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 学習資料一覧
 
 **クエリパラメータ**:
+
 - `project_id`: プロジェクトID（必須）
 - `material_type`: 資料タイプ（detail/case_study）
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -678,6 +717,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 学習資料アップロード
 
 **リクエスト**:
+
 ```json
 {
   "project_id": "uuid",
@@ -688,6 +728,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -709,6 +750,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 通話一覧取得
 
 **クエリパラメータ**:
+
 - `project_id`: プロジェクトID
 - `user_id`: ユーザーID（営業担当者）
 - `status`: 通話状態（connected/reception/no_conversation）
@@ -718,6 +760,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 - `limit`: 1ページあたりの件数
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -761,6 +804,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 通話詳細取得
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -818,6 +862,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 トークスクリプト分析詳細取得
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -857,6 +902,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 アポイント判定更新（ユーザー確認）
 
 **リクエスト**:
+
 ```json
 {
   "appointment_confirmed": true
@@ -864,6 +910,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -882,6 +929,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 音声ファイルのSigned URL取得
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -902,6 +950,7 @@ PDF取り込み（GPT-5による自動フェーズ判定）
 KPI取得
 
 **クエリパラメータ**:
+
 - `project_id`: プロジェクトID
 - `user_id`: ユーザーID（オプション）
 - `period`: 集計期間（daily/weekly/monthly/custom）
@@ -909,6 +958,7 @@ KPI取得
 - `date_to`: 終了日（customの場合）
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -944,11 +994,13 @@ KPI取得
 NG理由集計
 
 **クエリパラメータ**:
+
 - `project_id`: プロジェクトID（必須）
 - `date_from`: 開始日
 - `date_to`: 終了日
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -992,6 +1044,7 @@ NG理由集計
 Zoom Webhook受信
 
 **リクエスト**:
+
 ```json
 {
   "event": "recording.completed",
@@ -1019,6 +1072,7 @@ Zoom Webhook受信
 ```
 
 **レスポンス**:
+
 ```json
 {
   "success": true,
@@ -1033,20 +1087,21 @@ Zoom Webhook受信
 
 ## エラーコード一覧
 
-| コード | 説明 |
-|--------|------|
-| `UNAUTHORIZED` | 認証エラー |
-| `FORBIDDEN` | 権限エラー |
-| `NOT_FOUND` | リソースが見つからない |
-| `VALIDATION_ERROR` | バリデーションエラー |
-| `DUPLICATE_ENTRY` | 重複エラー |
+| コード                 | 説明                     |
+| ---------------------- | ------------------------ |
+| `UNAUTHORIZED`         | 認証エラー               |
+| `FORBIDDEN`            | 権限エラー               |
+| `NOT_FOUND`            | リソースが見つからない   |
+| `VALIDATION_ERROR`     | バリデーションエラー     |
+| `DUPLICATE_ENTRY`      | 重複エラー               |
 | `PROJECT_MEMBER_LIMIT` | プロジェクトメンバー上限 |
-| `FILE_TOO_LARGE` | ファイルサイズ超過 |
-| `INVALID_FILE_TYPE` | 無効なファイルタイプ |
-| `AI_PROCESSING_ERROR` | AI処理エラー |
-| `EXTERNAL_API_ERROR` | 外部APIエラー |
+| `FILE_TOO_LARGE`       | ファイルサイズ超過       |
+| `INVALID_FILE_TYPE`    | 無効なファイルタイプ     |
+| `AI_PROCESSING_ERROR`  | AI処理エラー             |
+| `EXTERNAL_API_ERROR`   | 外部APIエラー            |
 
 **エラーレスポンス例**:
+
 ```json
 {
   "success": false,
@@ -1071,6 +1126,7 @@ Zoom Webhook受信
 - **その他API**: 100リクエスト/分
 
 レート制限超過時のレスポンス:
+
 ```json
 {
   "success": false,

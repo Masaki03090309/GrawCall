@@ -85,6 +85,7 @@ pnpm dev
 ```
 
 アクセス:
+
 - フロントエンド: http://localhost:3000
 - Supabase Studio: http://localhost:54323
 
@@ -95,6 +96,7 @@ pnpm dev
 ### VS Code設定
 
 `.vscode/launch.json`:
+
 ```json
 {
   "version": "0.2.0",

@@ -54,6 +54,7 @@ gcloud services enable \
 ### 3. 環境変数設定
 
 #### Vercel
+
 ```bash
 vercel env add NEXT_PUBLIC_SUPABASE_URL
 vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -62,6 +63,7 @@ vercel env add OPENAI_API_KEY
 ```
 
 #### Cloud Run
+
 ```bash
 # Secret Managerに保存
 gcloud secrets create openai-api-key --data-file=- <<< "sk-..."
@@ -161,6 +163,7 @@ gsutil cors set cors.json gs://zoom-phone-feedback-prod
 ### GitHub Actions
 
 `.github/workflows/deploy.yml`:
+
 ```yaml
 name: Deploy to Production
 
@@ -209,6 +212,7 @@ jobs:
 ## ロールバック手順
 
 ### Vercel
+
 ```bash
 # デプロイ履歴確認
 vercel ls
@@ -218,6 +222,7 @@ vercel rollback [DEPLOYMENT_URL]
 ```
 
 ### Cloud Run
+
 ```bash
 # リビジョン一覧
 gcloud run revisions list --service backend-processor
@@ -249,8 +254,8 @@ gcloud alpha monitoring policies create \
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   environment: process.env.NODE_ENV,
-  tracesSampleRate: 0.1
-});
+  tracesSampleRate: 0.1,
+})
 ```
 
 ---

@@ -84,7 +84,7 @@ import './styles.css'
 
 ### コメント規約
 
-```typescript
+````typescript
 /**
  * 通話データを処理する関数
  *
@@ -104,7 +104,7 @@ async function processCall(callId: string, audioBuffer: Buffer) {
   // FIXME: リトライロジック追加
   // NOTE: Whisper APIのレート制限に注意
 }
-```
+````
 
 ---
 
@@ -140,7 +140,7 @@ import { z } from 'zod'
 // スキーマ定義
 const CreateProjectSchema = z.object({
   name: z.string().min(1, '必須項目です').max(255, '255文字以内で入力してください'),
-  slack_webhook_url: z.string().url('有効なURLを入力してください').optional()
+  slack_webhook_url: z.string().url('有効なURLを入力してください').optional(),
 })
 
 // 型抽出
@@ -258,14 +258,17 @@ import { z } from 'zod'
 
 const CreateProjectSchema = z.object({
   name: z.string().min(1).max(255),
-  slack_webhook_url: z.string().url().optional()
+  slack_webhook_url: z.string().url().optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
     // 1. 認証チェック
     const supabase = createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json(
@@ -279,11 +282,7 @@ export async function POST(request: NextRequest) {
     const validatedData = CreateProjectSchema.parse(body)
 
     // 3. ビジネスロジック実行
-    const { data, error } = await supabase
-      .from('projects')
-      .insert(validatedData)
-      .select()
-      .single()
+    const { data, error } = await supabase.from('projects').insert(validatedData).select().single()
 
     if (error) {
       return NextResponse.json(
@@ -293,16 +292,19 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. 成功レスポンス
-    return NextResponse.json(
-      { success: true, data },
-      { status: 201 }
-    )
-
+    return NextResponse.json({ success: true, data }, { status: 201 })
   } catch (error) {
     // 5. エラーハンドリング
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: { code: 'VALIDATION_ERROR', message: 'バリデーションエラー', details: error.errors } },
+        {
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'バリデーションエラー',
+            details: error.errors,
+          },
+        },
         { status: 422 }
       )
     }
@@ -370,8 +372,8 @@ export function createClient() {
       cookies: {
         get(name: string) {
           return cookieStore.get(name)?.value
-        }
-      }
+        },
+      },
     }
   )
 }
@@ -401,11 +403,13 @@ const { data, error } = await supabase
 // ✅ JOIN時もRLSが適用される
 const { data, error } = await supabase
   .from('calls')
-  .select(`
+  .select(
+    `
     *,
     user:users(id, name, email),
     project:projects(id, name)
-  `)
+  `
+  )
   .eq('id', callId)
   .single()
 
@@ -465,7 +469,7 @@ function Dashboard() {
 import OpenAI from 'openai'
 
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 })
 ```
 
@@ -481,7 +485,7 @@ async function transcribeAudio(audioPath: string) {
       file: fs.createReadStream(audioPath),
       model: 'whisper-1',
       language: 'ja',
-      response_format: 'srt' // または 'json', 'text', 'verbose_json', 'vtt'
+      response_format: 'srt', // または 'json', 'text', 'verbose_json', 'vtt'
     })
 
     return transcription
@@ -510,12 +514,12 @@ async function analyzeCallStatus(transcript: string) {
           content: `通話内容を分析し、以下のいずれかに分類してください:
 - connected: 担当者と会話できた
 - reception: 受付で止まった
-- no_conversation: 留守番電話または応答なし`
+- no_conversation: 留守番電話または応答なし`,
         },
         {
           role: 'user',
-          content: transcript
-        }
+          content: transcript,
+        },
       ],
       // ❌ temperature: 0.7, // 使用不可！
       // ❌ top_p: 1.0,       // 使用不可！
@@ -543,14 +547,14 @@ async function analyzeTalkScript(transcript: string, talkScript: TalkScript) {
     messages: [
       {
         role: 'system',
-        content: `トークスクリプトと実際の通話内容を比較し、JSON形式で評価してください。`
+        content: `トークスクリプトと実際の通話内容を比較し、JSON形式で評価してください。`,
       },
       {
         role: 'user',
-        content: JSON.stringify({ transcript, talkScript })
-      }
+        content: JSON.stringify({ transcript, talkScript }),
+      },
     ],
-    response_format: { type: 'json_object' }
+    response_format: { type: 'json_object' },
   })
 
   const result = JSON.parse(completion.choices[0].message.content)
@@ -558,7 +562,7 @@ async function analyzeTalkScript(transcript: string, talkScript: TalkScript) {
   return {
     overall_match_rate: result.overall_match_rate,
     phase_match_rates: result.phase_match_rates,
-    hearing_item_coverage: result.hearing_item_coverage
+    hearing_item_coverage: result.hearing_item_coverage,
   }
 }
 ```
@@ -570,7 +574,7 @@ async function createEmbedding(text: string) {
   const response = await openai.embeddings.create({
     model: 'text-embedding-3-small',
     input: text,
-    encoding_format: 'float' // または 'base64'
+    encoding_format: 'float', // または 'base64'
   })
 
   return response.data[0].embedding // number[]
@@ -580,7 +584,7 @@ async function createEmbedding(text: string) {
 async function createBatchEmbeddings(texts: string[]) {
   const response = await openai.embeddings.create({
     model: 'text-embedding-3-small',
-    input: texts // 最大2048個まで
+    input: texts, // 最大2048個まで
   })
 
   return response.data.map(d => d.embedding)
@@ -632,7 +636,7 @@ import { Storage } from '@google-cloud/storage'
 
 export const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID,
-  keyFilename: process.env.GCP_KEY_FILE // または credentials オブジェクト
+  keyFilename: process.env.GCP_KEY_FILE, // または credentials オブジェクト
 })
 
 export const bucket = storage.bucket(process.env.GCS_BUCKET_NAME!)
@@ -643,10 +647,7 @@ export const bucket = storage.bucket(process.env.GCS_BUCKET_NAME!)
 ```typescript
 import { bucket } from '@/lib/gcs'
 
-async function uploadAudioToGCS(
-  audioBuffer: Buffer,
-  callId: string
-): Promise<string> {
+async function uploadAudioToGCS(audioBuffer: Buffer, callId: string): Promise<string> {
   const filePath = `calls/${callId}/audio.mp3`
   const file = bucket.file(filePath)
 
@@ -655,9 +656,9 @@ async function uploadAudioToGCS(
       contentType: 'audio/mpeg',
       metadata: {
         callId,
-        uploadedAt: new Date().toISOString()
-      }
-    }
+        uploadedAt: new Date().toISOString(),
+      },
+    },
   })
 
   // 公開URLまたは署名URL返却
@@ -675,7 +676,7 @@ async function getSignedUrl(filePath: string): Promise<string> {
   const [signedUrl] = await file.getSignedUrl({
     version: 'v4',
     action: 'read',
-    expires: Date.now() + 60 * 60 * 1000 // 1時間
+    expires: Date.now() + 60 * 60 * 1000, // 1時間
   })
 
   return signedUrl
@@ -687,19 +688,18 @@ async function getSignedUrl(filePath: string): Promise<string> {
 ```typescript
 import { Readable } from 'stream'
 
-async function uploadStreamToGCS(
-  stream: Readable,
-  filePath: string
-): Promise<void> {
+async function uploadStreamToGCS(stream: Readable, filePath: string): Promise<void> {
   const file = bucket.file(filePath)
 
   return new Promise((resolve, reject) => {
     stream
-      .pipe(file.createWriteStream({
-        metadata: {
-          contentType: 'audio/mpeg'
-        }
-      }))
+      .pipe(
+        file.createWriteStream({
+          metadata: {
+            contentType: 'audio/mpeg',
+          },
+        })
+      )
       .on('error', reject)
       .on('finish', resolve)
   })
@@ -772,8 +772,8 @@ export async function POST(request: NextRequest) {
           error: {
             code: error.code,
             message: error.message,
-            details: error.details
-          }
+            details: error.details,
+          },
         },
         { status: error.statusCode }
       )
@@ -787,8 +787,8 @@ export async function POST(request: NextRequest) {
           error: {
             code: 'VALIDATION_ERROR',
             message: 'バリデーションエラー',
-            details: error.errors
-          }
+            details: error.errors,
+          },
         },
         { status: 422 }
       )
@@ -801,8 +801,8 @@ export async function POST(request: NextRequest) {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: '内部エラーが発生しました'
-        }
+          message: '内部エラーが発生しました',
+        },
       },
       { status: 500 }
     )
@@ -822,7 +822,7 @@ async function handleCreateProject(data: CreateProjectInput) {
     const response = await fetch('/api/projects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     })
 
     const result = await response.json()
@@ -842,7 +842,6 @@ async function handleCreateProject(data: CreateProjectInput) {
     // 成功処理
     toast.success('プロジェクトを作成しました')
     router.push(`/projects/${result.data.id}`)
-
   } catch (error) {
     console.error('Network error:', error)
     toast.error('ネットワークエラーが発生しました')
@@ -878,14 +877,11 @@ const API_KEY = process.env.NEXT_PUBLIC_OPENAI_API_KEY // ❌ 危険！
 
 ```typescript
 // ✅ Supabaseのパラメータ化クエリ（安全）
-const { data } = await supabase
-  .from('calls')
-  .select('*')
-  .eq('user_id', userId) // 自動的にエスケープされる
+const { data } = await supabase.from('calls').select('*').eq('user_id', userId) // 自動的にエスケープされる
 
 // ❌ 生SQL（使用しない）
 const { data } = await supabase.rpc('raw_query', {
-  query: `SELECT * FROM calls WHERE user_id = '${userId}'` // ❌ SQL Injection の危険性
+  query: `SELECT * FROM calls WHERE user_id = '${userId}'`, // ❌ SQL Injection の危険性
 })
 ```
 
@@ -920,10 +916,7 @@ export async function POST(request: NextRequest) {
 
   // オリジン検証
   if (origin && !ALLOWED_ORIGINS.includes(origin)) {
-    return NextResponse.json(
-      { error: 'Invalid origin' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 })
   }
 
   // ...
@@ -946,7 +939,7 @@ describe('calculateOverallMatchRate', () => {
       opening: 85,
       hearing: 68,
       proposal: 78,
-      closing: 73
+      closing: 73,
     }
 
     const result = calculateOverallMatchRate(phaseRates)
@@ -959,7 +952,7 @@ describe('calculateOverallMatchRate', () => {
       opening: 100,
       hearing: 0,
       proposal: 50,
-      closing: 50
+      closing: 50,
     }
 
     const result = calculateOverallMatchRate(phaseRates)
@@ -982,8 +975,8 @@ describe('/api/projects POST', () => {
       method: 'POST',
       json: async () => ({
         name: 'テストプロジェクト',
-        slack_webhook_url: 'https://hooks.slack.com/test'
-      })
+        slack_webhook_url: 'https://hooks.slack.com/test',
+      }),
     })
 
     const response = await POST(req)
@@ -997,7 +990,7 @@ describe('/api/projects POST', () => {
   it('バリデーションエラーを返す', async () => {
     const { req } = createMocks({
       method: 'POST',
-      json: async () => ({ name: '' }) // 空文字
+      json: async () => ({ name: '' }), // 空文字
     })
 
     const response = await POST(req)
@@ -1131,9 +1124,7 @@ for (const call of calls.data) {
 }
 
 // ✅ JOIN で一度に取得
-const { data: calls } = await supabase
-  .from('calls')
-  .select(`
+const { data: calls } = await supabase.from('calls').select(`
     *,
     user:users(id, name, email)
   `)
@@ -1153,10 +1144,7 @@ const { data: calls } = await supabase
 
 ```typescript
 // デバッグモード有効化
-const { data, error } = await supabase
-  .from('calls')
-  .select('*')
-  .eq('id', callId)
+const { data, error } = await supabase.from('calls').select('*').eq('id', callId)
 
 console.log('Query:', supabase.from('calls').select('*').eq('id', callId).toString())
 console.log('Data:', data)

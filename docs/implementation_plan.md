@@ -40,13 +40,13 @@
 
 ### チーム構成（推奨）
 
-| ロール | 人数 | 責任範囲 |
-|--------|------|---------|
-| **フロントエンドエンジニア** | 2名 | Next.js、UI/UX実装 |
-| **バックエンドエンジニア** | 2名 | Cloud Run、API、AI統合 |
-| **データベースエンジニア** | 1名 | Supabase、pgvector、RLS |
-| **DevOpsエンジニア** | 1名 | GCP、CI/CD、監視 |
-| **プロジェクトマネージャー** | 1名 | 進捗管理、要件調整 |
+| ロール                       | 人数 | 責任範囲                |
+| ---------------------------- | ---- | ----------------------- |
+| **フロントエンドエンジニア** | 2名  | Next.js、UI/UX実装      |
+| **バックエンドエンジニア**   | 2名  | Cloud Run、API、AI統合  |
+| **データベースエンジニア**   | 1名  | Supabase、pgvector、RLS |
+| **DevOpsエンジニア**         | 1名  | GCP、CI/CD、監視        |
+| **プロジェクトマネージャー** | 1名  | 進捗管理、要件調整      |
 
 ---
 
@@ -102,15 +102,22 @@
 
 - [x] Next.js 14プロジェクト初期化
 - [x] TypeScript + ESLint + Prettier設定
-- [ ] Supabaseプロジェクト作成
-- [ ] GCPプロジェクト作成
-- [ ] GitHub Repositoryセットアップ
-- [ ] CI/CD基本設定（GitHub Actions）
+- [x] Supabaseプロジェクト作成
+- [x] GCPプロジェクト作成
+- [x] GitHub Repositoryセットアップ
+- [x] CI/CD基本設定（GitHub Actions）
 
 **成果物**:
+
 - [x] `package.json` 完成
 - [x] `.env.example` 完成
 - [x] `README.md` セットアップ手順記載
+- [x] GCPプロジェクト: `zoom-phone-feedback`
+- [x] サービスアカウント: `zoom-phone-backend`
+- [x] `.github/workflows/test.yml` 作成（自動テスト）
+- [x] `.github/workflows/deploy-backend.yml` 作成（自動デプロイ）
+- [x] `.github/SECRETS.md` 作成（GitHub Secrets設定ガイド）
+- [x] `jest.config.js` + `jest.setup.js` 作成
 
 ---
 
@@ -124,6 +131,7 @@
 - [x] マイグレーションスクリプト作成
 
 **成果物**:
+
 - [x] `supabase/migrations/` 配下のSQLファイル
 - [x] データベース設計書との整合性確認
 
@@ -131,76 +139,109 @@
 
 #### M1.3: 認証機能実装（1週間）
 
-- [ ] Supabase Auth設定
-- [ ] Google OAuth設定
-- [ ] Email/Passwordログイン実装
-- [ ] Next.js Middlewareで認証チェック
-- [ ] ログインページ実装
-- [ ] ユーザー情報取得API実装
+- [x] Supabase Auth設定
+- [x] Google OAuth設定
+- [x] Email/Passwordログイン実装
+- [x] Next.js Middlewareで認証チェック
+- [x] ログインページ実装
+- [x] ユーザー情報取得API実装
 
 **成果物**:
-- `/app/login/page.tsx`
-- `/app/api/auth/*` API Routes
-- `middleware.ts`
+
+- [x] `/app/login/page.tsx`
+- [x] `/app/api/auth/*` API Routes
+- [x] `middleware.ts`
 
 ---
 
 #### M1.4: GCS・Cloud Run構築（1週間）
 
-- [ ] GCSバケット作成
-- [ ] Lifecycle設定（6ヶ月自動削除）
-- [ ] Cloud Run: Zoom Proxy Service デプロイ
-- [ ] Cloud Run: Backend Processor Service デプロイ
-- [ ] Cloud Pub/Sub設定
-- [ ] 環境変数管理（Secret Manager）
+- [x] GCSバケット作成
+- [x] Lifecycle設定（6ヶ月自動削除）
+- [x] Cloud Run: Zoom Proxy Service デプロイ
+- [x] Cloud Run: Backend Processor Service デプロイ
+- [x] Cloud Pub/Sub設定
+- [x] 環境変数管理（Secret Manager）
 
 **成果物**:
-- `backend/zoom-proxy/` 初期実装
-- `backend/processor/` 初期実装
-- `Dockerfile` × 2
-- GCS Lifecycle設定ファイル
+
+- [x] `backend/zoom-proxy/` 初期実装
+- [x] `backend/processor/` 初期実装
+- [x] `Dockerfile` × 2
+- [x] GCS Lifecycle設定ファイル
+- [x] Zoom Proxy URL: `https://zoom-proxy-421962770379.asia-northeast1.run.app`
+- [x] Backend Processor URL: `https://backend-processor-421962770379.asia-northeast1.run.app`
 
 ---
 
 #### M1.5: 基本的な通話処理フロー（2週間）
 
-- [ ] Zoom Webhook受信実装
-- [ ] 音声ダウンロード実装
-- [ ] GCS保存実装
-- [ ] Whisper API連携（文字起こし）
-- [ ] GPT-5-mini連携（通話状態判定）
-- [ ] Supabaseへのメタデータ保存
-- [ ] Slack通知実装（基本版）
+- [x] Zoom Webhook受信実装
+- [x] 音声ダウンロード実装
+- [x] GCS保存実装
+- [x] Whisper API連携（文字起こし）
+- [x] GPT-4o-mini連携（通話状態判定）
+- [x] Supabaseへのメタデータ保存
+- [x] Slack通知実装（基本版）
 
 **成果物**:
-- `/webhook/zoom` エンドポイント
-- Backend Processor 完成
-- `calls` テーブルへのデータ保存確認
+
+- [x] `/webhook/zoom` エンドポイント（Zoom Proxy経由）
+- [x] Backend Processor 完成（5ステップ処理フロー）
+- [x] `audioDownloader.ts` - Zoom音声ダウンロード＆GCS保存
+- [x] `transcription.ts` - Whisper API文字起こし
+- [x] `statusDetection.ts` - GPT-4o-mini通話状態判定
+- [x] `slackNotification.ts` - Slack通知
+- [x] `calls` テーブルへのデータ保存確認
 
 ---
 
 #### M1.6: プロジェクト・ユーザー管理（1週間）
 
-- [ ] プロジェクト一覧ページ
-- [ ] プロジェクト作成・編集・削除
-- [ ] メンバー管理UI
-- [ ] ロール管理（オーナー/ディレクター/ユーザー）
-- [ ] RLSによるアクセス制御確認
+- [x] プロジェクト一覧ページ
+- [x] プロジェクト作成・編集・削除
+- [x] メンバー管理UI
+- [x] ロール管理（オーナー/ディレクター/ユーザー）
+- [x] RLSによるアクセス制御確認
+- [x] Zoom User ID機能追加（ユーザー自動紐付け対応）
+- [x] 通話一覧ページ実装
+- [x] 通話詳細ページ実装
+- [x] 通話日時のJST表示対応
 
 **成果物**:
-- `/app/projects/*` ページ
-- `/app/api/projects/*` API Routes
+
+- [x] `/app/(dashboard)/projects/page.tsx` - プロジェクト一覧ページ
+- [x] `/app/(dashboard)/projects/new/page.tsx` - プロジェクト作成ページ
+- [x] `/app/(dashboard)/projects/[id]/page.tsx` - プロジェクト詳細・編集ページ
+- [x] `/app/(dashboard)/projects/[id]/members/page.tsx` - メンバー管理ページ
+- [x] `/app/(dashboard)/users/page.tsx` - ユーザーロール管理ページ（オーナー専用、Zoom User ID編集機能付き）
+- [x] `/app/(dashboard)/calls/page.tsx` - 通話一覧ページ（JST表示対応）
+- [x] `/app/(dashboard)/calls/[id]/page.tsx` - 通話詳細ページ（音声再生、文字起こし、フィードバック表示）
+- [x] `/app/api/projects/route.ts` - プロジェクトAPI（GET, POST）
+- [x] `/app/api/projects/[id]/route.ts` - 個別プロジェクトAPI（GET, PUT, DELETE）
+- [x] `/app/api/projects/[id]/members/route.ts` - メンバー管理API（GET, POST）
+- [x] `/app/api/projects/[id]/members/[userId]/route.ts` - メンバー削除API（DELETE）
+- [x] `/app/api/users/route.ts` - ユーザー一覧API（GET）
+- [x] `/app/api/users/[id]/route.ts` - ユーザー詳細・ロール更新API（GET, PUT、zoom_user_id対応）
+- [x] `/app/api/calls/route.ts` - 通話一覧API（GET、RLSフィルタリング）
+- [x] `/app/api/calls/[id]/route.ts` - 通話詳細API（GET、署名付きURL生成）
+- [x] `supabase/migrations/20250104_002_add_zoom_user_id.sql` - Zoom User IDカラム追加
+- [x] `backend/processor/src/processor.ts` - Zoom User ID自動紐付けロジック（Step 0追加）
 
 ---
 
 ### フェーズ1完了条件
 
-- [ ] ユーザーがログインできる
-- [ ] Zoom Webhookを受信し、通話データが保存される
-- [ ] 文字起こしが完了し、GCSに保存される
-- [ ] 通話状態判定（connected/reception/no_conversation）が動作する
-- [ ] プロジェクト・メンバー管理ができる
-- [ ] 全ユニットテストがパス（カバレッジ80%以上）
+- [x] ユーザーがログインできる
+- [x] Zoom Webhookを受信し、通話データが保存される
+- [x] 文字起こしが完了し、GCSに保存される
+- [x] 通話状態判定（connected/reception/no_conversation）が動作する
+- [x] プロジェクト・メンバー管理ができる
+- [x] CI/CD設定完了（GitHub Actions）
+- [ ] 全ユニットテストがパス（カバレッジ80%以上）- **Phase 7で実施**
+
+**統合テスト完了日**: 2025-11-04
+**テスト結果**: Zoom Webhook → Pub/Sub → Cloud Run Processor → Supabase保存フロー成功確認
 
 ---
 
@@ -213,29 +254,39 @@
 
 #### M2.1: プロンプト管理UI（1週間）
 
-- [ ] プロンプト一覧ページ
-- [ ] プロンプト作成・編集フォーム
-- [ ] マークダウンエディタ統合
-- [ ] 文字数カウンター表示
-- [ ] プロンプトタイプ切り替え（connected/reception）
+- [x] プロンプト一覧ページ
+- [x] プロンプト作成・編集フォーム
+- [x] マークダウンエディタ統合
+- [x] 文字数カウンター表示
+- [x] プロンプトタイプ切り替え（connected/reception）
 
 **成果物**:
-- `/app/projects/[id]/prompts/page.tsx`
-- `/app/api/prompts/*` API Routes
+
+- [x] `/app/(dashboard)/projects/[id]/prompts/page.tsx` - プロンプト一覧ページ（タブ表示）
+- [x] `/app/(dashboard)/projects/[id]/prompts/new/page.tsx` - プロンプト作成ページ（MDエディタ）
+- [x] `/app/(dashboard)/projects/[id]/prompts/[promptId]/edit/page.tsx` - プロンプト編集ページ
+- [x] `/app/(dashboard)/projects/[id]/prompts/[promptId]/history/page.tsx` - プロンプト履歴ページ
+- [x] `/app/api/prompts/route.ts` - プロンプト一覧取得・作成API
+- [x] `/app/api/prompts/[id]/route.ts` - 個別プロンプト取得・更新・削除API
+- [x] `/app/api/prompts/[id]/history/route.ts` - プロンプト履歴取得API
 
 ---
 
 #### M2.2: プロンプトバージョン管理（1週間）
 
-- [ ] 変更履歴表示（過去10件）
-- [ ] バージョン復元機能
-- [ ] 変更コメント記録
-- [ ] `is_active` フラグ管理
-- [ ] トリガーによる自動バージョン管理
+- [x] 変更履歴表示（過去10件）
+- [x] バージョン復元機能
+- [x] 変更コメント記録
+- [x] `is_active` フラグ管理
+- [x] トリガーによる自動バージョン管理（データベース実装済み）
 
 **成果物**:
-- 履歴表示UI
-- バージョン復元機能
+
+- [x] `/app/api/prompts/[id]/history/route.ts` - 履歴取得API（完成）
+- [x] `/app/api/prompts/[id]/restore/route.ts` - バージョン復元API（完成）
+- [x] `/app/(dashboard)/projects/[id]/prompts/[promptId]/history/page.tsx` - 履歴表示UI（復元ボタン付き）
+
+**完了日**: 2025-01-05
 
 ---
 
@@ -248,6 +299,7 @@
 - [ ] プロンプト保存
 
 **成果物**:
+
 - `/app/api/prompts/generate` エンドポイント
 - 音声録音コンポーネント
 
@@ -255,15 +307,27 @@
 
 #### M2.4: フィードバック生成実装（1週間）
 
-- [ ] GPT-5-mini連携（基本フィードバック生成）
-- [ ] プロンプト取得ロジック（プロジェクト固有 or デフォルト）
-- [ ] フィードバック生成条件判定
-- [ ] Slack通知にフィードバック追加
-- [ ] 通話詳細ページにフィードバック表示
+- [x] GPT-4o-mini連携（基本フィードバック生成）
+- [x] プロンプト取得ロジック（プロジェクト固有 or デフォルト）
+- [x] フィードバック生成条件判定（status='connected' AND duration>=60秒）
+- [x] Slack通知にフィードバック追加
+- [x] 通話詳細ページにフィードバック表示（Markdown形式、タブUI）
 
 **成果物**:
-- Backend Processor: フィードバック生成ロジック
-- `/app/calls/[id]/page.tsx` フィードバック表示
+
+- [x] `backend/processor/src/services/feedbackGeneration.ts` - フィードバック生成ロジック
+- [x] `backend/processor/src/processor.ts` - Step 4.5: フィードバック生成統合
+- [x] `/app/(dashboard)/calls/[id]/page.tsx` - フィードバック表示UI（react-markdown使用）
+- [x] デフォルトプロンプト作成（connected/reception用）
+
+**実装詳細**:
+
+- OpenAI GPT-4o-miniモデル使用
+- フィードバック生成条件: connected通話で60秒以上
+- プロンプトバージョン履歴対応（`prompt_version_id`でリンク）
+- Slack通知にフィードバックテキスト含む
+
+**完了日**: 2025-11-04
 
 ---
 
@@ -293,6 +357,7 @@
 - [ ] 表示順序のドラッグ&ドロップ
 
 **成果物**:
+
 - `/app/projects/[id]/talk-scripts/page.tsx`
 - `/app/api/talk-scripts/*` API Routes
 
@@ -308,6 +373,7 @@
 - [ ] OCRフォールバック（Tesseract等）
 
 **成果物**:
+
 - `/app/api/talk-scripts/import-pdf` エンドポイント
 - GPT-5によるフェーズ判定プロンプト
 
@@ -322,6 +388,7 @@
 - [ ] 分析結果の通話詳細ページ表示
 
 **成果物**:
+
 - Backend Processor: トークスクリプト分析ロジック
 - GPT-5プロンプト設計
 - 通話詳細ページに一致率表示
@@ -338,6 +405,7 @@
 - [ ] GPT-5へのシステムプロンプト更新
 
 **成果物**:
+
 - 因果関係ロジック実装
 - 統合フィードバック生成
 
@@ -370,6 +438,7 @@
 - [ ] 削除機能
 
 **成果物**:
+
 - `/app/projects/[id]/learning-materials/page.tsx`
 - `/app/api/learning-materials/*` API Routes
 
@@ -385,6 +454,7 @@
 - [ ] バッチ処理（大量データ対応）
 
 **成果物**:
+
 - Backend Processor: Embedding処理
 - チャンキングロジック
 
@@ -399,6 +469,7 @@
 - [ ] 検索パフォーマンスチューニング
 
 **成果物**:
+
 - RAG検索関数（Supabase Function or Backend）
 - ベクトル検索クエリ
 
@@ -413,6 +484,7 @@
 - [ ] フィードバック品質確認
 
 **成果物**:
+
 - RAG統合フィードバック生成ロジック
 - GPT-5プロンプト更新
 
@@ -445,6 +517,7 @@
 - [ ] API実装（`/api/kpi`）
 
 **成果物**:
+
 - `/app/api/kpi/*` API Routes
 - KPI集計クエリ
 
@@ -460,6 +533,7 @@
 - [ ] Recharts統合
 
 **成果物**:
+
 - `/app/dashboard/page.tsx`
 - グラフコンポーネント
 
@@ -475,6 +549,7 @@
 - [ ] 時系列グラフ（トレンド分析）
 
 **成果物**:
+
 - Backend Processor: NG理由判定ロジック
 - NG理由分析UI
 
@@ -488,6 +563,7 @@
 - [ ] トースト通知（新しい通話データ）
 
 **成果物**:
+
 - Realtime Subscription実装
 - リアルタイム更新ロジック
 
@@ -519,6 +595,7 @@
 - [ ] 採用API決定
 
 **成果物**:
+
 - API比較レポート
 - 採用API選定
 
@@ -534,6 +611,7 @@
 - [ ] GCS保存
 
 **成果物**:
+
 - Backend Processor: 感情分析ロジック
 - 感情分析データ（JSON）
 
@@ -549,6 +627,7 @@
 - [ ] 文字起こしハイライト連動
 
 **成果物**:
+
 - 感情分析グラフコンポーネント
 - 通話詳細ページ統合
 
@@ -564,6 +643,7 @@
 - [ ] フィラーワード検出
 
 **成果物**:
+
 - Python音声分析スクリプト
 - Cloud Functionデプロイ
 
@@ -595,6 +675,7 @@
 - [ ] モバイル対応確認
 
 **成果物**:
+
 - `e2e/` テストスイート
 - テストカバレッジレポート
 
@@ -610,6 +691,7 @@
 - [ ] 画像最適化
 
 **成果物**:
+
 - パフォーマンステストレポート
 - 最適化実装
 
@@ -624,6 +706,7 @@
 - [ ] エラーメッセージの改善
 
 **成果物**:
+
 - UI/UX改善リスト
 - アクセシビリティ監査レポート
 
@@ -641,6 +724,7 @@
 - [ ] 本番デプロイ
 
 **成果物**:
+
 - 本番環境
 - 運用ドキュメント
 - リリースノート
@@ -662,29 +746,29 @@
 
 ### 技術的リスク
 
-| リスク | 影響度 | 対策 |
-|--------|--------|------|
-| **OpenAI APIレート制限** | 高 | バッチ処理、リトライロジック、レート制限監視 |
-| **GPT-5の仕様変更** | 中 | GPT-5-miniへのフォールバック実装 |
-| **pgvectorのスケーラビリティ** | 中 | インデックスチューニング、パーティショニング |
-| **Cloud Run実行時間制限** | 中 | 非同期処理、タイムアウト管理 |
-| **GCS Signed URL期限切れ** | 低 | 動的再生成、キャッシュ管理 |
+| リスク                         | 影響度 | 対策                                         |
+| ------------------------------ | ------ | -------------------------------------------- |
+| **OpenAI APIレート制限**       | 高     | バッチ処理、リトライロジック、レート制限監視 |
+| **GPT-5の仕様変更**            | 中     | GPT-5-miniへのフォールバック実装             |
+| **pgvectorのスケーラビリティ** | 中     | インデックスチューニング、パーティショニング |
+| **Cloud Run実行時間制限**      | 中     | 非同期処理、タイムアウト管理                 |
+| **GCS Signed URL期限切れ**     | 低     | 動的再生成、キャッシュ管理                   |
 
 ### スケジュールリスク
 
-| リスク | 影響度 | 対策 |
-|--------|--------|------|
-| **要件追加** | 高 | スコープ管理、優先順位付け |
-| **技術的難易度の見積もりミス** | 中 | バッファ期間確保、早期プロトタイピング |
-| **リソース不足** | 中 | 外部リソース確保、タスク優先順位調整 |
+| リスク                         | 影響度 | 対策                                   |
+| ------------------------------ | ------ | -------------------------------------- |
+| **要件追加**                   | 高     | スコープ管理、優先順位付け             |
+| **技術的難易度の見積もりミス** | 中     | バッファ期間確保、早期プロトタイピング |
+| **リソース不足**               | 中     | 外部リソース確保、タスク優先順位調整   |
 
 ### 運用リスク
 
-| リスク | 影響度 | 対策 |
-|--------|--------|------|
-| **コスト超過** | 中 | コスト監視、使用量アラート設定 |
-| **データ損失** | 高 | 定期バックアップ、災害復旧計画 |
-| **セキュリティインシデント** | 高 | セキュリティ監査、ペネトレーションテスト |
+| リスク                       | 影響度 | 対策                                     |
+| ---------------------------- | ------ | ---------------------------------------- |
+| **コスト超過**               | 中     | コスト監視、使用量アラート設定           |
+| **データ損失**               | 高     | 定期バックアップ、災害復旧計画           |
+| **セキュリティインシデント** | 高     | セキュリティ監査、ペネトレーションテスト |
 
 ---
 

@@ -9,18 +9,18 @@
 
 ### OWASP Top 10対策
 
-| 脅威 | 対策 |
-|------|------|
-| **Injection** | パラメータ化クエリ、Zod バリデーション |
-| **認証の不備** | Supabase Auth、JWT、MFA対応 |
-| **データ漏洩** | RLS、暗号化、Signed URLs |
-| **XXE** | XML処理なし |
-| **アクセス制御の不備** | RLS、ロールベース制御 |
-| **セキュリティ設定ミス** | 環境変数管理、最小権限原則 |
-| **XSS** | React自動エスケープ、CSP |
-| **安全でないデシリアライゼーション** | JSON.parse検証 |
-| **既知の脆弱性** | Dependabot、定期更新 |
-| **ログ不足** | Sentry、Cloud Logging |
+| 脅威                                 | 対策                                   |
+| ------------------------------------ | -------------------------------------- |
+| **Injection**                        | パラメータ化クエリ、Zod バリデーション |
+| **認証の不備**                       | Supabase Auth、JWT、MFA対応            |
+| **データ漏洩**                       | RLS、暗号化、Signed URLs               |
+| **XXE**                              | XML処理なし                            |
+| **アクセス制御の不備**               | RLS、ロールベース制御                  |
+| **セキュリティ設定ミス**             | 環境変数管理、最小権限原則             |
+| **XSS**                              | React自動エスケープ、CSP               |
+| **安全でないデシリアライゼーション** | JSON.parse検証                         |
+| **既知の脆弱性**                     | Dependabot、定期更新                   |
+| **ログ不足**                         | Sentry、Cloud Logging                  |
 
 ---
 
@@ -90,15 +90,15 @@ USING (
 
 ```typescript
 // Express Rate Limiter
-import rateLimit from 'express-rate-limit';
+import rateLimit from 'express-rate-limit'
 
 const limiter = rateLimit({
   windowMs: 60 * 1000, // 1分
   max: 100, // 100リクエスト
-  message: 'レート制限を超過しました'
-});
+  message: 'レート制限を超過しました',
+})
 
-app.use('/api/', limiter);
+app.use('/api/', limiter)
 ```
 
 ### CORS設定
@@ -107,10 +107,10 @@ app.use('/api/', limiter);
 const corsOptions = {
   origin: process.env.ALLOWED_ORIGINS.split(','),
   credentials: true,
-  optionsSuccessStatus: 200
-};
+  optionsSuccessStatus: 200,
+}
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions))
 ```
 
 ---

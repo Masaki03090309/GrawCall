@@ -1,0 +1,30 @@
+{
+  "event": "phone.recording_completed",
+  "payload": {
+    "account_id": "test-account-id",
+    "object": {
+      "recordings": [
+        {
+          "id": "test-recording-id-001",
+          "user_id": "test-user-id",
+          "caller_number": "+819012345678",
+          "caller_number_type": 1,
+          "caller_name": "Test Caller",
+          "callee_number": "+819087654321",
+          "callee_number_type": 1,
+          "callee_name": "Test Callee",
+          "direction": "outbound",
+          "duration": 120,
+          "download_url": "https://zoom.us/rec/download/test",
+          "date_time": "2025-11-04T07:30:00Z",
+          "recording_type": "ondemand",
+          "call_log_id": "test-call-log-id-001",
+          "call_history_id": "test-call-history-id-001",
+          "call_id": "test-call-id-001",
+          "end_time": "2025-11-04T07:32:00Z",
+          "disclaimer_status": 0
+        }
+      ]
+    }
+  }
+}

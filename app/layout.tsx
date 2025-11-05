@@ -10,11 +10,7 @@ export const metadata: Metadata = {
     'AI-powered feedback system for Zoom Phone call recordings with talk script analysis',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
       <body className={inter.className}>{children}</body>

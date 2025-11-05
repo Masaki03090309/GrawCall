@@ -30,12 +30,24 @@
 
 ```css
 /* Headings */
-h1 { font-size: 2.25rem; font-weight: 700; }
-h2 { font-size: 1.875rem; font-weight: 600; }
-h3 { font-size: 1.5rem; font-weight: 600; }
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+}
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
 
 /* Body */
-body { font-size: 1rem; font-family: 'Inter', sans-serif; }
+body {
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+}
 ```
 
 ---
@@ -144,13 +156,19 @@ body { font-size: 1rem; font-family: 'Inter', sans-serif; }
 
 ```css
 /* Mobile */
-@media (min-width: 640px) { /* sm */ }
+@media (min-width: 640px) {
+  /* sm */
+}
 
 /* Tablet */
-@media (min-width: 768px) { /* md */ }
+@media (min-width: 768px) {
+  /* md */
+}
 
 /* Desktop */
-@media (min-width: 1024px) { /* lg */ }
+@media (min-width: 1024px) {
+  /* lg */
+}
 ```
 
 ---

@@ -101,6 +101,7 @@
 ### SQLの内容確認（参考）
 
 実行されるSQL内容:
+
 - ✅ 拡張機能の有効化（uuid-ossp, pg_cron, vector）
 - ✅ 11テーブルの作成
   - users, projects, project_members
@@ -289,6 +290,7 @@
    プロジェクトルートで以下のテストスクリプトを作成:
 
    **`test-supabase.js`**:
+
    ```javascript
    require('dotenv').config({ path: '.env.local' })
    const { createClient } = require('@supabase/supabase-js')
@@ -303,10 +305,7 @@
      console.log('Testing connection...')
 
      // Test: Select from users table
-     const { data, error } = await supabase
-       .from('users')
-       .select('*')
-       .limit(1)
+     const { data, error } = await supabase.from('users').select('*').limit(1)
 
      if (error) {
        console.error('❌ Error:', error.message)
@@ -320,11 +319,13 @@
    ```
 
    実行:
+
    ```bash
    node test-supabase.js
    ```
 
    期待される出力:
+
    ```
    Supabase URL: https://abcdefghijklmnop.supabase.co
    Testing connection...
@@ -351,11 +352,13 @@
 ### 問題1: SQL実行時にエラーが出る
 
 **エラー例**:
+
 ```
 Error: relation "users" already exists
 ```
 
 **解決方法**:
+
 - テーブルが既に存在する場合、SQL Editorで以下を実行して削除:
   ```sql
   DROP TABLE IF EXISTS ng_reason_logs CASCADE;
@@ -375,11 +378,13 @@ Error: relation "users" already exists
 ### 問題2: pgvector拡張機能が有効化されない
 
 **エラー例**:
+
 ```
 Error: type "vector" does not exist
 ```
 
 **解決方法**:
+
 - SQL Editorで以下を実行:
   ```sql
   CREATE EXTENSION IF NOT EXISTS vector;
@@ -389,10 +394,12 @@ Error: type "vector" does not exist
 ### 問題3: 環境変数が読み込まれない
 
 **症状**:
+
 - `undefined` が表示される
 - 接続エラーが発生
 
 **解決方法**:
+
 1. `.env.local` ファイルがプロジェクトルートに存在するか確認
 2. ファイル名が正確に `.env.local` であることを確認（`.env`ではない）
 3. 開発サーバーを再起動（環境変数は起動時に読み込まれる）
@@ -401,9 +408,11 @@ Error: type "vector" does not exist
 ### 問題4: RLSポリシーで403エラー
 
 **症状**:
+
 - データの取得・更新時に `new row violates row-level security policy` エラー
 
 **解決方法**:
+
 - 開発中は一時的にRLSを無効化してテスト:
   ```sql
   ALTER TABLE users DISABLE ROW LEVEL SECURITY;
