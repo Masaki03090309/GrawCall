@@ -1,34 +1,17 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { ArrowLeft, Trash2, Users } from 'lucide-react'
-
-interface Member {
-  user_id: string
-  role: string
-  created_at: string
-  users: {
-    id: string
-    name: string
-    email: string
-    role: string
-  }
-}
+  ArrowLeft,
+  FileText,
+  MessageSquare,
+  Users,
+  Settings,
+  Phone
+} from 'lucide-react'
 
 interface Project {
   id: string
@@ -36,24 +19,26 @@ interface Project {
   slack_webhook_url: string | null
   created_at: string
   updated_at: string
-  project_members: Member[]
+  project_members?: Array<{
+    user_id: string
+    role: string
+    users: {
+      id: string
+      name: string
+      email: string
+      role: string
+    }
+  }>
 }
 
 export default function ProjectDetailPage() {
-  const router = useRouter()
   const params = useParams()
+  const router = useRouter()
   const projectId = params.id as string
 
   const [project, setProject] = useState<Project | null>(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    slack_webhook_url: '',
-  })
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     fetchProject()
@@ -62,8 +47,6 @@ export default function ProjectDetailPage() {
   const fetchProject = async () => {
     try {
       setLoading(true)
-      setError(null)
-
       const response = await fetch(`/api/projects/${projectId}`)
       const result = await response.json()
 
@@ -72,78 +55,12 @@ export default function ProjectDetailPage() {
       }
 
       setProject(result.data)
-      setFormData({
-        name: result.data.name,
-        slack_webhook_url: result.data.slack_webhook_url || '',
-      })
     } catch (err: any) {
       console.error('Error fetching project:', err)
       setError(err.message)
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          slack_webhook_url: formData.slack_webhook_url || null,
-        }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error?.message || 'プロジェクトの更新に失敗しました')
-      }
-
-      setProject(result.data)
-      alert('プロジェクトを更新しました')
-    } catch (err: any) {
-      console.error('Error updating project:', err)
-      setError(err.message)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleDelete = async () => {
-    setDeleting(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/projects/${projectId}`, {
-        method: 'DELETE',
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error?.message || 'プロジェクトの削除に失敗しました')
-      }
-
-      router.push('/projects')
-    } catch (err: any) {
-      console.error('Error deleting project:', err)
-      setError(err.message)
-      setShowDeleteDialog(false)
-    } finally {
-      setDeleting(false)
-    }
-  }
-
-  const handleManageMembers = () => {
-    router.push(`/projects/${projectId}/members`)
   }
 
   if (loading) {
@@ -156,15 +73,15 @@ export default function ProjectDetailPage() {
     )
   }
 
-  if (error && !project) {
+  if (error || !project) {
     return (
-      <div className="container mx-auto max-w-4xl py-8">
+      <div className="container mx-auto py-8">
         <Card className="border-destructive">
           <CardHeader>
             <CardTitle className="text-destructive">エラー</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{error}</p>
+            <p>{error || 'プロジェクトが見つかりません'}</p>
             <Button onClick={() => router.push('/projects')} className="mt-4">
               プロジェクト一覧に戻る
             </Button>
@@ -174,136 +91,113 @@ export default function ProjectDetailPage() {
     )
   }
 
-  const memberCount = project?.project_members?.length || 0
-  const directorCount = project?.project_members?.filter(m => m.role === 'director').length || 0
+  const menuItems = [
+    {
+      title: 'トークスクリプト管理',
+      description: 'トークスクリプトの作成・編集・履歴管理',
+      icon: MessageSquare,
+      href: `/projects/${projectId}/talk-scripts`,
+      color: 'bg-blue-500',
+    },
+    {
+      title: 'プロンプト管理',
+      description: 'AIフィードバック用プロンプトの設定',
+      icon: FileText,
+      href: `/projects/${projectId}/prompts`,
+      color: 'bg-green-500',
+    },
+    {
+      title: 'メンバー一覧',
+      description: 'プロジェクトメンバーの確認・管理',
+      icon: Users,
+      href: `/projects/${projectId}/members`,
+      color: 'bg-purple-500',
+    },
+    {
+      title: '通話履歴',
+      description: 'プロジェクトの通話履歴を確認',
+      icon: Phone,
+      href: `/calls?project_id=${projectId}`,
+      color: 'bg-orange-500',
+    },
+    {
+      title: 'プロジェクト設定',
+      description: 'プロジェクト名やSlack連携設定',
+      icon: Settings,
+      href: `/projects/${projectId}/settings`,
+      color: 'bg-gray-500',
+    },
+  ]
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      <Button
-        variant="ghost"
-        onClick={() => router.push('/projects')}
-        className="mb-4"
-        disabled={saving || deleting}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        プロジェクト一覧
-      </Button>
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <Button
+          variant="ghost"
+          onClick={() => router.push('/projects')}
+          className="mb-4"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          プロジェクト一覧に戻る
+        </Button>
 
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>プロジェクト設定</CardTitle>
-            <CardDescription>プロジェクトの基本情報を編集します</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleUpdate} className="space-y-6">
-              {error && (
-                <div className="rounded-md border border-destructive bg-destructive/10 p-4">
-                  <p className="text-sm text-destructive">{error}</p>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="name">
-                  プロジェクト名 <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  disabled={saving}
-                  maxLength={255}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="slack_webhook_url">Slack Webhook URL (任意)</Label>
-                <Input
-                  id="slack_webhook_url"
-                  type="url"
-                  placeholder="https://hooks.slack.com/services/..."
-                  value={formData.slack_webhook_url}
-                  onChange={e =>
-                    setFormData({
-                      ...formData,
-                      slack_webhook_url: e.target.value,
-                    })
-                  }
-                  disabled={saving}
-                />
-                <p className="text-sm text-muted-foreground">
-                  通話処理完了時にSlack通知を送信するWebhook URL
-                </p>
-              </div>
-
-              <div className="flex justify-end gap-4">
-                <Button type="submit" disabled={saving}>
-                  {saving ? '保存中...' : '変更を保存'}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle>メンバー管理</CardTitle>
-                <CardDescription>
-                  プロジェクトメンバーを管理します ({memberCount} メンバー, {directorCount}{' '}
-                  ディレクター)
-                </CardDescription>
-              </div>
-              <Button onClick={handleManageMembers}>
-                <Users className="mr-2 h-4 w-4" />
-                メンバーを管理
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
-
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive">危険な操作</CardTitle>
-            <CardDescription>この操作は取り消せません。慎重に実行してください。</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button
-              variant="destructive"
-              onClick={() => setShowDeleteDialog(true)}
-              disabled={deleting}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              プロジェクトを削除
-            </Button>
-          </CardContent>
-        </Card>
+        <div>
+          <h1 className="text-3xl font-bold">{project.name}</h1>
+          <p className="mt-2 text-muted-foreground">
+            プロジェクトの管理メニュー
+          </p>
+        </div>
       </div>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>本当に削除しますか?</AlertDialogTitle>
-            <AlertDialogDescription>
-              この操作は取り消せません。プロジェクト「{project?.name}
-              」とそれに関連するすべてのデータが完全に削除されます。
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>キャンセル</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={deleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleting ? '削除中...' : '削除する'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {menuItems.map((item) => (
+          <Card
+            key={item.href}
+            className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+            onClick={() => router.push(item.href)}
+          >
+            <CardHeader>
+              <div className="flex items-start gap-4">
+                <div className={`rounded-lg ${item.color} p-3 text-white`}>
+                  <item.icon className="h-6 w-6" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-lg">{item.title}</CardTitle>
+                  <CardDescription className="mt-2">
+                    {item.description}
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>プロジェクト情報</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">プロジェクトID:</span>
+              <span className="font-mono">{project.id}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">メンバー数:</span>
+              <span>{project.project_members?.length || 0} 人</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Slack連携:</span>
+              <span>{project.slack_webhook_url ? '設定済み ✓' : '未設定'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">作成日:</span>
+              <span>{new Date(project.created_at).toLocaleDateString('ja-JP')}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
