@@ -10,7 +10,7 @@ import { z } from 'zod'
  * Flow:
  * 1. Receive audio file (base64)
  * 2. Transcribe with Whisper API
- * 3. Generate prompt with GPT-5
+ * 3. Generate prompt with GPT-5-mini
  * 4. Return transcription and generated prompt
  */
 
@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
     const transcribedText = transcription.text
     console.log('Transcription complete:', transcribedText.substring(0, 100))
 
-    // Step 3: Generate prompt with GPT-5
-    console.log('Generating prompt with GPT-5...')
+    // Step 3: Generate prompt with GPT-5-mini
+    console.log('Generating prompt with GPT-5-mini...')
 
     const promptTypeLabel =
       validated.prompt_type === 'connected'
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 ${validated.additional_context ? `追加コンテキスト: ${validated.additional_context}` : ''}`
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o', // Use GPT-4o for prompt generation (GPT-5 not available yet)
+      model: 'gpt-5-mini',
       messages: [
         {
           role: 'system',
@@ -108,6 +108,8 @@ ${validated.additional_context ? `追加コンテキスト: ${validated.addition
           content: `以下の音声文字起こしから、営業フィードバック生成用のプロンプトを作成してください:\n\n${transcribedText}`,
         },
       ],
+      temperature: 0.7,
+      // Note: GPT-5-mini supports standard parameters like temperature
     })
 
     const generatedPrompt = completion.choices[0].message.content || ''

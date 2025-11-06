@@ -337,9 +337,9 @@
 - 担当: バックエンドエンジニア
 - 依存: 音声ダウンロード実装
 
-#### [P0][L] GPT-4o-mini連携（通話状態判定）
+#### [P0][L] GPT-5-mini連携（通話状態判定）
 
-- [x] OpenAI SDK導入（GPT-4o-mini）
+- [x] OpenAI SDK導入（GPT-5-mini）
 - [x] プロンプト設計（connected/reception/no_conversation判定）
 - [x] **重要**: Temperature パラメータを使用しない
 - [x] API呼び出し実装
@@ -523,9 +523,9 @@
 - 担当: バックエンドエンジニア
 - 依存: Backend Processor Service
 
-#### [P1][M] GPT-4o連携（文字起こし→プロンプト生成）
+#### [P1][M] GPT-5連携（文字起こし→プロンプト生成）
 
-- [x] GPT-4o プロンプト設計（プロンプト生成用）
+- [x] GPT-5 プロンプト設計（プロンプト生成用）
 - [x] **重要**: Temperature パラメータを使用しない
 - [x] API呼び出し実装
 - [x] 生成されたプロンプト返却
@@ -537,10 +537,10 @@
 
 - [x] `POST /api/prompts/generate` 実装
 - [x] 音声受信（Base64）
-- [x] Whisper API → GPT-4o 連携
+- [x] Whisper API → GPT-5 連携
 - [x] レスポンス形式設計
 - 担当: バックエンドエンジニア
-- 依存: GPT-4o連携
+- 依存: GPT-5連携
 
 #### [P1][M] 生成プロンプト表示・編集UI
 
@@ -560,7 +560,7 @@
 #### [P0][XL] フィードバック生成ロジック実装
 
 - [x] プロンプト取得ロジック（プロジェクト固有 or デフォルト）
-- [x] GPT-4o-mini呼び出し実装
+- [x] GPT-5-mini呼び出し実装
 - [x] **重要**: Temperature パラメータを使用しない
 - [x] フィードバック生成条件判定（connected かつ 通話時間 >= 60秒）
 - [x] `calls` テーブルに `feedback_text` 保存
@@ -606,56 +606,60 @@
 
 #### [P0][XL] トークスクリプト作成・編集ページ
 
-- [ ] `/app/projects/[id]/talk-scripts/page.tsx` 作成
-- [ ] フェーズ別入力フォーム（オープニング/ヒアリング/提案/クロージング）
-- [ ] マークダウンエディタ統合
-- [ ] リアルタイムプレビュー
-- [ ] 変更コメント入力
-- [ ] 保存ボタン
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/page.tsx` 作成
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/new/page.tsx` 作成
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/[talkScriptId]/edit/page.tsx` 作成
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/[talkScriptId]/history/page.tsx` 作成
+- [x] フェーズ別入力フォーム（オープニング/ヒアリング/提案/クロージング）
+- [x] マークダウンエディタ統合
+- [x] リアルタイムプレビュー
+- [x] 変更コメント入力
+- [x] 保存ボタン
 - 担当: フロントエンドリード
 - 依存: プロジェクト一覧ページ
 
 #### [P0][L] ヒアリング項目管理UI
 
-- [ ] ヒアリング項目一覧表示
-- [ ] 項目追加フォーム
-- [ ] 項目編集フォーム
-- [ ] 項目削除ボタン（デフォルト項目は削除不可）
-- [ ] ドラッグ&ドロップで表示順序変更
-- [ ] 最大10項目制限
+- [x] ヒアリング項目一覧表示
+- [x] 項目追加フォーム
+- [x] 項目編集フォーム
+- [x] 項目削除ボタン（デフォルト項目は削除不可）
+- [x] ドラッグ&ドロップで表示順序変更
+- [x] 最大10項目制限
 - 担当: フロントエンドエンジニア
 - 依存: トークスクリプト作成・編集ページ
 
 #### [P0][M] トークスクリプト取得API
 
-- [ ] `GET /api/talk-scripts` 実装
-- [ ] プロジェクトIDでフィルタ
-- [ ] 最新バージョン（`is_active=TRUE`）取得
-- [ ] ヒアリング項目JOIN
-- [ ] RLS確認
+- [x] `GET /api/talk-scripts` 実装
+- [x] プロジェクトIDでフィルタ
+- [x] 最新バージョン（`is_active=TRUE`）取得
+- [x] ヒアリング項目JOIN
+- [x] RLS確認
 - 担当: バックエンドエンジニア
 - 依存: 全11テーブル作成
 
 #### [P0][M] トークスクリプト作成・更新API
 
-- [ ] `POST /api/talk-scripts` 実装
-- [ ] `PUT /api/talk-scripts/:id` 実装
-- [ ] バージョン自動インクリメント
-- [ ] `is_active` フラグ管理
-- [ ] ヒアリング項目同時保存
-- [ ] RLS確認（オーナー/ディレクター権限）
+- [x] `POST /api/talk-scripts` 実装
+- [x] `PUT /api/talk-scripts/:id` 実装
+- [x] バージョン自動インクリメント
+- [x] `is_active` フラグ管理
+- [x] ヒアリング項目同時保存
+- [x] RLS確認（オーナー/ディレクター権限）
 - 担当: バックエンドエンジニア
 - 依存: トークスクリプト取得API
 
 #### [P1][M] ヒアリング項目API
 
-- [ ] `POST /api/talk-scripts/:id/hearing-items` 実装
-- [ ] `PUT /api/talk-scripts/hearing-items/:itemId` 実装
-- [ ] `DELETE /api/talk-scripts/hearing-items/:itemId` 実装
-- [ ] デフォルト項目削除防止
-- [ ] 表示順序管理
+- [x] `PUT /api/talk-scripts/hearing-items/:itemId` 実装
+- [x] `DELETE /api/talk-scripts/hearing-items/:itemId` 実装
+- [x] デフォルト項目削除防止
+- [x] 表示順序管理
 - 担当: バックエンドエンジニア
 - 依存: トークスクリプト作成・更新API
+
+**完了日**: 2025-01-05
 
 ---
 

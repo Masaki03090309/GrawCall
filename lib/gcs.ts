@@ -5,7 +5,7 @@ import { Storage } from '@google-cloud/storage'
  */
 export const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID,
-  keyFilename: process.env.GCP_KEY_FILE, // Path to service account key file
+  keyFilename: process.env.GCP_SERVICE_ACCOUNT_KEY_PATH, // Path to service account key file
 })
 
 export const bucket = storage.bucket(process.env.GCS_BUCKET_NAME || '')

@@ -1,8 +1,8 @@
-export type CallStatus = 'connected' | 'reception' | 'no_conversation'
+export type CallStatus = 'connected' | 'reception' | 'no_conversation';
 export interface StatusDetectionResult {
-  status: CallStatus
-  confidence: number
-  reason: string
+    status: CallStatus;
+    confidence: number;
+    reason: string;
 }
 /**
  * Detect call status using GPT-5-mini
@@ -12,8 +12,5 @@ export interface StatusDetectionResult {
  * - reception: Reached receptionist/gatekeeper, didn't reach decision maker
  * - no_conversation: No meaningful conversation (too short, voicemail, etc.)
  */
-export declare function detectCallStatus(
-  transcript: string,
-  duration: number
-): Promise<StatusDetectionResult>
+export declare function detectCallStatus(transcript: string, duration: number): Promise<StatusDetectionResult>;
 //# sourceMappingURL=statusDetection.d.ts.map

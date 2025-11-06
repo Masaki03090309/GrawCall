@@ -422,6 +422,7 @@ CREATE TABLE calls (
   -- ファイルURL
   audio_url TEXT,
   transcript_url TEXT,
+  transcript_segments JSONB, -- SRT形式用タイムスタンプ付きセグメント (追加: 2025-01-06)
 
   -- 判定結果
   status VARCHAR(50) CHECK (status IN ('connected', 'reception', 'no_conversation')),
@@ -478,6 +479,7 @@ CREATE INDEX idx_calls_zoom_recording ON calls(zoom_recording_id);
 | call_time | TIMESTAMP | NULL | 通話日時 |
 | audio_url | TEXT | NULL | 音声ファイルURL（GCS） |
 | transcript_url | TEXT | NULL | 文字起こしファイルURL（GCS） |
+| transcript_segments | JSONB | NULL | SRT形式タイムスタンプ付きセグメント（Whisper API取得） |
 | status | VARCHAR(50) | NULL | 通話状態（connected/reception/no_conversation） |
 | status_confidence | DECIMAL(5, 2) | NULL | 判定信頼度 |
 | feedback_text | TEXT | NULL | フィードバック本文 |
@@ -498,6 +500,22 @@ CREATE INDEX idx_calls_zoom_recording ON calls(zoom_recording_id);
 **JSONB構造例**:
 
 ```json
+// transcript_segments (SRT形式タイムスタンプ付きセグメント) - 追加: 2025-01-06
+[
+  {
+    "id": 0,
+    "start": 0.0,
+    "end": 3.5,
+    "text": "こんにちは、株式会社ABCの山田と申します。"
+  },
+  {
+    "id": 1,
+    "start": 3.5,
+    "end": 7.2,
+    "text": "本日はお時間いただきありがとうございます。"
+  }
+]
+
 // phase_match_rates
 {
   "opening": 85,

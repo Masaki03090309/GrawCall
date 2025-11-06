@@ -14,10 +14,18 @@ const storage = new Storage({
 
 const bucketName = process.env.GCS_BUCKET_NAME || 'zoom-phone-feedback-audio'
 
+export interface TranscriptionSegment {
+  id: number
+  start: number
+  end: number
+  text: string
+}
+
 export interface TranscriptionResult {
   text: string
   duration?: number
   language?: string
+  segments?: TranscriptionSegment[]
 }
 
 /**
@@ -80,10 +88,19 @@ export async function transcribeAudio(audioGcsPath: string): Promise<Transcripti
 
     console.log(`Saved transcription to: gs://${bucketName}/${transcriptPath}`)
 
+    // Extract segments with timestamps for SRT format
+    const segments: TranscriptionSegment[] = (transcription.segments || []).map((seg: any) => ({
+      id: seg.id,
+      start: seg.start,
+      end: seg.end,
+      text: seg.text,
+    }))
+
     return {
       text: transcription.text,
       duration: transcription.duration,
       language: transcription.language,
+      segments,
     }
   } catch (error: any) {
     console.error('Error transcribing audio:', error.message)

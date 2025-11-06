@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from '@/components/LogoutButton'
-import { Home, FolderKanban, Users, FileText } from 'lucide-react'
+import { Home, FolderKanban, Users, FileText, Phone } from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -48,6 +48,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 >
                   <FolderKanban className="h-4 w-4" />
                   プロジェクト
+                </Link>
+                <Link
+                  href="/calls"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Phone className="h-4 w-4" />
+                  通話履歴
                 </Link>
                 <Link
                   href="/prompts"

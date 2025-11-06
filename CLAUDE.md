@@ -8,12 +8,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Zoom Phone フィードバックシステム 拡張版** - An AI-powered feedback system for Zoom Phone call recordings that provides:
 
-1. **トークスクリプト一致率分析** - Semantic matching analysis of actual calls against predefined talk scripts using GPT-5
+1. **トークスクリプト一致率分析** - Semantic matching analysis of actual calls against predefined talk scripts using GPT-5-mini
 2. **因果関係を考慮した統合フィードバック** - Causal relationship-based feedback combining talk script analysis, RAG search, NG reason trends, and transcripts
 3. **RAG検索による学習資料参照** - Retrieval Augmented Generation using pgvector and OpenAI Embeddings
 4. **NG理由永久保存とトレンド分析** - Permanent storage of rejection reasons for long-term trend analysis
 
-**Current Status**: Phase 1 COMPLETED + Phase 2 COMPLETED - All milestones M1.1 through M2.4 completed. **Phase 1**: M1.1 (開発環境構築 + CI/CD設定), M1.2 (データベース構築), M1.3 (認証機能実装), M1.4 (GCS・Cloud Run構築), M1.5 (基本的な通話処理フロー - 統合テスト完了 2025-11-04), M1.6 (プロジェクト・ユーザー管理 + Zoom User ID機能 + 通話一覧/詳細UI + JST表示対応). **Phase 2**: M2.1 (プロンプト管理UI), M2.2 (プロンプトバージョン管理 + 復元機能), M2.3 (AIプロンプトアシスタント - 音声録音 + Whisper + GPT-4o - 完了 2025-01-05), M2.4 (フィードバック生成実装). **統合テスト成功**: Zoom Webhook → Cloud Run Proxy → Pub/Sub → Cloud Run Processor → Whisper API → GPT-4o-mini (Status Detection + Feedback Generation) → Supabase保存フロー全て動作確認済み。**CI/CD構築完了**: GitHub Actions自動テスト・デプロイパイプライン実装済み。Development server can run on port 7000. Full feedback system operational with AI-powered analysis. AI Prompt Assistant with voice recording functional. Next: Phase 3 (トークスクリプト管理).
+**Current Status**: Phase 1 COMPLETED + Phase 2 COMPLETED - All milestones M1.1 through M2.4 completed. **Phase 1**: M1.1 (開発環境構築 + CI/CD設定), M1.2 (データベース構築), M1.3 (認証機能実装), M1.4 (GCS・Cloud Run構築), M1.5 (基本的な通話処理フロー - 統合テスト完了 2025-11-04 + **SRT形式対応** - タイムスタンプ付き文字起こし実装完了 2025-01-06), M1.6 (プロジェクト・ユーザー管理 + Zoom User ID機能 + 通話一覧/詳細UI + JST表示対応). **Phase 2**: M2.1 (プロンプト管理UI), M2.2 (プロンプトバージョン管理 + 復元機能), M2.3 (AIプロンプトアシスタント - 音声録音 + Whisper + GPT-5-mini - 完了 2025-01-05), M2.4 (フィードバック生成実装). **統合テスト成功**: Zoom Webhook → Cloud Run Proxy → Pub/Sub → Cloud Run Processor → Whisper API (with segments) → GPT-5-mini (Status Detection + Feedback Generation) → Supabase保存（transcript_segments含む）フロー全て動作確認済み。**CI/CD構築完了**: GitHub Actions自動テスト・デプロイパイプライン実装済み。Development server can run on port 7000. Full feedback system operational with AI-powered analysis and SRT-formatted transcripts. AI Prompt Assistant with voice recording functional. **コスト最適化完了**: 全処理をGPT-5-miniに統一（2025-01-06）。Next: Phase 3 (トークスクリプト管理).
 
 ---
 
@@ -70,29 +70,24 @@ All project documentation is in `docs/`:
 
 ---
 
-## Critical GPT-5 Implementation Note
+## OpenAI API Implementation Note
 
-**IMPORTANT**: GPT-5 推論モデルは以下のサンプリングパラメータを**サポートしていません**:
+**IMPORTANT**: このプロジェクトでは全処理に**GPT-5-mini**を使用（コスト最適化）
 
 ```typescript
-// ❌ これらのパラメータは使用不可（400 Bad Request エラー）
-temperature: 0.7
-top_p: 1.0
-presence_penalty: 0.0
-frequency_penalty: 0.0
-logprobs: true
-logit_bias: {...}
-
-// ✅ GPT-5/GPT-5-mini 正しい呼び出し
+// ✅ GPT-5-mini 標準的な呼び出し
 const completion = await openai.chat.completions.create({
-  model: 'gpt-5', // または 'gpt-5-mini'
+  model: 'gpt-5-mini',
   messages: [...],
-  // temperature等のパラメータは完全に省略
-  // オプション: verbosity, reasoning_effort は使用可能
+  temperature: 0.7, // サンプリングパラメータをサポート
+  // GPT-5-miniは通常の言語モデルとして動作
 })
 ```
 
-**理由**: GPT-5は内部で複数ラウンドの推論・検証を実行するため、外部からのサンプリングパラメータは不要。
+**モデル選定方針**:
+- **全処理**: GPT-5-mini（状態判定、フィードバック生成、トークスクリプト分析、RAG統合）
+- **理由**: コスト効率とパフォーマンスのバランス重視
+- **料金**: 入力$0.25/1M、出力$2.00/1M（GPT-5比で大幅削減）
 
 **参照**: `docs/requirements_specification_v2.md` Section 3.2.2, `docs/technical_guidelines.md` OpenAI API連携ガイド
 
@@ -112,10 +107,10 @@ Zoom Webhook → Cloud Run (Proxy) → Cloud Pub/Sub → Cloud Run (Processor)
    - Audio Analysis: Emotion/frequency analysis
    - RAG Search: pgvector similarity search
    - NG Reason Trends: Aggregate past 1 month
-   - GPT-5: Talk Script Semantic Matching
+   - GPT-5-mini: Talk Script Semantic Matching
 4. Feedback Generation:
    - IF connected AND duration >= 60s:
-     - WITH RAG results: GPT-5 (4-factor integrated feedback)
+     - WITH RAG results: GPT-5-mini (4-factor integrated feedback)
      - WITHOUT RAG: GPT-5-mini (3-factor feedback)
    - ELSE: No feedback (Slack notification only)
 5. Save to Supabase + Slack Notification

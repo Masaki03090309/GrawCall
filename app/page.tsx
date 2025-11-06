@@ -98,14 +98,16 @@ export default async function Home() {
             </CardHeader>
           </Card>
 
-          <Card className="opacity-50">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-gray-400" />
-                <CardTitle>通話履歴</CardTitle>
-              </div>
-              <CardDescription>通話記録とフィードバック（開発中）</CardDescription>
-            </CardHeader>
+          <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+            <Link href="/calls">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-green-600" />
+                  <CardTitle>通話履歴</CardTitle>
+                </div>
+                <CardDescription>通話記録とフィードバック</CardDescription>
+              </CardHeader>
+            </Link>
           </Card>
         </div>
       </div>

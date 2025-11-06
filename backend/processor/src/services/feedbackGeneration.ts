@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { createClient } from '@supabase/supabase-js'
+import { TalkScriptAnalysisResult, determineCausalPattern } from './talkScriptAnalysis'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -21,13 +22,15 @@ interface FeedbackGenerationResult {
  * @param status - Call status (connected/reception/no_conversation)
  * @param durationSeconds - Call duration in seconds
  * @param projectId - Project ID (optional, for project-specific prompts)
+ * @param analysisResult - Talk script analysis result (optional, M3.3)
  * @returns FeedbackGenerationResult
  */
 export async function generateFeedback(
   transcriptText: string,
   status: string,
   durationSeconds: number,
-  projectId: string | null
+  projectId: string | null,
+  analysisResult?: TalkScriptAnalysisResult
 ): Promise<FeedbackGenerationResult> {
   console.log('[Feedback] Starting feedback generation...')
   console.log(
@@ -74,16 +77,22 @@ export async function generateFeedback(
   console.log('[Feedback] Step 2: Generating feedback with GPT-5-mini...')
 
   try {
+    // Build enhanced system prompt with talk script analysis (M3.4 - Causality-aware feedback)
+    const systemPrompt = buildSystemPrompt(prompt.content, analysisResult)
+
+    // Build user prompt with analysis context
+    const userPrompt = buildUserPrompt(transcriptText, durationSeconds, analysisResult)
+
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Using GPT-5-mini equivalent
+      model: 'gpt-5-mini',
       messages: [
         {
           role: 'system',
-          content: prompt.content,
+          content: systemPrompt,
         },
         {
           role: 'user',
-          content: `以下の通話内容を分析し、フィードバックを生成してください。\n\n通話時間: ${durationSeconds}秒\n\n文字起こし:\n${transcriptText}`,
+          content: userPrompt,
         },
       ],
       // IMPORTANT: GPT-5/GPT-5-mini does NOT support temperature, top_p, presence_penalty, frequency_penalty
@@ -171,4 +180,127 @@ async function getActivePrompt(projectId: string | null): Promise<any> {
     console.error('[Feedback] Error in getActivePrompt:', error.message)
     return null
   }
+}
+
+/**
+ * Build enhanced system prompt with talk script analysis context (M3.4)
+ */
+function buildSystemPrompt(
+  basePromptContent: string,
+  analysisResult?: TalkScriptAnalysisResult
+): string {
+  if (!analysisResult || !analysisResult.phase_match_rates) {
+    // No talk script analysis - use base prompt
+    return basePromptContent
+  }
+
+  const causalPattern = determineCausalPattern(analysisResult.phase_match_rates)
+
+  let causalInstructions = ''
+
+  switch (causalPattern) {
+    case 'hearing_insufficient':
+      causalInstructions = `
+【重要な因果関係分析】
+ヒアリング不足が根本原因です。ヒアリングが不十分なため、提案・クロージングに進めませんでした。
+
+フィードバックの重点:
+1. **ヒアリング力の強化を最優先**
+2. 未カバーのヒアリング項目を具体的に指摘
+3. ニーズ・課題の顕在化テクニックを提案
+4. 提案・クロージングの低さは、ヒアリング不足の結果であることを説明
+
+※ 単純に一致率が低い順に指摘するのではなく、因果関係を考慮してください。`
+      break
+
+    case 'proposal_insufficient':
+      causalInstructions = `
+【重要な因果関係分析】
+提案力不足が根本原因です。ヒアリングはできていますが、それを提案に活かせていません。
+
+フィードバックの重点:
+1. **ヒアリング内容と商品の強みを結びつける**
+2. 学習資料や事例集の活用を推奨
+3. 価値提案の明確化
+4. 顧客のニーズに応じた具体的な提案例を示す`
+      break
+
+    case 'closing_insufficient':
+      causalInstructions = `
+【重要な因果関係分析】
+クロージング不足が根本原因です。ヒアリング・提案は良好ですが、次のステップを提示できていません。
+
+フィードバックの重点:
+1. **アポイント打診の具体性を強化**
+2. 次回訪問の日時提案を推奨
+3. クロージングトークの実践例を提示
+4. 「検討します」で終わらせない工夫を提案`
+      break
+
+    case 'general':
+      causalInstructions = `
+【因果関係分析】
+営業プロセス全体の流れに沿って改善提案を行ってください。
+
+フィードバックの重点:
+1. 最も低いフェーズから順に指摘
+2. 営業プロセスの流れ（オープニング→ヒアリング→提案→クロージング）を考慮
+3. 前のフェーズの不足が後のフェーズに影響している可能性を検討`
+      break
+  }
+
+  return `${basePromptContent}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+【Phase 3拡張: トークスクリプト分析結果の活用】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+以下のトークスクリプト一致率分析結果を参考に、因果関係を考慮した建設的なフィードバックを生成してください。
+
+${causalInstructions}
+
+【注意事項】
+- 一致率が100%である必要はありません。70%以上なら「良好」と評価してください
+- 表現が異なっても意図が伝わっていれば高く評価してください
+- 未カバーのヒアリング項目については、次回必ず確認するよう具体的にアドバイスしてください`
+}
+
+/**
+ * Build user prompt with analysis context (M3.4)
+ */
+function buildUserPrompt(
+  transcriptText: string,
+  durationSeconds: number,
+  analysisResult?: TalkScriptAnalysisResult
+): string {
+  const sections: string[] = []
+
+  sections.push('以下の通話内容を分析し、フィードバックを生成してください。\n')
+  sections.push(`通話時間: ${durationSeconds}秒\n`)
+
+  // Add talk script analysis if available
+  if (analysisResult && analysisResult.phase_match_rates && analysisResult.hearing_item_coverage) {
+    sections.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    sections.push('【トークスクリプト一致率分析】\n')
+    sections.push(`総合一致率: ${analysisResult.overall_match_rate}%\n`)
+    sections.push('フェーズ別一致率:')
+    sections.push(`- オープニング: ${analysisResult.phase_match_rates.opening}%`)
+    sections.push(`- ヒアリング: ${analysisResult.phase_match_rates.hearing}%`)
+    sections.push(`- 提案: ${analysisResult.phase_match_rates.proposal}%`)
+    sections.push(`- クロージング: ${analysisResult.phase_match_rates.closing}%\n`)
+
+    sections.push('ヒアリング項目カバー状況:')
+    const coverageItems = Object.entries(analysisResult.hearing_item_coverage)
+    coverageItems.forEach(([itemName, coverage]) => {
+      const status = coverage.covered ? '✅ カバー済み' : '❌ 未カバー'
+      const matchRate = coverage.covered ? `（一致率: ${coverage.match_rate}%）` : ''
+      sections.push(`- ${itemName}: ${status}${matchRate}`)
+    })
+    sections.push('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
+  }
+
+  sections.push('文字起こし:')
+  sections.push(transcriptText)
+
+  return sections.join('\n')
 }

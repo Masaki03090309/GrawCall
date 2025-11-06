@@ -92,7 +92,17 @@
       "Bash(git reset:*)",
       "Bash(git rm:*)",
       "Bash(.git/info/exclude)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "Bash(uv --version:*)",
+      "Bash(C:Usersowner.localbinuv.exe --version)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp list:*)",
+      "Bash(cmd //c \"taskkill //PID 49112 //F\")",
+      "Bash(gcloud pubsub topics list:*)",
+      "Bash(gcloud storage ls:*)",
+      "Bash(gcloud storage cat:*)",
+      "Bash(cmd //c \"taskkill //PID 42988 //F\")",
+      "mcp__supabase__apply_migration"
     ],
     "deny": [],
     "ask": []

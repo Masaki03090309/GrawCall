@@ -9,6 +9,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ArrowLeft, Phone, Clock, User, Calendar, Download } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 
+interface TranscriptSegment {
+  id: number
+  start: number
+  end: number
+  text: string
+}
+
+interface HearingItemCoverage {
+  covered: boolean
+  match_rate: number
+}
+
+interface PhaseMatchRates {
+  opening: number
+  hearing: number
+  proposal: number
+  closing: number
+}
+
 interface CallDetail {
   id: string
   zoom_call_id: string
@@ -23,6 +42,9 @@ interface CallDetail {
   audio_signed_url: string | null
   transcript_signed_url: string | null
   transcript_text: string | null
+  transcript_segments: TranscriptSegment[] | null
+  phase_match_rates: PhaseMatchRates | null
+  hearing_item_coverage: { [itemName: string]: HearingItemCoverage } | null
   user: {
     id: string
     name: string
@@ -108,6 +130,13 @@ export default function CallDetailPage() {
     const hour = String(jstTime.getUTCHours()).padStart(2, '0')
     const minute = String(jstTime.getUTCMinutes()).padStart(2, '0')
     return `${year}/${month}/${day} ${hour}:${minute}`
+  }
+
+  const formatTimestamp = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    const ms = Math.floor((seconds % 1) * 1000)
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(3, '0')}`
   }
 
   if (loading) {
@@ -249,9 +278,12 @@ export default function CallDetailPage() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={call.feedback_text ? 'feedback' : 'transcript'}>
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="feedback" disabled={!call.feedback_text}>
                 AIフィードバック
+              </TabsTrigger>
+              <TabsTrigger value="analysis" disabled={!call.phase_match_rates}>
+                トークスクリプト分析
               </TabsTrigger>
               <TabsTrigger value="transcript">文字起こし</TabsTrigger>
             </TabsList>
@@ -287,9 +319,160 @@ export default function CallDetailPage() {
               )}
             </TabsContent>
 
+            {/* Talk Script Analysis Tab (M3.3 - Phase 3) */}
+            <TabsContent value="analysis">
+              {call.phase_match_rates && call.hearing_item_coverage ? (
+                <div className="space-y-6">
+                  {/* Overall Match Rate */}
+                  <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                    <div className="mb-2 text-sm font-medium text-gray-700">
+                      総合一致率
+                    </div>
+                    <div className="text-3xl font-bold text-blue-600">
+                      {Math.round(
+                        (call.phase_match_rates.opening +
+                          call.phase_match_rates.hearing +
+                          call.phase_match_rates.proposal +
+                          call.phase_match_rates.closing) /
+                          4
+                      )}
+                      %
+                    </div>
+                  </div>
+
+                  {/* Phase Match Rates */}
+                  <div>
+                    <h3 className="mb-3 text-sm font-semibold text-gray-700">
+                      フェーズ別一致率
+                    </h3>
+                    <div className="space-y-3">
+                      {[
+                        { key: 'opening', label: '📝 オープニング', color: 'bg-purple-500' },
+                        { key: 'hearing', label: '🎤 ヒアリング', color: 'bg-green-500' },
+                        { key: 'proposal', label: '💡 提案', color: 'bg-yellow-500' },
+                        { key: 'closing', label: '🤝 クロージング', color: 'bg-blue-500' },
+                      ].map((phase) => {
+                        const rate = call.phase_match_rates![phase.key as keyof PhaseMatchRates]
+                        const status = rate >= 70 ? '✅' : rate >= 50 ? '⚠️' : '❌'
+                        return (
+                          <div key={phase.key} className="rounded-md border bg-white p-3">
+                            <div className="mb-2 flex items-center justify-between">
+                              <span className="text-sm font-medium">
+                                {phase.label}
+                              </span>
+                              <span className="text-lg">
+                                {status} {rate}%
+                              </span>
+                            </div>
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                              <div
+                                className={`h-full ${phase.color}`}
+                                style={{ width: `${rate}%` }}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Hearing Item Coverage */}
+                  <div>
+                    <h3 className="mb-3 text-sm font-semibold text-gray-700">
+                      ヒアリング項目カバー状況
+                    </h3>
+                    <div className="space-y-2">
+                      {Object.entries(call.hearing_item_coverage).map(([itemName, coverage]) => (
+                        <div
+                          key={itemName}
+                          className={`rounded-md border p-3 ${
+                            coverage.covered
+                              ? 'border-green-200 bg-green-50'
+                              : 'border-red-200 bg-red-50'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">
+                                {coverage.covered ? '✅' : '❌'}
+                              </span>
+                              <span className="font-medium">{itemName}</span>
+                            </div>
+                            <span
+                              className={`text-sm font-semibold ${
+                                coverage.covered ? 'text-green-700' : 'text-red-700'
+                              }`}
+                            >
+                              {coverage.covered
+                                ? `カバー済み（${coverage.match_rate}%）`
+                                : '未カバー'}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Coverage Rate Summary */}
+                    <div className="mt-4 rounded-md bg-gray-50 p-3 text-sm text-gray-600">
+                      ヒアリング項目カバー率:{' '}
+                      <strong>
+                        {Math.round(
+                          (Object.values(call.hearing_item_coverage).filter((c) => c.covered)
+                            .length /
+                            Object.keys(call.hearing_item_coverage).length) *
+                            100
+                        )}
+                        %
+                      </strong>{' '}
+                      (
+                      {Object.values(call.hearing_item_coverage).filter((c) => c.covered).length}/
+                      {Object.keys(call.hearing_item_coverage).length}項目)
+                    </div>
+                  </div>
+
+                  {/* Explanation */}
+                  <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+                    <p className="mb-2 font-medium">💡 一致率について</p>
+                    <ul className="list-inside list-disc space-y-1 text-xs">
+                      <li>
+                        70%以上: 良好 ✅（表現が異なっても意図が伝わっていれば高評価）
+                      </li>
+                      <li>50-69%: 改善の余地あり ⚠️</li>
+                      <li>50%未満: 要改善 ❌</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-8 text-center text-gray-500">
+                  <p className="mb-2 font-medium">トークスクリプト分析がありません</p>
+                  <div className="space-y-2 text-sm">
+                    <p>分析が実施されない理由：</p>
+                    <ul className="list-inside list-disc space-y-1">
+                      <li>プロジェクトにトークスクリプトが設定されていない</li>
+                      <li>この通話はトークスクリプト分析機能実装前に記録されたもの</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
             {/* Transcript Tab */}
             <TabsContent value="transcript">
-              {call.transcript_text ? (
+              {call.transcript_segments && call.transcript_segments.length > 0 ? (
+                <div className="space-y-3 rounded-md bg-gray-50 p-4">
+                  <div className="mb-4 text-sm font-medium text-gray-700">
+                    タイムスタンプ付き文字起こし（SRT形式）
+                  </div>
+                  {call.transcript_segments.map((segment) => (
+                    <div key={segment.id} className="border-l-4 border-blue-500 bg-white p-3">
+                      <div className="mb-1 font-mono text-xs text-gray-500">
+                        {formatTimestamp(segment.start)} → {formatTimestamp(segment.end)}
+                      </div>
+                      <div className="text-sm leading-relaxed">{segment.text}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : call.transcript_text ? (
                 <div className="whitespace-pre-wrap rounded-md bg-gray-50 p-4">
                   {call.transcript_text}
                 </div>

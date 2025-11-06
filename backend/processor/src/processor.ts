@@ -5,6 +5,7 @@ import { detectCallStatus } from './services/statusDetection'
 import { sendSlackNotification } from './services/slackNotification'
 import { getZoomAccessToken } from './services/zoomAuth'
 import { generateFeedback } from './services/feedbackGeneration'
+import { analyzeTalkScriptMatch } from './services/talkScriptAnalysis'
 
 // Initialize Supabase client
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -166,6 +167,7 @@ async function processRecording(recording: ZoomPhoneRecording) {
         status_confidence: statusResult.confidence,
         audio_url: audioResult.gcsPath,
         transcript_url: transcriptPath,
+        transcript_segments: transcriptionResult.segments || null,
         // Auto-assigned user_id from Zoom User ID lookup
         user_id: userId || null,
         // project_id will be determined from phone number matching (M1.6)
@@ -181,13 +183,47 @@ async function processRecording(recording: ZoomPhoneRecording) {
 
     console.log('Call saved to Supabase:', callRecord.id)
 
+    // Step 4.3: Analyze talk script match (M3.3) - Phase 3
+    console.log('Step 4.3: Analyzing talk script match...')
+    const analysisResult = await analyzeTalkScriptMatch(
+      transcriptionResult.text,
+      callRecord.project_id
+    )
+
+    if (analysisResult.should_analyze) {
+      console.log(
+        `Talk script analysis complete: overall=${analysisResult.overall_match_rate}%`
+      )
+
+      // Update call record with analysis results
+      const { error: analysisUpdateError } = await supabase
+        .from('calls')
+        .update({
+          phase_match_rates: analysisResult.phase_match_rates,
+          hearing_item_coverage: analysisResult.hearing_item_coverage,
+        })
+        .eq('id', callRecord.id)
+
+      if (analysisUpdateError) {
+        console.error('Error updating call with analysis results:', analysisUpdateError)
+      } else {
+        console.log('Talk script analysis results saved to Supabase')
+        // Update callRecord with analysis for feedback generation
+        callRecord.phase_match_rates = analysisResult.phase_match_rates as any
+        callRecord.hearing_item_coverage = analysisResult.hearing_item_coverage as any
+      }
+    } else {
+      console.log('Talk script analysis skipped (no project or no talk script)')
+    }
+
     // Step 4.5: Generate AI Feedback (M2.4)
     console.log('Step 4.5: Generating AI feedback...')
     const feedbackResult = await generateFeedback(
       transcriptionResult.text,
       statusResult.status,
       recording.duration,
-      callRecord.project_id
+      callRecord.project_id,
+      analysisResult.should_analyze ? analysisResult : undefined
     )
 
     if (feedbackResult.should_generate && feedbackResult.feedback_text) {

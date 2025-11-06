@@ -180,8 +180,10 @@
 - [x] 音声ダウンロード実装
 - [x] GCS保存実装
 - [x] Whisper API連携（文字起こし）
-- [x] GPT-4o-mini連携（通話状態判定）
+- [x] Whisper APIセグメント取得（SRT形式対応）
+- [x] GPT-5-mini連携（通話状態判定）
 - [x] Supabaseへのメタデータ保存
+- [x] タイムスタンプ付き文字起こし保存（transcript_segments）
 - [x] Slack通知実装（基本版）
 
 **成果物**:
@@ -189,10 +191,12 @@
 - [x] `/webhook/zoom` エンドポイント（Zoom Proxy経由）
 - [x] Backend Processor 完成（5ステップ処理フロー）
 - [x] `audioDownloader.ts` - Zoom音声ダウンロード＆GCS保存
-- [x] `transcription.ts` - Whisper API文字起こし
-- [x] `statusDetection.ts` - GPT-4o-mini通話状態判定
+- [x] `transcription.ts` - Whisper API文字起こし（セグメント情報含む）
+- [x] `statusDetection.ts` - GPT-5-mini通話状態判定
 - [x] `slackNotification.ts` - Slack通知
 - [x] `calls` テーブルへのデータ保存確認
+- [x] Migration: `transcript_segments` JSONB列追加（2025-01-06）
+- [x] SRT形式表示UI実装（通話詳細ページ）
 
 ---
 
@@ -294,13 +298,13 @@
 
 - [x] 音声録音UI（Web Audio API）
 - [x] Whisper API連携（音声→文字起こし）
-- [x] GPT-4o連携（文字起こし→プロンプト生成）※GPT-5の代替
+- [x] GPT-5連携（文字起こし→プロンプト生成）
 - [x] 生成されたプロンプトの編集UI
 - [x] プロンプト保存
 
 **成果物**:
 
-- [x] `/app/api/prompts/generate` エンドポイント - Whisper + GPT-4o統合
+- [x] `/app/api/prompts/generate` エンドポイント - Whisper + GPT-5統合
 - [x] `components/AudioRecorder.tsx` - 音声録音コンポーネント（Web Audio API）
 - [x] プロンプト作成ページへのAIアシスタント統合（折りたたみ可能なUIカード）
 - [x] 追加コンテキスト入力機能
@@ -310,7 +314,7 @@
 **実装詳細**:
 
 - OpenAI Whisper API: 音声→日本語文字起こし
-- OpenAI GPT-4o: 文字起こし→プロンプト生成（システムプロンプトで営業フィードバックに最適化）
+- OpenAI GPT-5: 文字起こし→プロンプト生成（システムプロンプトで営業フィードバックに最適化）
 - 最大録音時間: 300秒（5分）
 - エラーハンドリング: 認証エラー、レート制限、バリデーションエラー対応
 
@@ -320,7 +324,7 @@
 
 #### M2.4: フィードバック生成実装（1週間）
 
-- [x] GPT-4o-mini連携（基本フィードバック生成）
+- [x] GPT-5-mini連携（基本フィードバック生成）
 - [x] プロンプト取得ロジック（プロジェクト固有 or デフォルト）
 - [x] フィードバック生成条件判定（status='connected' AND duration>=60秒）
 - [x] Slack通知にフィードバック追加
@@ -335,7 +339,7 @@
 
 **実装詳細**:
 
-- OpenAI GPT-4o-miniモデル使用
+- OpenAI GPT-5-miniモデル使用
 - フィードバック生成条件: connected通話で60秒以上
 - プロンプトバージョン履歴対応（`prompt_version_id`でリンク）
 - Slack通知にフィードバックテキスト含む
@@ -366,16 +370,25 @@
 
 #### M3.1: トークスクリプト管理UI（1週間）
 
-- [ ] トークスクリプト作成・編集ページ
-- [ ] フェーズ別入力フォーム（オープニング/ヒアリング/提案/クロージング）
-- [ ] ヒアリング項目管理UI
-- [ ] デフォルト項目「現在の課題」の削除不可制約
-- [ ] 表示順序のドラッグ&ドロップ
+- [x] トークスクリプト作成・編集ページ
+- [x] フェーズ別入力フォーム（オープニング/ヒアリング/提案/クロージング）
+- [x] ヒアリング項目管理UI
+- [x] デフォルト項目「現在の課題」の削除不可制約
+- [x] 表示順序のドラッグ&ドロップ
 
 **成果物**:
 
-- `/app/projects/[id]/talk-scripts/page.tsx`
-- `/app/api/talk-scripts/*` API Routes
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/page.tsx` - トークスクリプト一覧・詳細ページ
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/new/page.tsx` - トークスクリプト作成ページ
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/[talkScriptId]/edit/page.tsx` - トークスクリプト編集ページ
+- [x] `/app/(dashboard)/projects/[id]/talk-scripts/[talkScriptId]/history/page.tsx` - トークスクリプト履歴ページ
+- [x] `/app/api/talk-scripts/route.ts` - トークスクリプトAPI（GET, POST）
+- [x] `/app/api/talk-scripts/[id]/route.ts` - 個別トークスクリプトAPI（GET, PUT, DELETE）
+- [x] `/app/api/talk-scripts/[id]/history/route.ts` - 履歴取得API
+- [x] `/app/api/talk-scripts/[id]/restore/route.ts` - バージョン復元API
+- [x] `/app/api/talk-scripts/hearing-items/[itemId]/route.ts` - ヒアリング項目API（PUT, DELETE）
+
+**完了日**: 2025-01-05
 
 ---
 
