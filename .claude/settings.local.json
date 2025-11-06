@@ -102,7 +102,9 @@
       "Bash(gcloud storage ls:*)",
       "Bash(gcloud storage cat:*)",
       "Bash(cmd //c \"taskkill //PID 42988 //F\")",
-      "mcp__supabase__apply_migration"
+      "mcp__supabase__apply_migration",
+      "Bash(ls:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

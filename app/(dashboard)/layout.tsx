@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from '@/components/LogoutButton'
-import { Home, FolderKanban, Users, FileText, Phone } from 'lucide-react'
+import { Home, FolderKanban, Users, FileText, Phone, Settings } from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -64,13 +64,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
                   プロンプト
                 </Link>
                 {isOwner && (
-                  <Link
-                    href="/users"
-                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    <Users className="h-4 w-4" />
-                    ユーザー管理
-                  </Link>
+                  <>
+                    <Link
+                      href="/users"
+                      className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <Users className="h-4 w-4" />
+                      ユーザー管理
+                    </Link>
+                    <Link
+                      href="/admin/default-prompts"
+                      className="flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      <Settings className="h-4 w-4" />
+                      システム設定
+                    </Link>
+                  </>
                 )}
               </div>
             </div>
