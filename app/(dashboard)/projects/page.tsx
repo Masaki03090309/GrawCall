@@ -22,15 +22,37 @@ interface Project {
   }>
 }
 
+interface UserInfo {
+  id: string
+  name: string
+  email: string
+  role: 'owner' | 'director' | 'user'
+}
+
 export default function ProjectsPage() {
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    fetchUserInfo()
     fetchProjects()
   }, [])
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch('/api/auth/user')
+      const result = await response.json()
+
+      if (result.success && result.data) {
+        setUserInfo(result.data)
+      }
+    } catch (err: any) {
+      console.error('Error fetching user info:', err)
+    }
+  }
 
   const fetchProjects = async () => {
     try {
@@ -96,20 +118,24 @@ export default function ProjectsPage() {
           <h1 className="text-3xl font-bold">プロジェクト</h1>
           <p className="mt-2 text-muted-foreground">プロジェクトを管理し、メンバーを招待します</p>
         </div>
-        <Button onClick={handleCreateProject}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          新規プロジェクト
-        </Button>
+        {userInfo?.role === 'owner' && (
+          <Button onClick={handleCreateProject}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            新規プロジェクト
+          </Button>
+        )}
       </div>
 
       {projects.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
             <p className="mb-4 text-muted-foreground">プロジェクトがありません</p>
-            <Button onClick={handleCreateProject}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              最初のプロジェクトを作成
-            </Button>
+            {userInfo?.role === 'owner' && (
+              <Button onClick={handleCreateProject}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                最初のプロジェクトを作成
+              </Button>
+            )}
           </CardContent>
         </Card>
       ) : (

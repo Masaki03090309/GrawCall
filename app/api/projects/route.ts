@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
 
     const { name, slack_webhook_url } = validationResult.data
 
-    // Check user role - only owners and directors can create projects
+    // Check user role - only owners can create projects
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role')
@@ -157,13 +157,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (userData.role !== 'owner' && userData.role !== 'director') {
+    if (userData.role !== 'owner') {
       return NextResponse.json(
         {
           success: false,
           error: {
             code: 'FORBIDDEN',
-            message: 'プロジェクトを作成する権限がありません',
+            message: 'プロジェクトを作成する権限がありません。オーナーのみがプロジェクトを作成できます。',
           },
         },
         { status: 403 }
