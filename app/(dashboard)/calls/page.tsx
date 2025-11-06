@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Phone, Clock, Eye } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Phone, Clock, Eye, Filter } from 'lucide-react'
 
 interface Call {
   id: string
@@ -27,24 +34,58 @@ interface Call {
     name: string
   } | null
   project: {
+    id: string
     name: string
   } | null
 }
 
+interface Project {
+  id: string
+  name: string
+}
+
 export default function CallsListPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [calls, setCalls] = useState<Call[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(
+    searchParams.get('project_id') || 'all'
+  )
+
+  useEffect(() => {
+    fetchProjects()
+  }, [])
 
   useEffect(() => {
     fetchCalls()
-  }, [])
+  }, [selectedProjectId])
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects')
+      const result = await response.json()
+
+      if (result.success && result.data?.items) {
+        setProjects(result.data.items)
+      }
+    } catch (err: any) {
+      console.error('Error fetching projects:', err)
+    }
+  }
 
   const fetchCalls = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/calls')
+      const params = new URLSearchParams()
+
+      if (selectedProjectId && selectedProjectId !== 'all') {
+        params.append('project_id', selectedProjectId)
+      }
+
+      const response = await fetch(`/api/calls?${params.toString()}`)
       const result = await response.json()
 
       if (!result.success) {
@@ -58,6 +99,17 @@ export default function CallsListPage() {
       setError('通話一覧の取得に失敗しました')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleProjectFilterChange = (value: string) => {
+    setSelectedProjectId(value)
+
+    // Update URL
+    if (value === 'all') {
+      router.push('/calls')
+    } else {
+      router.push(`/calls?project_id=${value}`)
     }
   }
 
@@ -127,8 +179,32 @@ export default function CallsListPage() {
     <div className="container mx-auto py-8">
       <Card>
         <CardHeader>
-          <CardTitle>通話履歴</CardTitle>
-          <CardDescription>Zoom Phone通話の処理済みデータ一覧</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>通話履歴</CardTitle>
+              <CardDescription>Zoom Phone通話の処理済みデータ一覧</CardDescription>
+            </div>
+
+            {/* Project Filter */}
+            {projects.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <Select value={selectedProjectId} onValueChange={handleProjectFilterChange}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="プロジェクトで絞り込み" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全てのプロジェクト</SelectItem>
+                    {projects.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {calls.length === 0 ? (
