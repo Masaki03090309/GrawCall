@@ -72,11 +72,12 @@ export default function ProjectMembersPage() {
   const [selectedUserEmail, setSelectedUserEmail] = useState('')
   const [newMemberRole, setNewMemberRole] = useState<'director' | 'user'>('user')
   const [showDropdown, setShowDropdown] = useState(false)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
+      await fetchUserRole()
       await fetchMembers()
-      await fetchAllUsers()
     }
     loadData()
   }, [projectId])
@@ -99,6 +100,24 @@ export default function ProjectMembersPage() {
     }
   }, [showDropdown])
 
+  const fetchUserRole = async () => {
+    try {
+      const response = await fetch('/api/auth/user')
+      const result = await response.json()
+
+      if (result.success && result.data) {
+        setUserRole(result.data.role)
+
+        // Only owner can add members, so only fetch all users for owner
+        if (result.data.role === 'owner') {
+          await fetchAllUsers()
+        }
+      }
+    } catch (err: any) {
+      console.error('Error fetching user role:', err)
+    }
+  }
+
   const fetchMembers = async () => {
     try {
       setLoading(true)
@@ -112,6 +131,11 @@ export default function ProjectMembersPage() {
       }
 
       setMembers(result.data.items)
+
+      // Refresh available users if owner
+      if (userRole === 'owner') {
+        await fetchAllUsers()
+      }
     } catch (err: any) {
       console.error('Error fetching members:', err)
       setError(err.message)
@@ -280,13 +304,19 @@ export default function ProjectMembersPage() {
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle>メンバー管理</CardTitle>
-              <CardDescription>プロジェクトメンバーの追加・削除とロール管理</CardDescription>
+              <CardTitle>メンバー一覧</CardTitle>
+              <CardDescription>
+                {userRole === 'owner'
+                  ? 'プロジェクトメンバーの追加・削除とロール管理'
+                  : 'プロジェクトメンバーの確認'}
+              </CardDescription>
             </div>
-            <Button onClick={() => setShowAddDialog(true)}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              メンバーを追加
-            </Button>
+            {userRole === 'owner' && (
+              <Button onClick={() => setShowAddDialog(true)}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                メンバーを追加
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -307,7 +337,7 @@ export default function ProjectMembersPage() {
                   <TableHead>ロール</TableHead>
                   <TableHead>システムロール</TableHead>
                   <TableHead>追加日</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
+                  {userRole === 'owner' && <TableHead className="text-right">操作</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -320,18 +350,20 @@ export default function ProjectMembersPage() {
                       <span className="capitalize">{member.users.role}</span>
                     </TableCell>
                     <TableCell>{new Date(member.created_at).toLocaleDateString('ja-JP')}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          setMemberToDelete(member)
-                          setShowDeleteDialog(true)
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </TableCell>
+                    {userRole === 'owner' && (
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setMemberToDelete(member)
+                            setShowDeleteDialog(true)
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
