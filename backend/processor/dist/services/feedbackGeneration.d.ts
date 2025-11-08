@@ -6,7 +6,9 @@ interface FeedbackGenerationResult {
     skip_reason?: string;
 }
 /**
- * Generate feedback for a call using GPT-5-mini
+ * Generate feedback for a call using GPT model
+ * - Connected calls (60s+): Use 'connected' prompt with gpt-5-mini
+ * - Reception calls: Use 'reception' prompt with gpt-5-nano
  *
  * @param transcriptText - Transcribed text from the call
  * @param status - Call status (connected/reception/no_conversation)

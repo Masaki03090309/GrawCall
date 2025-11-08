@@ -72,6 +72,9 @@ CREATE TABLE users (
   name VARCHAR(255),
   role VARCHAR(50) NOT NULL CHECK (role IN ('owner', 'director', 'user')),
 
+  -- Zoom連携（追加: 2025-01-07）
+  zoom_user_id TEXT UNIQUE,
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -79,6 +82,7 @@ CREATE TABLE users (
 -- インデックス
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
+CREATE INDEX idx_users_zoom_user_id ON users(zoom_user_id);
 
 -- RLS ポリシー
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
@@ -104,6 +108,7 @@ USING (
 | email | VARCHAR(255) | NOT NULL | メールアドレス（ユニーク） |
 | name | VARCHAR(255) | NULL | ユーザー名 |
 | role | VARCHAR(50) | NOT NULL | ロール（owner/director/user） |
+| zoom_user_id | TEXT | NULL | Zoom User ID（ユニーク、通話の識別子）※追加: 2025-01-07 |
 | created_at | TIMESTAMP | NOT NULL | 作成日時 |
 | updated_at | TIMESTAMP | NOT NULL | 更新日時 |
 
@@ -411,6 +416,7 @@ CREATE TABLE calls (
   -- Zoom情報
   zoom_call_id VARCHAR(255) UNIQUE NOT NULL,
   zoom_recording_id VARCHAR(255) UNIQUE NOT NULL,
+  zoom_user_id TEXT, -- ★ 主要な識別子（Zoom webhook の user_id）※追加: 2025-01-07
 
   -- 通話情報
   direction VARCHAR(50) CHECK (direction IN ('inbound', 'outbound')),
@@ -455,10 +461,78 @@ CREATE TABLE calls (
 -- インデックス
 CREATE INDEX idx_calls_project ON calls(project_id);
 CREATE INDEX idx_calls_user ON calls(user_id);
+CREATE INDEX idx_calls_zoom_user_id ON calls(zoom_user_id); -- 追加: 2025-01-07
 CREATE INDEX idx_calls_time ON calls(call_time);
 CREATE INDEX idx_calls_status ON calls(status);
 CREATE INDEX idx_calls_zoom_call ON calls(zoom_call_id);
 CREATE INDEX idx_calls_zoom_recording ON calls(zoom_recording_id);
+
+-- RLS ポリシー（Zoom User ID ベース）※更新: 2025-01-07
+ALTER TABLE calls ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "calls_select"
+ON calls FOR SELECT
+USING (
+  -- ユーザーは自分の zoom_user_id の通話を閲覧
+  EXISTS (
+    SELECT 1 FROM users
+    WHERE users.id = auth.uid()
+      AND users.zoom_user_id = calls.zoom_user_id
+      AND calls.zoom_user_id IS NOT NULL
+  )
+  OR
+  -- ディレクターはプロジェクトメンバーの通話を閲覧（zoom_user_id ベース）
+  EXISTS (
+    SELECT 1 FROM project_members pm_self
+    WHERE pm_self.user_id = auth.uid()
+      AND pm_self.role IN ('director', 'owner')
+      AND EXISTS (
+        SELECT 1 FROM project_members pm_other
+        INNER JOIN users u ON u.id = pm_other.user_id
+        WHERE pm_other.project_id = pm_self.project_id
+          AND u.zoom_user_id = calls.zoom_user_id
+          AND calls.zoom_user_id IS NOT NULL
+      )
+  )
+  OR
+  -- オーナーは全通話を閲覧
+  EXISTS (
+    SELECT 1 FROM users
+    WHERE id = auth.uid() AND role = 'owner'
+  )
+);
+
+CREATE POLICY "calls_update_own"
+ON calls FOR UPDATE
+USING (
+  -- ユーザーは自分の zoom_user_id の通話を更新
+  EXISTS (
+    SELECT 1 FROM users
+    WHERE users.id = auth.uid()
+      AND users.zoom_user_id = calls.zoom_user_id
+      AND calls.zoom_user_id IS NOT NULL
+  )
+  OR
+  -- ディレクターはプロジェクトメンバーの通話を更新
+  EXISTS (
+    SELECT 1 FROM project_members pm_self
+    WHERE pm_self.user_id = auth.uid()
+      AND pm_self.role IN ('director', 'owner')
+      AND EXISTS (
+        SELECT 1 FROM project_members pm_other
+        INNER JOIN users u ON u.id = pm_other.user_id
+        WHERE pm_other.project_id = pm_self.project_id
+          AND u.zoom_user_id = calls.zoom_user_id
+          AND calls.zoom_user_id IS NOT NULL
+      )
+  )
+  OR
+  -- オーナーは全通話を更新
+  EXISTS (
+    SELECT 1 FROM users
+    WHERE id = auth.uid() AND role = 'owner'
+  )
+);
 
 -- パーティショニング用（将来的に月次パーティション可能）
 -- CREATE INDEX idx_calls_partition ON calls(call_time, project_id);
@@ -468,10 +542,11 @@ CREATE INDEX idx_calls_zoom_recording ON calls(zoom_recording_id);
 | カラム名 | データ型 | NULL | 説明 |
 |---------|---------|------|------|
 | id | UUID | NOT NULL | 通話ID |
-| project_id | UUID | NULL | プロジェクトID |
-| user_id | UUID | NULL | ユーザーID（営業担当者） |
+| project_id | UUID | NULL | プロジェクトID（参考情報） |
+| user_id | UUID | NULL | ユーザーID（営業担当者、参考情報） |
 | zoom_call_id | VARCHAR(255) | NOT NULL | Zoom Call ID |
 | zoom_recording_id | VARCHAR(255) | NOT NULL | Zoom Recording ID |
+| zoom_user_id | TEXT | NULL | **Zoom User ID（主要な識別子）** - Zoom webhookのuser_id。通話アクセス制御に使用。※追加: 2025-01-07 |
 | direction | VARCHAR(50) | NULL | 通話方向（inbound/outbound） |
 | caller_number | VARCHAR(50) | NULL | 発信者電話番号 |
 | callee_number | VARCHAR(50) | NULL | 着信者電話番号 |
@@ -496,6 +571,8 @@ CREATE INDEX idx_calls_zoom_recording ON calls(zoom_recording_id);
 | emotion_analysis_url | TEXT | NULL | 感情分析グラフデータURL（JSON） |
 | created_at | TIMESTAMP | NOT NULL | 作成日時 |
 | updated_at | TIMESTAMP | NOT NULL | 更新日時 |
+
+**重要**: `zoom_user_id` が主要な識別子として使用されます。`user_id` と `project_id` は参考情報として保存されますが、アクセス制御には使用されません。詳細は [Zoom User ID Architecture](./zoom_user_id_architecture.md) を参照してください。
 
 **JSONB構造例**:
 

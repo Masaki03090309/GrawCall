@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,6 +16,75 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
+
+  // Handle email confirmation callback with hash fragment
+  useEffect(() => {
+    const handleEmailConfirmation = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      const accessToken = hashParams.get('access_token')
+      const refreshToken = hashParams.get('refresh_token')
+      const type = hashParams.get('type')
+
+      // If we have tokens in the hash fragment, process them
+      if (accessToken && refreshToken) {
+        console.log('Found tokens in hash fragment, type:', type)
+        setLoading(true)
+
+        try {
+          // Manually set session using tokens from hash fragment
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          })
+
+          if (error) {
+            console.error('Error setting session:', error)
+            setError('認証に失敗しました。もう一度お試しください。')
+            setLoading(false)
+            return
+          }
+
+          if (data.session && data.user) {
+            console.log('Session established for user:', data.user.email)
+
+            // Ensure user record exists in database
+            const { data: existingUser } = await supabase
+              .from('users')
+              .select('id')
+              .eq('id', data.user.id)
+              .maybeSingle()
+
+            if (!existingUser) {
+              console.log('Creating user record...')
+              const { error: insertError } = await supabase.from('users').insert({
+                id: data.user.id,
+                email: data.user.email!,
+                name: data.user.user_metadata?.full_name || data.user.email!.split('@')[0],
+                role: 'user',
+              })
+
+              if (insertError) {
+                console.error('Error creating user record:', insertError)
+              }
+            }
+
+            // Clear hash fragment and redirect to home
+            console.log('Redirecting to home...')
+            window.history.replaceState(null, '', window.location.pathname)
+            router.push('/')
+            router.refresh()
+          }
+        } catch (error) {
+          console.error('Unexpected error during email confirmation:', error)
+          setError('認証に失敗しました。もう一度お試しください。')
+          setLoading(false)
+        }
+      }
+    }
+
+    handleEmailConfirmation()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -192,6 +262,13 @@ export default function LoginPage() {
             </svg>
             Google でログイン
           </Button>
+
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">アカウントをお持ちでないですか？ </span>
+            <Link href="/signup" className="font-medium text-primary hover:underline">
+              新規登録
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </div>

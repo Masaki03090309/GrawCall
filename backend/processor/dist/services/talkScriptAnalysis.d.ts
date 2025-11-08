@@ -17,7 +17,7 @@ export interface TalkScriptAnalysisResult {
 }
 /**
  * Analyze semantic match rate between talk script and actual call transcript
- * Uses GPT-5-mini for semantic (meaning-based) matching
+ * Uses GPT-5-nano for semantic (meaning-based) matching
  */
 export declare function analyzeTalkScriptMatch(transcript: string, projectId: string | null): Promise<TalkScriptAnalysisResult>;
 /**

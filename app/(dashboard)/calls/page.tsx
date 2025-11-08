@@ -231,7 +231,7 @@ export default function CallsListPage() {
                 {calls.map(call => (
                   <TableRow key={call.id}>
                     <TableCell className="font-medium">{formatDate(call.call_time)}</TableCell>
-                    <TableCell>{call.caller_number || 'N/A'}</TableCell>
+                    <TableCell>{call.user?.name || call.caller_number || 'N/A'}</TableCell>
                     <TableCell>{call.callee_number || 'N/A'}</TableCell>
                     <TableCell>
                       <div className="flex items-center">

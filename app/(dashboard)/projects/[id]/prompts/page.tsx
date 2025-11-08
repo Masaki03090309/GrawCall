@@ -1,28 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, History, Edit, Trash2, FileText } from 'lucide-react'
-import Link from 'next/link'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { MessageSquare, Eye, Sparkles } from 'lucide-react'
 
 interface Prompt {
   id: string
-  project_id: string
+  project_id: string | null
   prompt_type: 'connected' | 'reception'
   content: string
   version: number
@@ -39,12 +34,17 @@ interface Prompt {
 
 export default function PromptsPage() {
   const params = useParams()
+  const router = useRouter()
   const projectId = params.id as string
 
-  const [connectedPrompts, setConnectedPrompts] = useState<Prompt[]>([])
-  const [receptionPrompts, setReceptionPrompts] = useState<Prompt[]>([])
+  const [connectedPrompt, setConnectedPrompt] = useState<Prompt | null>(null)
+  const [receptionPrompt, setReceptionPrompt] = useState<Prompt | null>(null)
+  const [defaultConnectedPrompt, setDefaultConnectedPrompt] = useState<Prompt | null>(null)
+  const [defaultReceptionPrompt, setDefaultReceptionPrompt] = useState<Prompt | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [viewingPrompt, setViewingPrompt] = useState<Prompt | null>(null)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchPrompts()
@@ -55,24 +55,45 @@ export default function PromptsPage() {
     setError(null)
 
     try {
-      // Fetch connected prompts
-      const connectedRes = await fetch(`/api/prompts?project_id=${projectId}&prompt_type=connected`)
+      // Fetch project-specific connected prompt
+      const connectedRes = await fetch(
+        `/api/prompts?project_id=${projectId}&prompt_type=connected&is_active=true`
+      )
       const connectedData = await connectedRes.json()
 
-      if (!connectedData.success) {
-        throw new Error(connectedData.error?.message || 'Failed to fetch connected prompts')
+      if (connectedData.success && connectedData.data.items.length > 0) {
+        setConnectedPrompt(connectedData.data.items[0])
       }
 
-      // Fetch reception prompts
-      const receptionRes = await fetch(`/api/prompts?project_id=${projectId}&prompt_type=reception`)
+      // Fetch project-specific reception prompt
+      const receptionRes = await fetch(
+        `/api/prompts?project_id=${projectId}&prompt_type=reception&is_active=true`
+      )
       const receptionData = await receptionRes.json()
 
-      if (!receptionData.success) {
-        throw new Error(receptionData.error?.message || 'Failed to fetch reception prompts')
+      if (receptionData.success && receptionData.data.items.length > 0) {
+        setReceptionPrompt(receptionData.data.items[0])
       }
 
-      setConnectedPrompts(connectedData.data.items || [])
-      setReceptionPrompts(receptionData.data.items || [])
+      // Fetch system default connected prompt
+      const defaultConnectedRes = await fetch(
+        `/api/prompts?project_id=null&prompt_type=connected&is_active=true`
+      )
+      const defaultConnectedData = await defaultConnectedRes.json()
+
+      if (defaultConnectedData.success && defaultConnectedData.data.items.length > 0) {
+        setDefaultConnectedPrompt(defaultConnectedData.data.items[0])
+      }
+
+      // Fetch system default reception prompt
+      const defaultReceptionRes = await fetch(
+        `/api/prompts?project_id=null&prompt_type=reception&is_active=true`
+      )
+      const defaultReceptionData = await defaultReceptionRes.json()
+
+      if (defaultReceptionData.success && defaultReceptionData.data.items.length > 0) {
+        setDefaultReceptionPrompt(defaultReceptionData.data.items[0])
+      }
     } catch (err: any) {
       console.error('Error fetching prompts:', err)
       setError(err.message || 'プロンプトの取得に失敗しました')
@@ -81,91 +102,86 @@ export default function PromptsPage() {
     }
   }
 
-  const handleDelete = async (promptId: string) => {
-    try {
-      const res = await fetch(`/api/prompts/${promptId}`, {
-        method: 'DELETE',
-      })
-
-      const data = await res.json()
-
-      if (!data.success) {
-        throw new Error(data.error?.message || 'Failed to delete prompt')
-      }
-
-      // Refresh prompts
-      await fetchPrompts()
-    } catch (err: any) {
-      console.error('Error deleting prompt:', err)
-      alert(err.message || 'プロンプトの削除に失敗しました')
-    }
+  const viewPrompt = (prompt: Prompt | null) => {
+    if (!prompt) return
+    setViewingPrompt(prompt)
+    setIsDialogOpen(true)
   }
 
-  const renderPromptCard = (prompt: Prompt) => (
-    <Card key={prompt.id} className="mb-4">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-lg">Version {prompt.version}</CardTitle>
-            {prompt.is_active && <Badge variant="default">アクティブ</Badge>}
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/projects/${projectId}/prompts/${prompt.id}/history`}>
-                <History className="mr-2 h-4 w-4" />
-                履歴
-              </Link>
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/projects/${projectId}/prompts/${prompt.id}/edit`}>
-                <Edit className="mr-2 h-4 w-4" />
-                編集
-              </Link>
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm">
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  削除
+  const renderPromptCard = (
+    title: string,
+    description: string,
+    promptType: 'connected' | 'reception',
+    customPrompt: Prompt | null,
+    defaultPrompt: Prompt | null
+  ) => {
+    const isCustomized = customPrompt !== null
+    const displayPrompt = customPrompt || defaultPrompt
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isCustomized ? (
+            // カスタマイズ済み
+            <>
+              <div className="mb-4 flex items-center gap-2">
+                <Badge variant="default">カスタマイズ済み</Badge>
+                <span className="text-sm text-muted-foreground">
+                  最終更新: {displayPrompt ? new Date(displayPrompt.created_at).toLocaleDateString('ja-JP') : ''}
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <Button
+                  onClick={() =>
+                    router.push(`/projects/${projectId}/prompts/assistant?type=${promptType}`)
+                  }
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  さらに改善する
                 </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>プロンプトを削除しますか？</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    この操作は取り消せません。Version {prompt.version}{' '}
-                    のプロンプトが完全に削除されます。
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>キャンセル</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleDelete(prompt.id)}>
-                    削除
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </div>
-        {prompt.change_comment && <CardDescription>{prompt.change_comment}</CardDescription>}
-      </CardHeader>
-      <CardContent>
-        <div className="mb-2 text-sm text-gray-600">
-          作成者: {prompt.created_by_user?.name || 'Unknown'} | 作成日時:{' '}
-          {new Date(prompt.created_at).toLocaleString('ja-JP')}
-        </div>
-        <div className="rounded-md bg-gray-50 p-4">
-          <pre className="whitespace-pre-wrap text-sm">{prompt.content}</pre>
-        </div>
-      </CardContent>
-    </Card>
-  )
+                <Button variant="outline" onClick={() => viewPrompt(displayPrompt)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  プロンプトを確認
+                </Button>
+              </div>
+            </>
+          ) : (
+            // システムデフォルト使用中
+            <>
+              <div className="mb-4 flex items-center gap-2">
+                <Badge variant="outline">システムデフォルト使用中</Badge>
+              </div>
+
+              <p className="mb-4 text-sm text-muted-foreground">
+                現在はシステム共通のプロンプトを使用しています。
+                プロンプトアシスタントで、このプロジェクト専用にカスタマイズできます。
+              </p>
+
+              <Button
+                onClick={() =>
+                  router.push(`/projects/${projectId}/prompts/assistant?type=${promptType}`)
+                }
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                プロンプトアシスタントで改善する
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
 
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="flex items-center justify-center">
-          <p>読み込み中...</p>
+      <div className="container mx-auto py-8">
+        <div className="flex min-h-[400px] items-center justify-center">
+          <p className="text-muted-foreground">読み込み中...</p>
         </div>
       </div>
     )
@@ -173,99 +189,67 @@ export default function PromptsPage() {
 
   if (error) {
     return (
-      <div className="p-8">
-        <Card className="border-red-200 bg-red-50">
+      <div className="container mx-auto py-8">
+        <Card className="border-destructive bg-destructive/10">
           <CardHeader>
-            <CardTitle className="text-red-800">エラー</CardTitle>
-            <CardDescription className="text-red-600">{error}</CardDescription>
+            <CardTitle className="text-destructive">エラー</CardTitle>
+            <CardDescription className="text-destructive">{error}</CardDescription>
           </CardHeader>
+          <CardContent>
+            <Button onClick={fetchPrompts}>再試行</Button>
+          </CardContent>
         </Card>
       </div>
     )
   }
 
-  const activeConnected = connectedPrompts.find(p => p.is_active)
-  const activeReception = receptionPrompts.find(p => p.is_active)
-
   return (
-    <div className="p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">プロンプト管理</h1>
-          <p className="mt-2 text-gray-600">AIフィードバック生成に使用するプロンプトを管理します</p>
-        </div>
-        <Button asChild>
-          <Link href={`/projects/${projectId}/prompts/new`}>
-            <Plus className="mr-2 h-4 w-4" />
-            新規作成
-          </Link>
-        </Button>
+    <div className="container mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">プロンプト管理</h1>
+        <p className="mt-2 text-muted-foreground">
+          AIフィードバック生成に使用するプロンプトを管理します
+        </p>
       </div>
 
-      <Tabs defaultValue="connected" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="connected">
-            <FileText className="mr-2 h-4 w-4" />
-            つながった通話用
-            {activeConnected && (
-              <Badge variant="secondary" className="ml-2">
-                v{activeConnected.version}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="reception">
-            <FileText className="mr-2 h-4 w-4" />
-            受付に当たった通話用
-            {activeReception && (
-              <Badge variant="secondary" className="ml-2">
-                v{activeReception.version}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        {/* Connected用プロンプト */}
+        {renderPromptCard(
+          'Connected用プロンプト',
+          '担当者につながった通話のフィードバック生成に使用されます',
+          'connected',
+          connectedPrompt,
+          defaultConnectedPrompt
+        )}
 
-        <TabsContent value="connected" className="mt-6">
-          {connectedPrompts.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center text-gray-500">
-                  <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                  <p>つながった通話用のプロンプトがまだありません</p>
-                  <Button className="mt-4" asChild>
-                    <Link href={`/projects/${projectId}/prompts/new?type=connected`}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      最初のプロンプトを作成
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div>{connectedPrompts.map(renderPromptCard)}</div>
-          )}
-        </TabsContent>
+        {/* Reception用プロンプト */}
+        {renderPromptCard(
+          'Reception用プロンプト',
+          '受付に当たった通話のフィードバック生成に使用されます',
+          'reception',
+          receptionPrompt,
+          defaultReceptionPrompt
+        )}
+      </div>
 
-        <TabsContent value="reception" className="mt-6">
-          {receptionPrompts.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center text-gray-500">
-                  <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                  <p>受付に当たった通話用のプロンプトがまだありません</p>
-                  <Button className="mt-4" asChild>
-                    <Link href={`/projects/${projectId}/prompts/new?type=reception`}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      最初のプロンプトを作成
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div>{receptionPrompts.map(renderPromptCard)}</div>
-          )}
-        </TabsContent>
-      </Tabs>
+      {/* プロンプト表示ダイアログ */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>プロンプト内容</DialogTitle>
+            <DialogDescription>
+              {viewingPrompt?.prompt_type === 'connected'
+                ? 'Connected用プロンプト'
+                : 'Reception用プロンプト'}
+              {' - '}
+              バージョン: {viewingPrompt?.version}
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[600px] w-full rounded-md border p-4">
+            <pre className="whitespace-pre-wrap text-sm">{viewingPrompt?.content}</pre>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

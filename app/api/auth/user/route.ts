@@ -13,7 +13,7 @@ export async function GET() {
 
     if (authError || !user) {
       return NextResponse.json(
-        { error: 'UNAUTHORIZED', message: '認証されていません' },
+        { success: false, error: { code: 'UNAUTHORIZED', message: '認証されていません' } },
         { status: 401 }
       )
     }
@@ -44,7 +44,8 @@ export async function GET() {
         }
 
         return NextResponse.json({
-          user: newUser,
+          success: true,
+          data: newUser,
           projects: [],
         })
       }
@@ -82,13 +83,17 @@ export async function GET() {
       })) || []
 
     return NextResponse.json({
-      user: userData,
+      success: true,
+      data: userData,
       projects: formattedProjects,
     })
   } catch (error: any) {
     console.error('Error fetching user:', error)
     return NextResponse.json(
-      { error: 'INTERNAL_SERVER_ERROR', message: 'ユーザー情報の取得に失敗しました' },
+      {
+        success: false,
+        error: { code: 'INTERNAL_SERVER_ERROR', message: 'ユーザー情報の取得に失敗しました' },
+      },
       { status: 500 }
     )
   }

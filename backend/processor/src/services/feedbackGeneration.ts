@@ -16,7 +16,9 @@ interface FeedbackGenerationResult {
 }
 
 /**
- * Generate feedback for a call using GPT-5-mini
+ * Generate feedback for a call using GPT model
+ * - Connected calls (60s+): Use 'connected' prompt with gpt-5-mini
+ * - Reception calls: Use 'reception' prompt with gpt-5-nano
  *
  * @param transcriptText - Transcribed text from the call
  * @param status - Call status (connected/reception/no_conversation)
@@ -38,13 +40,17 @@ export async function generateFeedback(
   )
 
   // Check feedback generation conditions
-  const shouldGenerate = status === 'connected' && durationSeconds >= 60
+  // Generate feedback for:
+  // 1. Connected calls with duration >= 60s (use 'connected' prompt with gpt-5-mini)
+  // 2. Reception calls (use 'reception' prompt with gpt-5-nano)
+  const shouldGenerate =
+    (status === 'connected' && durationSeconds >= 60) || status === 'reception'
 
   if (!shouldGenerate) {
     const skipReason =
-      status !== 'connected'
-        ? `Status is ${status}, not connected`
-        : `Duration is ${durationSeconds}s, less than 60s`
+      status === 'connected'
+        ? `Duration is ${durationSeconds}s, less than 60s`
+        : `Status is ${status}, not connected or reception`
 
     console.log(`[Feedback] Skipping feedback generation: ${skipReason}`)
 
@@ -56,10 +62,14 @@ export async function generateFeedback(
     }
   }
 
+  // Determine prompt type based on status
+  const promptType = status === 'connected' ? 'connected' : 'reception'
+  console.log(`[Feedback] Prompt type: ${promptType}`)
+
   // Step 1: Retrieve prompt (project-specific or default)
   console.log('[Feedback] Step 1: Retrieving prompt...')
 
-  const prompt = await getActivePrompt(projectId)
+  const prompt = await getActivePrompt(projectId, promptType)
 
   if (!prompt) {
     console.warn('[Feedback] No active prompt found, skipping feedback generation')
@@ -73,8 +83,11 @@ export async function generateFeedback(
 
   console.log(`[Feedback] Using prompt: ${prompt.id} (version ${prompt.version})`)
 
-  // Step 2: Generate feedback with GPT-5-mini
-  console.log('[Feedback] Step 2: Generating feedback with GPT-5-mini...')
+  // Step 2: Generate feedback with appropriate model
+  // Connected (60s+) → gpt-5-mini
+  // Reception → gpt-5-nano
+  const model = promptType === 'connected' ? 'gpt-5-mini' : 'gpt-5-nano'
+  console.log(`[Feedback] Step 2: Generating feedback with ${model}...`)
 
   try {
     // Build enhanced system prompt with talk script analysis (M3.4 - Causality-aware feedback)
@@ -84,7 +97,7 @@ export async function generateFeedback(
     const userPrompt = buildUserPrompt(transcriptText, durationSeconds, analysisResult)
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-5-mini',
+      model,
       messages: [
         {
           role: 'system',
@@ -95,19 +108,19 @@ export async function generateFeedback(
           content: userPrompt,
         },
       ],
-      // IMPORTANT: GPT-5/GPT-5-mini does NOT support temperature, top_p, presence_penalty, frequency_penalty
+      // IMPORTANT: GPT-5/GPT-5-mini/GPT-5-nano does NOT support temperature, top_p, presence_penalty, frequency_penalty
       // These parameters are omitted as per technical guidelines
     })
 
     const feedbackText = completion.choices[0]?.message?.content
 
     if (!feedbackText) {
-      console.error('[Feedback] GPT-5-mini returned empty feedback')
+      console.error(`[Feedback] ${model} returned empty feedback`)
       return {
         feedback_text: null,
         prompt_version_id: prompt.id,
         should_generate: true,
-        skip_reason: 'GPT-5-mini returned empty response',
+        skip_reason: `${model} returned empty response`,
       }
     }
 
@@ -119,25 +132,29 @@ export async function generateFeedback(
       should_generate: true,
     }
   } catch (error: any) {
-    console.error('[Feedback] Error generating feedback with GPT-5-mini:', error.message)
+    console.error(`[Feedback] Error generating feedback with ${model}:`, error.message)
 
     return {
       feedback_text: null,
       prompt_version_id: prompt.id,
       should_generate: true,
-      skip_reason: `GPT-5-mini error: ${error.message}`,
+      skip_reason: `${model} error: ${error.message}`,
     }
   }
 }
 
 /**
  * Get active prompt for feedback generation
- * Priority: Project-specific connected prompt > Default connected prompt
+ * Priority: Project-specific prompt > Default system prompt
  *
  * @param projectId - Project ID (optional)
+ * @param promptType - Prompt type ('connected' or 'reception')
  * @returns Active prompt or null
  */
-async function getActivePrompt(projectId: string | null): Promise<any> {
+async function getActivePrompt(
+  projectId: string | null,
+  promptType: 'connected' | 'reception'
+): Promise<any> {
   try {
     // If projectId is provided, try to get project-specific prompt first
     if (projectId) {
@@ -145,36 +162,40 @@ async function getActivePrompt(projectId: string | null): Promise<any> {
         .from('prompts')
         .select('*')
         .eq('project_id', projectId)
-        .eq('prompt_type', 'connected')
+        .eq('prompt_type', promptType)
         .eq('is_active', true)
         .maybeSingle()
 
       if (!projectError && projectPrompt) {
-        console.log(`[Feedback] Found project-specific prompt for project ${projectId}`)
+        console.log(
+          `[Feedback] Found project-specific ${promptType} prompt for project ${projectId}`
+        )
         return projectPrompt
       }
     }
 
-    // Fallback to default prompt (project_id IS NULL)
+    // Fallback to default system prompt (project_id IS NULL)
     const { data: defaultPrompt, error: defaultError } = await supabase
       .from('prompts')
       .select('*')
       .is('project_id', null)
-      .eq('prompt_type', 'connected')
+      .eq('prompt_type', promptType)
       .eq('is_active', true)
       .maybeSingle()
 
     if (defaultError) {
-      console.error('[Feedback] Error fetching default prompt:', defaultError)
+      console.error(`[Feedback] Error fetching default ${promptType} prompt:`, defaultError)
       return null
     }
 
     if (defaultPrompt) {
-      console.log('[Feedback] Using default prompt')
+      console.log(`[Feedback] Using default ${promptType} prompt`)
       return defaultPrompt
     }
 
-    console.warn('[Feedback] No active prompt found (neither project-specific nor default)')
+    console.warn(
+      `[Feedback] No active ${promptType} prompt found (neither project-specific nor default)`
+    )
     return null
   } catch (error: any) {
     console.error('[Feedback] Error in getActivePrompt:', error.message)

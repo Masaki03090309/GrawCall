@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   // Public paths that don't require authentication
-  const publicPaths = ['/login', '/auth/callback']
+  const publicPaths = ['/login', '/signup', '/auth/callback']
   const isPublicPath = publicPaths.some(path => request.nextUrl.pathname.startsWith(path))
 
   // If user is not authenticated and trying to access protected route
@@ -67,8 +67,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // If user is authenticated and trying to access login page, redirect to home
-  if (user && request.nextUrl.pathname === '/login') {
+  // If user is authenticated and trying to access login or signup page, redirect to home
+  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
@@ -83,7 +83,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public folder
+     * - api routes (handled separately)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

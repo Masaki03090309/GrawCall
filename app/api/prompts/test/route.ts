@@ -16,7 +16,7 @@ const TestPromptSchema = z.object({
 
 /**
  * POST /api/prompts/test
- * Test a prompt with GPT-4o-mini
+ * Test a prompt with GPT-5-nano
  */
 export async function POST(request: NextRequest) {
   try {
@@ -104,9 +104,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Call OpenAI API with GPT-4o-mini
+    // Call OpenAI API with GPT-5-nano
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5-nano',
       messages: [
         {
           role: 'system',
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
           content: test_input,
         },
       ],
-      temperature: 0.7,
+      // Note: GPT-5-nano does not support temperature parameter
     })
 
     const response = completion.choices[0]?.message?.content || ''

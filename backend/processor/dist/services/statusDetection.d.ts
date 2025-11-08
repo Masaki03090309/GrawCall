@@ -5,7 +5,7 @@ export interface StatusDetectionResult {
     reason: string;
 }
 /**
- * Detect call status using GPT-5-mini
+ * Detect call status using GPT-5-nano
  *
  * Status definitions:
  * - connected: Successfully reached decision maker, had meaningful conversation

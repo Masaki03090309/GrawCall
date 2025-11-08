@@ -1,4 +1,5 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
 export function createClient() {
@@ -28,6 +29,23 @@ export function createClient() {
             // その場合はエラーを無視する
           }
         },
+      },
+    }
+  )
+}
+
+/**
+ * Create a Supabase client with service role key (bypasses RLS)
+ * Use this only in API routes where you need to bypass RLS policies
+ */
+export function createServiceRoleClient() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     }
   )

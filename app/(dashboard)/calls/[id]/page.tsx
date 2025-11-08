@@ -206,10 +206,10 @@ export default function CallDetailPage() {
             </div>
 
             <div className="flex items-center">
-              <Phone className="mr-2 h-4 w-4 text-gray-500" />
+              <User className="mr-2 h-4 w-4 text-gray-500" />
               <div>
-                <div className="text-sm text-gray-500">発信者番号</div>
-                <div className="font-medium">{call.caller_number || 'N/A'}</div>
+                <div className="text-sm text-gray-500">発信者</div>
+                <div className="font-medium">{call.user?.name || call.caller_number || 'N/A'}</div>
               </div>
             </div>
 
@@ -221,16 +221,6 @@ export default function CallDetailPage() {
               </div>
             </div>
 
-            {call.user && (
-              <div className="flex items-center">
-                <User className="mr-2 h-4 w-4 text-gray-500" />
-                <div>
-                  <div className="text-sm text-gray-500">ユーザー</div>
-                  <div className="font-medium">{call.user.name}</div>
-                </div>
-              </div>
-            )}
-
             {call.project && (
               <div className="flex items-center">
                 <User className="mr-2 h-4 w-4 text-gray-500" />
@@ -240,12 +230,6 @@ export default function CallDetailPage() {
                 </div>
               </div>
             )}
-          </div>
-
-          {/* AI Detection Confidence */}
-          <div className="mt-4 rounded-md bg-gray-50 p-3">
-            <div className="mb-1 text-sm text-gray-500">AI判定信頼度</div>
-            <div className="font-medium">{(call.status_confidence * 100).toFixed(0)}%</div>
           </div>
         </CardContent>
       </Card>

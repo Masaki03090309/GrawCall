@@ -9,6 +9,8 @@ export interface SlackNotificationData {
     transcriptUrl?: string;
     feedbackText?: string;
     webAppUrl?: string;
+    projectName?: string;
+    userName?: string;
 }
 /**
  * Send Slack notification for call processing completion

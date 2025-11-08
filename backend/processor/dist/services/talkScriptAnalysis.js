@@ -13,7 +13,7 @@ const openai = new openai_1.default({
 const supabase = (0, supabase_js_1.createClient)(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 /**
  * Analyze semantic match rate between talk script and actual call transcript
- * Uses GPT-5-mini for semantic (meaning-based) matching
+ * Uses GPT-5-nano for semantic (meaning-based) matching
  */
 async function analyzeTalkScriptMatch(transcript, projectId) {
     console.log('Analyzing talk script match...');
@@ -86,26 +86,26 @@ async function analyzeTalkScriptMatch(transcript, projectId) {
   }
 }`;
         const userPrompt = buildAnalysisPrompt(talkScript, transcript);
-        console.log('Calling GPT-5-mini for semantic matching...');
-        // Step 3: Call GPT-5-mini
+        console.log('Calling GPT-5-nano for semantic matching...');
+        // Step 3: Call GPT-5-nano
         const completion = await openai.chat.completions.create({
-            model: 'gpt-5-mini',
+            model: 'gpt-5-nano',
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userPrompt },
             ],
-            temperature: 0.3, // Lower temperature for more consistent analysis
+            // NOTE: GPT-5-nano does NOT support temperature parameter
             response_format: { type: 'json_object' },
         });
         const responseText = completion.choices[0].message.content || '{}';
-        console.log('GPT-5-mini analysis response received');
+        console.log('GPT-5-nano analysis response received');
         // Step 4: Parse response
         let analysisData;
         try {
             analysisData = JSON.parse(responseText);
         }
         catch (parseError) {
-            console.error('Failed to parse GPT-5-mini response:', parseError);
+            console.error('Failed to parse GPT-5-nano response:', parseError);
             return { should_analyze: false };
         }
         // Validate and return

@@ -94,6 +94,37 @@ async function lookupUserByZoomId(zoomUserId: string): Promise<string | null> {
   }
 }
 
+/**
+ * Get user's project
+ */
+async function getUserProject(userId: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase
+      .from('project_members')
+      .select('project_id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error looking up user project:', error)
+      return null
+    }
+
+    if (data) {
+      console.log(`User project found: ${data.project_id}`)
+      return data.project_id
+    } else {
+      console.log('User is not a member of any project')
+      return null
+    }
+  } catch (error) {
+    console.error('Exception in getUserProject:', error)
+    return null
+  }
+}
+
 async function processRecording(recording: ZoomPhoneRecording) {
   const callId = recording.call_log_id
 
@@ -105,10 +136,22 @@ async function processRecording(recording: ZoomPhoneRecording) {
     console.log('Step 0: Looking up user by Zoom User ID...')
     const userId = await lookupUserByZoomId(recording.user_id)
 
+    let projectId: string | null = null
+
     if (userId) {
       console.log(`Matched user: ${userId}`)
+
+      // Step 0.5: Get user's project
+      console.log('Step 0.5: Looking up user project...')
+      projectId = await getUserProject(userId)
+
+      if (projectId) {
+        console.log(`User belongs to project: ${projectId}`)
+      } else {
+        console.log('User is not assigned to any project')
+      }
     } else {
-      console.log('No user matched - call will be saved with user_id=null')
+      console.log('No user matched - call will be saved with user_id=null and project_id=null')
     }
 
     // Step 1: Download audio file
@@ -168,10 +211,12 @@ async function processRecording(recording: ZoomPhoneRecording) {
         audio_url: audioResult.gcsPath,
         transcript_url: transcriptPath,
         transcript_segments: transcriptionResult.segments || null,
-        // Auto-assigned user_id from Zoom User ID lookup
+        // Zoom User ID from webhook payload (primary identifier)
+        zoom_user_id: recording.user_id,
+        // Auto-assigned user_id from Zoom User ID lookup (for reference)
         user_id: userId || null,
-        // project_id will be determined from phone number matching (M1.6)
-        project_id: null,
+        // Auto-assigned project_id from user's project membership
+        project_id: projectId || null,
       })
       .select()
       .single()
@@ -251,24 +296,58 @@ async function processRecording(recording: ZoomPhoneRecording) {
       console.log(`Feedback not generated: ${feedbackResult.skip_reason || 'Unknown reason'}`)
     }
 
-    // Step 5: Send Slack notification
-    console.log('Step 5: Sending Slack notification...')
+    // Step 5: Send Slack notification (only for connected calls)
+    console.log('Step 5: Checking if Slack notification should be sent...')
 
-    // For now, we don't have project-specific webhook URLs
-    // This will be implemented in M1.6 when project management is added
-    const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL
+    if (statusResult.status === 'connected' && callRecord.project_id) {
+      console.log('Call is connected and has project_id, fetching project details...')
 
-    if (slackWebhookUrl) {
-      await sendSlackNotification(slackWebhookUrl, {
-        callId: callRecord.id,
-        callerNumber: recording.caller_number,
-        calledNumber: recording.callee_number,
-        callTime: new Date(recording.date_time),
-        duration: recording.duration,
-        status: statusResult.status,
-        feedbackText: callRecord.feedback_text || undefined,
-        webAppUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:7000',
-      })
+      // Fetch project details including webhook URL
+      const { data: projectData, error: projectError } = await supabase
+        .from('projects')
+        .select('name, slack_webhook_url')
+        .eq('id', callRecord.project_id)
+        .single()
+
+      if (projectError) {
+        console.error('Error fetching project for Slack notification:', projectError)
+      } else if (projectData?.slack_webhook_url) {
+        console.log(`Project webhook found: ${projectData.name}`)
+
+        // Fetch user details if available
+        let userName: string | undefined
+        if (callRecord.user_id) {
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('name')
+            .eq('id', callRecord.user_id)
+            .single()
+
+          if (!userError && userData) {
+            userName = userData.name
+          }
+        }
+
+        // Send notification with project-specific webhook
+        await sendSlackNotification(projectData.slack_webhook_url, {
+          callId: callRecord.id,
+          callerNumber: recording.caller_number,
+          calledNumber: recording.callee_number,
+          callTime: new Date(recording.date_time),
+          duration: recording.duration,
+          status: statusResult.status,
+          feedbackText: callRecord.feedback_text || undefined,
+          webAppUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:7000',
+          projectName: projectData.name,
+          userName: userName,
+        })
+      } else {
+        console.log('Project webhook URL not configured, skipping notification')
+      }
+    } else {
+      console.log(
+        `Skipping Slack notification (status: ${statusResult.status}, has project: ${!!callRecord.project_id})`
+      )
     }
 
     console.log(`✅ Call ${callId} processed successfully`)

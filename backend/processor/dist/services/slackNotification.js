@@ -15,77 +15,20 @@ async function sendSlackNotification(webhookUrl, data) {
     }
     console.log(`Sending Slack notification for call ${data.callId}...`);
     try {
-        const statusEmoji = getStatusEmoji(data.status);
-        const statusText = getStatusText(data.status);
-        const color = getStatusColor(data.status);
-        const blocks = [
-            {
-                type: 'header',
-                text: {
-                    type: 'plain_text',
-                    text: `${statusEmoji} 通話処理完了`,
-                    emoji: true,
-                },
-            },
-            {
-                type: 'section',
-                fields: [
-                    {
-                        type: 'mrkdwn',
-                        text: `*ステータス:*\n${statusText}`,
-                    },
-                    {
-                        type: 'mrkdwn',
-                        text: `*通話時間:*\n${data.duration}秒`,
-                    },
-                    {
-                        type: 'mrkdwn',
-                        text: `*発信者番号:*\n${data.callerNumber || 'N/A'}`,
-                    },
-                    {
-                        type: 'mrkdwn',
-                        text: `*着信番号:*\n${data.calledNumber || 'N/A'}`,
-                    },
-                ],
-            },
-        ];
-        // Add feedback if available and status is connected
-        if (data.feedbackText && data.status === 'connected') {
-            blocks.push({
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: `*フィードバック:*\n${truncateText(data.feedbackText, 500)}`,
-                },
-            });
-        }
-        // Add action button
-        if (data.webAppUrl) {
-            blocks.push({
-                type: 'actions',
-                elements: [
-                    {
-                        type: 'button',
-                        text: {
-                            type: 'plain_text',
-                            text: '詳細を見る',
-                            emoji: true,
-                        },
-                        url: `${data.webAppUrl}/calls/${data.callId}`,
-                        style: 'primary',
-                    },
-                ],
-            });
+        // Determine call outcome status
+        const callOutcome = determineCallOutcome(data);
+        const feedbackUrl = `${data.webAppUrl}/calls/${data.callId}`;
+        // Format message according to user specifications
+        let messageText = `【${data.projectName || 'プロジェクト名不明'}】\n`;
+        messageText += `架電者：${data.userName || '不明'}\n`;
+        messageText += `格納ファイル：${feedbackUrl}\n`;
+        messageText += `お客様電話番号：${data.calledNumber || 'N/A'}\n`;
+        messageText += `通話ステータス：${callOutcome}\n`;
+        if (data.feedbackText) {
+            messageText += `\nフィードバック内容：\n〔架電結果〕\n${data.feedbackText}`;
         }
         const payload = {
-            attachments: [
-                {
-                    color: color,
-                    blocks: blocks,
-                    footer: `Call ID: ${data.callId}`,
-                    ts: Math.floor(data.callTime.getTime() / 1000).toString(),
-                },
-            ],
+            text: messageText,
         };
         await axios_1.default.post(webhookUrl, payload, {
             headers: {
@@ -99,6 +42,28 @@ async function sendSlackNotification(webhookUrl, data) {
         console.error('Error sending Slack notification:', error.message);
         // Don't throw error - notification failure shouldn't stop processing
     }
+}
+/**
+ * Determine call outcome based on feedback content and duration
+ */
+function determineCallOutcome(data) {
+    // If there's feedback text with meaningful content, check for appointment indicators
+    if (data.feedbackText) {
+        const lowerFeedback = data.feedbackText.toLowerCase();
+        // Check for appointment-related keywords
+        if (lowerFeedback.includes('アポ') ||
+            lowerFeedback.includes('約束') ||
+            lowerFeedback.includes('面談') ||
+            lowerFeedback.includes('訪問') ||
+            lowerFeedback.includes('次回') ||
+            lowerFeedback.includes('日程')) {
+            return 'アポイント獲得';
+        }
+        // If feedback exists but no appointment indicators, it's just connected
+        return 'つながっただけ';
+    }
+    // No feedback means just connected
+    return 'つながっただけ';
 }
 function getStatusEmoji(status) {
     switch (status) {

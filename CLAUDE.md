@@ -8,12 +8,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Zoom Phone フィードバックシステム 拡張版** - An AI-powered feedback system for Zoom Phone call recordings that provides:
 
-1. **トークスクリプト一致率分析** - Semantic matching analysis of actual calls against predefined talk scripts using GPT-5-mini
+1. **トークスクリプト一致率分析** - Semantic matching analysis of actual calls against predefined talk scripts using GPT-5-nano
 2. **因果関係を考慮した統合フィードバック** - Causal relationship-based feedback combining talk script analysis, RAG search, NG reason trends, and transcripts
 3. **RAG検索による学習資料参照** - Retrieval Augmented Generation using pgvector and OpenAI Embeddings
 4. **NG理由永久保存とトレンド分析** - Permanent storage of rejection reasons for long-term trend analysis
 
-**Current Status**: Phase 1 COMPLETED + Phase 2 COMPLETED - All milestones M1.1 through M2.4 completed. **Phase 1**: M1.1 (開発環境構築 + CI/CD設定), M1.2 (データベース構築), M1.3 (認証機能実装), M1.4 (GCS・Cloud Run構築), M1.5 (基本的な通話処理フロー - 統合テスト完了 2025-11-04 + **SRT形式対応** - タイムスタンプ付き文字起こし実装完了 2025-01-06), M1.6 (プロジェクト・ユーザー管理 + Zoom User ID機能 + 通話一覧/詳細UI + JST表示対応). **Phase 2**: M2.1 (プロンプト管理UI), M2.2 (プロンプトバージョン管理 + 復元機能), M2.3 (AIプロンプトアシスタント - 音声録音 + Whisper + GPT-5-mini - 完了 2025-01-05), M2.4 (フィードバック生成実装). **統合テスト成功**: Zoom Webhook → Cloud Run Proxy → Pub/Sub → Cloud Run Processor → Whisper API (with segments) → GPT-5-mini (Status Detection + Feedback Generation) → Supabase保存（transcript_segments含む）フロー全て動作確認済み。**CI/CD構築完了**: GitHub Actions自動テスト・デプロイパイプライン実装済み。Development server can run on port 7000. Full feedback system operational with AI-powered analysis and SRT-formatted transcripts. AI Prompt Assistant with voice recording functional. **コスト最適化完了**: 全処理をGPT-5-miniに統一（2025-01-06）。Next: Phase 3 (トークスクリプト管理).
+**Current Status**: Phase 1 COMPLETED + Phase 2 COMPLETED - All milestones M1.1 through M2.4 completed. **Phase 1**: M1.1 (開発環境構築 + CI/CD設定), M1.2 (データベース構築), M1.3 (認証機能実装), M1.4 (GCS・Cloud Run構築), M1.5 (基本的な通話処理フロー - 統合テスト完了 2025-11-04 + **SRT形式対応** - タイムスタンプ付き文字起こし実装完了 2025-01-06), M1.6 (プロジェクト・ユーザー管理 + Zoom User ID機能 + 通話一覧/詳細UI + JST表示対応). **Phase 2**: M2.1 (プロンプト管理UI), M2.2 (プロンプトバージョン管理 + 復元機能), M2.3 (AIプロンプトアシスタント - 音声録音 + Whisper + GPT-5-mini - 完了 2025-01-05), M2.4 (フィードバック生成実装). **統合テスト成功**: Zoom Webhook → Cloud Run Proxy → Pub/Sub → Cloud Run Processor → Whisper API (with segments) → GPT-5-nano (Status Detection) + GPT-5-mini (Feedback Generation + Talk Script Analysis) → Supabase保存（transcript_segments含む）フロー全て動作確認済み。**CI/CD構築完了**: GitHub Actions自動テスト・デプロイパイプライン実装済み。Development server can run on port 7000. Full feedback system operational with AI-powered analysis and SRT-formatted transcripts. AI Prompt Assistant with voice recording functional. **コスト最適化完了**: 高頻度処理をGPT-5-nanoに、品質重視処理をGPT-5-miniに最適配置（2025-01-07）。Next: Phase 3 (トークスクリプト管理).
 
 ---
 
@@ -58,8 +58,9 @@ All project documentation is in `docs/`:
 ### AI/ML
 
 - OpenAI Whisper (transcription)
-- OpenAI GPT-5 (talk script analysis, RAG-enhanced feedback)
-- OpenAI GPT-5-mini (status detection, basic feedback, NG reason classification)
+- OpenAI GPT-5-nano (status detection, prompt testing - cost-optimized)
+- OpenAI GPT-5-mini (feedback generation, talk script analysis, prompt assistant - quality-focused)
+- OpenAI GPT-5 (PDF import with Vision API, future RAG enhancements - premium features)
 - OpenAI text-embedding-3-small (RAG embeddings)
 
 ### Infrastructure
@@ -72,22 +73,81 @@ All project documentation is in `docs/`:
 
 ## OpenAI API Implementation Note
 
-**IMPORTANT**: このプロジェクトでは全処理に**GPT-5-mini**を使用（コスト最適化）
+**IMPORTANT**: コスト最適化のため、処理頻度と品質要件に応じて3段階のモデルを使い分け
+
+### モデル選定方針（2025-01-07更新）
+
+#### ✅ 実装済み機能
+
+| 機能 | モデル | 使用頻度 | 理由 | ファイル |
+|------|--------|----------|------|---------|
+| **通話状態判定** | `gpt-5-nano` | 高（全通話） | 3分類タスク、コスト最優先 | `statusDetection.ts` |
+| **フィードバック生成（Connected 60s+）** | `gpt-5-mini` | 中 | 品質重視、詳細分析必要 | `feedbackGeneration.ts` |
+| **フィードバック生成（Reception）** | `gpt-5-nano` | 中 | シンプルなフィードバック | `feedbackGeneration.ts` |
+| **トークスクリプト一致率分析** | `gpt-5-nano` | 中 | JSON構造化出力、セマンティック分析 | `talkScriptAnalysis.ts` |
+| **プロンプトアシスタント** | `gpt-5-mini` | 低 | 品質優先、頻度が低い | `api/prompts/generate` |
+| **プロンプトテスト** | `gpt-5-nano` | 低 | テスト用途、コスト優先 | `api/prompts/test` |
+
+#### 🔄 未実装機能（Phase 3-6予定）
+
+| 機能 | 予定モデル | 使用頻度 | 理由 | Phase |
+|------|-----------|----------|------|-------|
+| **RAG統合フィードバック** | `gpt-5-mini` | 中 | 学習資料参照、miniで十分 | Phase 4 |
+| **PDF取り込み（Vision API）** | `gpt-5` | 極低（月1回） | Vision API必須、コストより品質 | Phase 3 |
+| **NG理由自動判定** | `gpt-5-nano` | 中 | 分類タスク、nanoで十分 | 未定 |
+| **アポイント自動判定** | `gpt-5-nano` | 中 | Yes/No判定、nanoで十分 | 未定 |
+
+### 料金表（2025年1月時点）
+
+| モデル | 入力 | 出力 | 用途 |
+|--------|------|------|------|
+| **gpt-5-nano** | $0.10/1M | $0.40/1M | 高頻度・分類タスク |
+| **gpt-5-mini** | $0.25/1M | $2.00/1M | 品質重視・分析タスク |
+| **gpt-5** | $5.00/1M | $15.00/1M | Vision API・プレミアム機能 |
+| **whisper-1** | $0.006/分 | - | 音声文字起こし |
+| **text-embedding-3-small** | $0.02/1M | - | RAG用埋め込み |
+
+### コード例
 
 ```typescript
-// ✅ GPT-5-mini 標準的な呼び出し
-const completion = await openai.chat.completions.create({
+// ✅ GPT-5-nano（高頻度・コスト最優先）
+const statusResponse = await openai.chat.completions.create({
+  model: 'gpt-5-nano',
+  messages: [...],
+  // NOTE: GPT-5-nano/miniは temperature, top_p, presence_penalty, frequency_penalty 非サポート
+})
+
+// ✅ GPT-5-mini（品質重視）
+const feedbackResponse = await openai.chat.completions.create({
   model: 'gpt-5-mini',
   messages: [...],
-  temperature: 0.7, // サンプリングパラメータをサポート
-  // GPT-5-miniは通常の言語モデルとして動作
+  temperature: 0.7, // GPT-5-miniはサンプリングパラメータをサポート
+})
+
+// ✅ GPT-5（Vision API - Phase 3実装予定）
+const visionResponse = await openai.chat.completions.create({
+  model: 'gpt-5',
+  messages: [
+    {
+      role: 'user',
+      content: [
+        { type: 'text', text: 'このPDFからトークスクリプトのフェーズを判定してください' },
+        { type: 'image_url', image_url: { url: 'data:image/...' } }
+      ]
+    }
+  ]
 })
 ```
 
-**モデル選定方針**:
-- **全処理**: GPT-5-mini（状態判定、フィードバック生成、トークスクリプト分析、RAG統合）
-- **理由**: コスト効率とパフォーマンスのバランス重視
-- **料金**: 入力$0.25/1M、出力$2.00/1M（GPT-5比で大幅削減）
+### RAG統合フィードバックの実装方針（Phase 4）
+
+**当初計画**: RAGあり=gpt-5、RAGなし=gpt-5-mini
+**新方針**: **両方gpt-5-miniに統一**
+
+**理由**:
+- 学習資料を参照したフィードバック生成はgpt-5-miniで十分な品質
+- コスト削減（月額$150-300 → $50-80）
+- RAG検索結果をコンテキストに含めることで、miniでも高品質なフィードバックを生成可能
 
 **参照**: `docs/requirements_specification_v2.md` Section 3.2.2, `docs/technical_guidelines.md` OpenAI API連携ガイド
 

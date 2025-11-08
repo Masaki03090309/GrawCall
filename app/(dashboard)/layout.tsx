@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from '@/components/LogoutButton'
+import UserMenu from '@/components/UserMenu'
 import { Home, FolderKanban, Users, FileText, Phone, Settings } from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -15,10 +16,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login')
   }
 
-  // Get user role
+  // Get user data
   const { data: userData } = await supabase
     .from('users')
-    .select('role')
+    .select('name, email, role')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -83,7 +84,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 )}
               </div>
             </div>
-            <LogoutButton />
+            <div className="flex items-center gap-4">
+              <UserMenu userName={userData?.name || userData?.email || 'ユーザー'} userEmail={userData?.email || ''} />
+              <LogoutButton />
+            </div>
           </div>
         </div>
       </nav>

@@ -19,7 +19,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Shield, User as UserIcon, Crown, Edit2, Check, X } from 'lucide-react'
+import { Shield, User as UserIcon, Crown, Edit2, Check, X, Trash2 } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 interface User {
   id: string
@@ -39,6 +49,9 @@ export default function UsersManagementPage() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [editingZoomId, setEditingZoomId] = useState<string | null>(null)
   const [editingZoomValue, setEditingZoomValue] = useState<string>('')
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     fetchUsers()
@@ -165,6 +178,37 @@ export default function UsersManagementPage() {
     }
   }
 
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return
+
+    setDeleting(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/users/${userToDelete.id}`, {
+        method: 'DELETE',
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error?.message || 'ユーザーの削除に失敗しました')
+      }
+
+      // Remove user from local state
+      setUsers(users.filter(user => user.id !== userToDelete.id))
+
+      setShowDeleteDialog(false)
+      setUserToDelete(null)
+    } catch (err: any) {
+      console.error('Error deleting user:', err)
+      setError(err.message)
+      setShowDeleteDialog(false)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'owner':
@@ -256,6 +300,7 @@ export default function UsersManagementPage() {
                   <TableHead>ロール</TableHead>
                   <TableHead>登録日</TableHead>
                   <TableHead>ロール変更</TableHead>
+                  <TableHead className="text-right">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -338,6 +383,23 @@ export default function UsersManagementPage() {
                           </Select>
                         )}
                       </TableCell>
+                      <TableCell className="text-right">
+                        {isCurrentUser ? (
+                          <div className="text-sm text-muted-foreground">削除不可</div>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setUserToDelete(user)
+                              setShowDeleteDialog(true)
+                            }}
+                            disabled={deleting}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        )}
+                      </TableCell>
                     </TableRow>
                   )
                 })}
@@ -383,6 +445,34 @@ export default function UsersManagementPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete User Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>ユーザーを削除しますか？</AlertDialogTitle>
+            <AlertDialogDescription>
+              {userToDelete?.name} ({userToDelete?.email})
+              を完全に削除します。この操作は取り消せません。
+              <br />
+              <br />
+              <strong className="text-destructive">
+                このユーザーに関連する全てのデータ（プロジェクトメンバーシップ、作成したプロンプトなど）も削除されます。
+              </strong>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>キャンセル</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteUser}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? '削除中...' : '削除する'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

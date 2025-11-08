@@ -262,8 +262,18 @@ export default function ProjectMembersPage() {
     }
   }
 
-  const getRoleBadge = (role: string) => {
-    if (role === 'director') {
+  const getRoleBadge = (projectRole: string, systemRole: string) => {
+    // システムロールがオーナーの場合は「オーナー」を優先表示
+    if (systemRole === 'owner') {
+      return (
+        <div className="flex items-center gap-1 text-amber-600">
+          <Shield className="h-4 w-4" />
+          <span className="font-medium">オーナー</span>
+        </div>
+      )
+    }
+
+    if (projectRole === 'director') {
       return (
         <div className="flex items-center gap-1 text-blue-600">
           <Shield className="h-4 w-4" />
@@ -345,7 +355,7 @@ export default function ProjectMembersPage() {
                   <TableRow key={member.user_id}>
                     <TableCell className="font-medium">{member.users.name}</TableCell>
                     <TableCell>{member.users.email}</TableCell>
-                    <TableCell>{getRoleBadge(member.role)}</TableCell>
+                    <TableCell>{getRoleBadge(member.role, member.users.role)}</TableCell>
                     <TableCell>
                       <span className="capitalize">{member.users.role}</span>
                     </TableCell>

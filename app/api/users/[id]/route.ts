@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -304,6 +304,169 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       )
     }
 
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'サーバーエラーが発生しました',
+        },
+      },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * DELETE /api/users/:id
+ * Delete user from both Auth and Database (owner only)
+ */
+export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const supabase = await createClient()
+    const adminClient = createServiceRoleClient()
+
+    // Get authenticated user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'UNAUTHORIZED',
+            message: '認証が必要です',
+          },
+        },
+        { status: 401 }
+      )
+    }
+
+    const userIdToDelete = params.id
+
+    // Get current user role
+    const { data: currentUserData, error: currentUserError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (currentUserError || !currentUserData) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'USER_NOT_FOUND',
+            message: 'ユーザー情報が見つかりません',
+          },
+        },
+        { status: 404 }
+      )
+    }
+
+    // Only owners can delete users
+    if (currentUserData.role !== 'owner') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: 'ユーザーを削除する権限がありません',
+          },
+        },
+        { status: 403 }
+      )
+    }
+
+    // Prevent owner from deleting themselves
+    if (user.id === userIdToDelete) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'FORBIDDEN',
+            message: '自分自身を削除することはできません',
+          },
+        },
+        { status: 403 }
+      )
+    }
+
+    // Check if user exists
+    const { data: userToDelete, error: userFetchError } = await supabase
+      .from('users')
+      .select('id, email, name')
+      .eq('id', userIdToDelete)
+      .single()
+
+    if (userFetchError || !userToDelete) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: '削除対象のユーザーが見つかりません',
+          },
+        },
+        { status: 404 }
+      )
+    }
+
+    // Step 1: Delete from Supabase Auth (auth.users)
+    const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(userIdToDelete)
+
+    if (authDeleteError) {
+      console.error('Error deleting user from auth:', authDeleteError)
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'AUTH_DELETE_ERROR',
+            message: '認証ユーザーの削除に失敗しました',
+            details: authDeleteError,
+          },
+        },
+        { status: 500 }
+      )
+    }
+
+    // Step 2: Delete from public.users (CASCADE will handle related data)
+    const { error: dbDeleteError } = await adminClient
+      .from('users')
+      .delete()
+      .eq('id', userIdToDelete)
+
+    if (dbDeleteError) {
+      console.error('Error deleting user from database:', dbDeleteError)
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'DATABASE_DELETE_ERROR',
+            message: 'データベースユーザーの削除に失敗しました',
+            details: dbDeleteError,
+          },
+        },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        message: 'ユーザーが正常に削除されました',
+        deletedUser: {
+          id: userToDelete.id,
+          name: userToDelete.name,
+          email: userToDelete.email,
+        },
+      },
+    })
+  } catch (error: any) {
+    console.error('Unexpected error during user deletion:', error)
     return NextResponse.json(
       {
         success: false,

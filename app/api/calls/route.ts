@@ -35,6 +35,48 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50', 10)
     const offset = parseInt(searchParams.get('offset') || '0', 10)
 
+    // If project_id is specified, get project members' Zoom IDs and filter calls
+    let memberZoomUserIds: string[] = []
+    if (projectId) {
+      const { data: members, error: membersError } = await supabase
+        .from('project_members')
+        .select('user_id, users(zoom_user_id)')
+        .eq('project_id', projectId)
+
+      if (membersError) {
+        console.error('Error fetching project members:', membersError)
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: 'DATABASE_ERROR',
+              message: 'プロジェクトメンバーの取得に失敗しました',
+              details: membersError,
+            },
+          },
+          { status: 500 }
+        )
+      }
+
+      // Extract Zoom User IDs from members
+      memberZoomUserIds = members
+        ?.map(m => (m.users as any)?.zoom_user_id)
+        .filter(zoomId => zoomId != null) || []
+
+      // If no members have Zoom IDs, return empty list
+      if (memberZoomUserIds.length === 0) {
+        return NextResponse.json({
+          success: true,
+          data: {
+            items: [],
+            total: 0,
+            limit,
+            offset,
+          },
+        })
+      }
+    }
+
     // Build query
     let query = supabase
       .from('calls')
@@ -48,7 +90,8 @@ export async function GET(request: NextRequest) {
         status,
         status_confidence,
         feedback_text,
-        user:users(id, name, email),
+        zoom_user_id,
+        user:users!calls_user_id_fkey(id, name, email),
         project:projects(id, name)
       `,
         { count: 'exact' }
@@ -57,8 +100,9 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1)
 
     // Apply filters
-    if (projectId) {
-      query = query.eq('project_id', projectId)
+    if (projectId && memberZoomUserIds.length > 0) {
+      // Filter by Zoom User IDs of project members (dynamic lookup)
+      query = query.in('zoom_user_id', memberZoomUserIds)
     }
 
     if (status) {
@@ -82,10 +126,30 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Dynamically lookup current user for each call based on zoom_user_id
+    // This allows user display to change when zoom_user_id assignment changes
+    const enrichedCalls = await Promise.all(
+      (calls || []).map(async (call: any) => {
+        if (call.zoom_user_id) {
+          const { data: currentUser } = await supabase
+            .from('users')
+            .select('id, name, email')
+            .eq('zoom_user_id', call.zoom_user_id)
+            .maybeSingle()
+
+          return {
+            ...call,
+            user: currentUser || call.user, // Use current user or fallback to stored user_id
+          }
+        }
+        return call
+      })
+    )
+
     return NextResponse.json({
       success: true,
       data: {
-        items: calls || [],
+        items: enrichedCalls,
         total: count || 0,
         limit,
         offset,

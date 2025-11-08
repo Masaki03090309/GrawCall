@@ -4,13 +4,15 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
 import {
   ArrowLeft,
   FileText,
   MessageSquare,
   Users,
   Settings,
-  Phone
+  Phone,
+  Send
 } from 'lucide-react'
 
 interface Project {
@@ -34,11 +36,13 @@ interface Project {
 export default function ProjectDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { toast } = useToast()
   const projectId = params.id as string
 
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [testingWebhook, setTestingWebhook] = useState(false)
 
   useEffect(() => {
     fetchProject()
@@ -60,6 +64,43 @@ export default function ProjectDetailPage() {
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const testWebhook = async () => {
+    if (!project?.slack_webhook_url) {
+      toast({
+        title: 'エラー',
+        description: 'Slack WebhookURLが設定されていません',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      setTestingWebhook(true)
+      const response = await fetch(`/api/projects/${projectId}/test-webhook`, {
+        method: 'POST',
+      })
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error?.message || 'テスト送信に失敗しました')
+      }
+
+      toast({
+        title: '送信成功',
+        description: 'Slackにテストメッセージを送信しました',
+      })
+    } catch (err: any) {
+      console.error('Error testing webhook:', err)
+      toast({
+        title: 'エラー',
+        description: err.message,
+        variant: 'destructive',
+      })
+    } finally {
+      setTestingWebhook(false)
     }
   }
 
@@ -115,9 +156,9 @@ export default function ProjectDetailPage() {
     },
     {
       title: '通話履歴',
-      description: 'プロジェクトの通話履歴を確認',
+      description: 'プロジェクトメンバーの通話履歴を確認',
       icon: Phone,
-      href: `/calls?project_id=${projectId}`,
+      href: `/projects/${projectId}/calls`,
       color: 'bg-orange-500',
     },
     {
@@ -141,11 +182,23 @@ export default function ProjectDetailPage() {
           プロジェクト一覧に戻る
         </Button>
 
-        <div>
-          <h1 className="text-3xl font-bold">{project.name}</h1>
-          <p className="mt-2 text-muted-foreground">
-            プロジェクトの管理メニュー
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">{project.name}</h1>
+            <p className="mt-2 text-muted-foreground">
+              プロジェクトの管理メニュー
+            </p>
+          </div>
+          {project.slack_webhook_url && (
+            <Button
+              variant="outline"
+              onClick={testWebhook}
+              disabled={testingWebhook}
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {testingWebhook ? 'テスト送信中...' : 'Webhook テスト送信'}
+            </Button>
+          )}
         </div>
       </div>
 
