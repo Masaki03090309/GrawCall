@@ -90,9 +90,7 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-center text-2xl font-bold">
-            アカウント作成
-          </CardTitle>
+          <CardTitle className="text-center text-2xl font-bold">アカウント作成</CardTitle>
           <CardDescription className="text-center">
             Zoom Phone フィードバックシステムに新規登録
           </CardDescription>
@@ -105,7 +103,7 @@ export default function SignupPage() {
           )}
 
           {success && (
-            <div className="rounded-md bg-green-50 p-4 border-l-4 border-green-500">
+            <div className="rounded-md border-l-4 border-green-500 bg-green-50 p-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg

@@ -166,9 +166,7 @@ export default function ProjectCallsPage() {
                 <Phone className="h-5 w-5" />
                 {project?.name || 'プロジェクト'} - 通話履歴
               </CardTitle>
-              <CardDescription>
-                このプロジェクトのメンバーの通話履歴を確認できます
-              </CardDescription>
+              <CardDescription>このプロジェクトのメンバーの通話履歴を確認できます</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -195,9 +193,7 @@ export default function ProjectCallsPage() {
           {loading ? (
             <div className="py-8 text-center text-muted-foreground">読み込み中...</div>
           ) : calls.length === 0 ? (
-            <div className="py-8 text-center text-muted-foreground">
-              通話履歴がありません
-            </div>
+            <div className="py-8 text-center text-muted-foreground">通話履歴がありません</div>
           ) : (
             <div className="rounded-md border">
               <Table>
@@ -225,9 +221,7 @@ export default function ProjectCallsPage() {
                         {call.user ? (
                           <div className="flex flex-col">
                             <span className="font-medium">{call.user.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {call.user.email}
-                            </span>
+                            <span className="text-xs text-muted-foreground">{call.user.email}</span>
                           </div>
                         ) : (
                           <span className="text-muted-foreground">不明</span>
@@ -267,9 +261,7 @@ export default function ProjectCallsPage() {
           )}
 
           {calls.length > 0 && (
-            <div className="mt-4 text-sm text-muted-foreground">
-              {calls.length} 件の通話履歴
-            </div>
+            <div className="mt-4 text-sm text-muted-foreground">{calls.length} 件の通話履歴</div>
           )}
         </CardContent>
       </Card>

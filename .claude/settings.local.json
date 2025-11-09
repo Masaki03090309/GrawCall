@@ -130,7 +130,16 @@
       "Bash(cmd /c \"taskkill /PID 69164 /F\")",
       "Bash(cmd /c \"taskkill //PID 69164 //F\")",
       "Bash(cmd /c \"taskkill /PID 90804 /F\")",
-      "Bash(json_pp)"
+      "Bash(json_pp)",
+      "Bash(gcloud run revisions describe:*)",
+      "Bash(gcloud run revisions delete:*)",
+      "Bash(cmd /c \"del /Q \"\"C:\\AIエンジニア用ファイル\\Maroo AI PJT\\GrawCall\\backend\\processor\\env-vars.yaml\"\"\")",
+      "Bash(cmd /c \"del /Q \"\"C:\\AIエンジニア用ファイル\\Maroo AI PJT\\GrawCall\\check-fukase-setup.js\"\"\")",
+      "Bash(git checkout:*)",
+      "Bash(vercel login)",
+      "Bash(vercel whoami:*)",
+      "Bash(vercel:*)",
+      "Bash(tee:*)"
     ],
     "deny": [],
     "ask": []

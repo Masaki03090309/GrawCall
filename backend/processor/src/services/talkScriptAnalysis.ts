@@ -194,7 +194,7 @@ function buildAnalysisPrompt(talkScript: TalkScript, transcript: string): string
   // Hearing items
   if (talkScript.hearing_items.length > 0) {
     sections.push('■ ヒアリング:')
-    talkScript.hearing_items.forEach((item) => {
+    talkScript.hearing_items.forEach(item => {
       sections.push(`  - ${item.item_name}: ${item.item_script}`)
     })
     sections.push('')
@@ -215,7 +215,9 @@ function buildAnalysisPrompt(talkScript: TalkScript, transcript: string): string
   sections.push(transcript.substring(0, 8000)) // Limit to 8000 chars to avoid token limits
 
   sections.push('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
-  sections.push('上記のトークスクリプトと実際の通話を比較し、JSON形式で評価結果を出力してください。')
+  sections.push(
+    '上記のトークスクリプトと実際の通話を比較し、JSON形式で評価結果を出力してください。'
+  )
 
   return sections.join('\n')
 }

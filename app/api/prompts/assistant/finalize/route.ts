@@ -139,7 +139,11 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: buildFinalSystemPrompt(defaultPrompt.content, conversation_history, improvements),
+          content: buildFinalSystemPrompt(
+            defaultPrompt.content,
+            conversation_history,
+            improvements
+          ),
         },
       ],
     })

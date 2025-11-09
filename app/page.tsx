@@ -11,7 +11,7 @@ import {
   Phone,
   MessageSquare,
   Settings,
-  User
+  User,
 } from 'lucide-react'
 
 export default async function Home() {
@@ -147,10 +147,10 @@ export default async function Home() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">メニュー</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {visibleMenuItems.map((item) => (
+            {visibleMenuItems.map(item => (
               <Card
                 key={item.href}
-                className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+                className="cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
               >
                 <Link href={item.href}>
                   <CardHeader>
@@ -160,9 +160,7 @@ export default async function Home() {
                       </div>
                       <div className="flex-1">
                         <CardTitle className="text-lg">{item.title}</CardTitle>
-                        <CardDescription className="mt-1">
-                          {item.description}
-                        </CardDescription>
+                        <CardDescription className="mt-1">{item.description}</CardDescription>
                       </div>
                     </div>
                   </CardHeader>
@@ -179,9 +177,7 @@ export default async function Home() {
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-lg">ダッシュボード</CardTitle>
-                    <CardDescription className="mt-1">
-                      通話分析とKPI（開発中）
-                    </CardDescription>
+                    <CardDescription className="mt-1">通話分析とKPI（開発中）</CardDescription>
                   </div>
                 </div>
               </CardHeader>

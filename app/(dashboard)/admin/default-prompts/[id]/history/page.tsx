@@ -145,7 +145,8 @@ export default function DefaultPromptHistoryPage() {
     )
   }
 
-  const promptTypeLabel = history.prompt_type === 'connected' ? 'Connected通話用' : 'Reception通話用'
+  const promptTypeLabel =
+    history.prompt_type === 'connected' ? 'Connected通話用' : 'Reception通話用'
 
   return (
     <div className="container mx-auto max-w-6xl py-8">
@@ -198,11 +199,7 @@ export default function DefaultPromptHistoryPage() {
                     )}
                   </div>
                   {index !== 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleRestoreClick(version)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => handleRestoreClick(version)}>
                       <RotateCcw className="mr-2 h-4 w-4" />
                       復元
                     </Button>

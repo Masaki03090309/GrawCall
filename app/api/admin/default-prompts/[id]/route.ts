@@ -11,10 +11,7 @@ const UpdateDefaultPromptSchema = z.object({
  * GET /api/admin/default-prompts/:id
  * Get a specific system default prompt (owner only)
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient()
 
@@ -115,10 +112,7 @@ export async function GET(
  * PUT /api/admin/default-prompts/:id
  * Update a system default prompt (owner only)
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient()
 
@@ -279,10 +273,7 @@ export async function PUT(
  * DELETE /api/admin/default-prompts/:id
  * Delete a system default prompt (owner only)
  */
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient()
 
@@ -348,10 +339,7 @@ export async function DELETE(
     }
 
     // Delete prompt
-    const { error: deleteError } = await supabase
-      .from('prompts')
-      .delete()
-      .eq('id', promptId)
+    const { error: deleteError } = await supabase.from('prompts').delete().eq('id', promptId)
 
     if (deleteError) {
       console.error('Error deleting default prompt:', deleteError)

@@ -83,9 +83,9 @@ export default function TalkScriptsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-gray-900"></div>
           <p className="mt-4 text-gray-600">Loading talk script...</p>
         </div>
       </div>
@@ -94,7 +94,7 @@ export default function TalkScriptsPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-red-600">Error: {error}</p>
           <Button onClick={fetchTalkScript} className="mt-4">
@@ -108,22 +108,18 @@ export default function TalkScriptsPage() {
   if (!talkScript) {
     return (
       <div className="container mx-auto p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">トークスクリプト</h1>
-            <p className="text-gray-600 mt-2">
-              営業電話のトークスクリプトを管理します
-            </p>
+            <p className="mt-2 text-gray-600">営業電話のトークスクリプトを管理します</p>
           </div>
         </div>
 
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <FileText className="h-16 w-16 text-gray-400 mb-4" />
-            <h2 className="text-xl font-semibold mb-2">
-              トークスクリプトが未設定です
-            </h2>
-            <p className="text-gray-600 mb-6 text-center max-w-md">
+            <FileText className="mb-4 h-16 w-16 text-gray-400" />
+            <h2 className="mb-2 text-xl font-semibold">トークスクリプトが未設定です</h2>
+            <p className="mb-6 max-w-md text-center text-gray-600">
               トークスクリプトを作成して、通話内容との一致率分析を開始しましょう
             </p>
             <Button onClick={handleCreateNew} size="lg">
@@ -138,12 +134,10 @@ export default function TalkScriptsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">トークスクリプト</h1>
-          <p className="text-gray-600 mt-2">
-            現在のバージョン: v{talkScript.version}
-          </p>
+          <p className="mt-2 text-gray-600">現在のバージョン: v{talkScript.version}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleViewHistory}>
@@ -154,12 +148,10 @@ export default function TalkScriptsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              バージョン
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">バージョン</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">v{talkScript.version}</div>
@@ -171,25 +163,19 @@ export default function TalkScriptsPage() {
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              作成者
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">作成者</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center">
-              <User className="h-5 w-5 mr-2 text-gray-400" />
-              <span className="text-lg font-medium">
-                {talkScript.created_by.name}
-              </span>
+              <User className="mr-2 h-5 w-5 text-gray-400" />
+              <span className="text-lg font-medium">{talkScript.created_by.name}</span>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              最終更新
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">最終更新</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-lg font-medium">
@@ -224,9 +210,7 @@ export default function TalkScriptsPage() {
                 {talkScript.opening_script ? (
                   <ReactMarkdown>{talkScript.opening_script}</ReactMarkdown>
                 ) : (
-                  <p className="text-gray-400 italic">
-                    オープニングスクリプトが未設定です
-                  </p>
+                  <p className="italic text-gray-400">オープニングスクリプトが未設定です</p>
                 )}
               </div>
             </TabsContent>
@@ -235,10 +219,10 @@ export default function TalkScriptsPage() {
               <div className="space-y-4">
                 {talkScript.hearing_items.length > 0 ? (
                   talkScript.hearing_items.map((item, index) => (
-                    <div key={item.id} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-semibold flex items-center">
-                          <span className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+                    <div key={item.id} className="rounded-lg border p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <h3 className="flex items-center text-lg font-semibold">
+                          <span className="mr-2 rounded bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
                             {index + 1}
                           </span>
                           {item.item_name}
@@ -255,9 +239,7 @@ export default function TalkScriptsPage() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-400 italic">
-                    ヒアリング項目が未設定です
-                  </p>
+                  <p className="italic text-gray-400">ヒアリング項目が未設定です</p>
                 )}
               </div>
             </TabsContent>
@@ -267,9 +249,7 @@ export default function TalkScriptsPage() {
                 {talkScript.proposal_script ? (
                   <ReactMarkdown>{talkScript.proposal_script}</ReactMarkdown>
                 ) : (
-                  <p className="text-gray-400 italic">
-                    提案スクリプトが未設定です
-                  </p>
+                  <p className="italic text-gray-400">提案スクリプトが未設定です</p>
                 )}
               </div>
             </TabsContent>
@@ -279,9 +259,7 @@ export default function TalkScriptsPage() {
                 {talkScript.closing_script ? (
                   <ReactMarkdown>{talkScript.closing_script}</ReactMarkdown>
                 ) : (
-                  <p className="text-gray-400 italic">
-                    クロージングスクリプトが未設定です
-                  </p>
+                  <p className="italic text-gray-400">クロージングスクリプトが未設定です</p>
                 )}
               </div>
             </TabsContent>

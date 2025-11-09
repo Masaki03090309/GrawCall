@@ -19,12 +19,13 @@ export default function DebugUserInfo() {
       const projectsData = await projectsRes.json()
 
       if (projectsData.success && projectsData.data?.items) {
-        const memberships = projectsData.data.items.flatMap((project: any) =>
-          project.project_members?.map((member: any) => ({
-            projectName: project.name,
-            role: member.role,
-            userName: member.users?.name,
-          })) || []
+        const memberships = projectsData.data.items.flatMap(
+          (project: any) =>
+            project.project_members?.map((member: any) => ({
+              projectName: project.name,
+              role: member.role,
+              userName: member.users?.name,
+            })) || []
         )
         setProjectMemberships(memberships)
       }
@@ -79,9 +80,7 @@ export default function DebugUserInfo() {
               {userInfo.role === 'user' && (
                 <div className="rounded-md border-2 border-yellow-500 bg-yellow-50 p-4">
                   <div className="font-bold text-yellow-700">👤 一般ユーザー権限</div>
-                  <div className="mt-1 text-sm text-yellow-600">
-                    自分の通話のみ閲覧できます
-                  </div>
+                  <div className="mt-1 text-sm text-yellow-600">自分の通話のみ閲覧できます</div>
                 </div>
               )}
             </div>
@@ -93,13 +92,11 @@ export default function DebugUserInfo() {
               <h3 className="mb-2 font-semibold">プロジェクト所属状況</h3>
               <div className="space-y-2">
                 {projectMemberships
-                  .filter((m) => m.userName === userInfo.name)
+                  .filter(m => m.userName === userInfo.name)
                   .map((membership, i) => (
                     <div key={i} className="rounded-md bg-gray-100 p-3">
                       <div className="font-medium">{membership.projectName}</div>
-                      <div className="text-sm text-gray-600">
-                        ロール: {membership.role}
-                      </div>
+                      <div className="text-sm text-gray-600">ロール: {membership.role}</div>
                     </div>
                   ))}
               </div>

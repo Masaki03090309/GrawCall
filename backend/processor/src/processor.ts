@@ -236,9 +236,7 @@ async function processRecording(recording: ZoomPhoneRecording) {
     )
 
     if (analysisResult.should_analyze) {
-      console.log(
-        `Talk script analysis complete: overall=${analysisResult.overall_match_rate}%`
-      )
+      console.log(`Talk script analysis complete: overall=${analysisResult.overall_match_rate}%`)
 
       // Update call record with analysis results
       const { error: analysisUpdateError } = await supabase

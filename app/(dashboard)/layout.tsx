@@ -85,7 +85,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <UserMenu userName={userData?.name || userData?.email || 'ユーザー'} userEmail={userData?.email || ''} />
+              <UserMenu
+                userName={userData?.name || userData?.email || 'ユーザー'}
+                userEmail={userData?.email || ''}
+              />
               <LogoutButton />
             </div>
           </div>

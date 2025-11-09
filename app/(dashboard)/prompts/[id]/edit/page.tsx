@@ -14,7 +14,14 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Save, TestTube, Eye, Clock } from 'lucide-react'
 
@@ -339,7 +346,9 @@ export default function EditPromptPage() {
                 {loadingCalls ? (
                   <p className="py-4 text-center text-muted-foreground">読み込み中...</p>
                 ) : calls.length === 0 ? (
-                  <p className="py-4 text-center text-muted-foreground">Connected通話がありません</p>
+                  <p className="py-4 text-center text-muted-foreground">
+                    Connected通話がありません
+                  </p>
                 ) : (
                   <div className="rounded-md border">
                     <Table>
@@ -353,7 +362,10 @@ export default function EditPromptPage() {
                       </TableHeader>
                       <TableBody>
                         {calls.map(call => (
-                          <TableRow key={call.id} className={selectedCallId === call.id ? 'bg-blue-50' : ''}>
+                          <TableRow
+                            key={call.id}
+                            className={selectedCallId === call.id ? 'bg-blue-50' : ''}
+                          >
                             <TableCell className="font-medium">
                               {formatDateTime(call.call_time)}
                             </TableCell>
@@ -454,13 +466,14 @@ export default function EditPromptPage() {
             <DialogDescription>
               {viewingCall && (
                 <>
-                  {formatDateTime(viewingCall.call_time)} - {viewingCall.user?.name || '不明'} ({formatDuration(viewingCall.duration_seconds)})
+                  {formatDateTime(viewingCall.call_time)} - {viewingCall.user?.name || '不明'} (
+                  {formatDuration(viewingCall.duration_seconds)})
                 </>
               )}
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-            <pre className="whitespace-pre-wrap text-sm font-mono">
+            <pre className="whitespace-pre-wrap font-mono text-sm">
               {viewingCall?.transcript || '文字起こしがありません'}
             </pre>
           </ScrollArea>
@@ -468,9 +481,7 @@ export default function EditPromptPage() {
             <Button variant="outline" onClick={() => setIsCallDialogOpen(false)}>
               キャンセル
             </Button>
-            <Button onClick={handleUseCall}>
-              この通話を使う
-            </Button>
+            <Button onClick={handleUseCall}>この通話を使う</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

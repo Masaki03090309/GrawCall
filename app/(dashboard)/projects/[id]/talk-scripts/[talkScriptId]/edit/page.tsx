@@ -186,9 +186,9 @@ export default function EditTalkScriptPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-gray-400" />
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-gray-400" />
           <p className="mt-4 text-gray-600">Loading talk script...</p>
         </div>
       </div>
@@ -197,12 +197,10 @@ export default function EditTalkScriptPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">トークスクリプトを編集</h1>
-          <p className="text-gray-600 mt-2">
-            変更すると新しいバージョンが作成されます
-          </p>
+          <p className="mt-2 text-gray-600">変更すると新しいバージョンが作成されます</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -233,7 +231,7 @@ export default function EditTalkScriptPage() {
           <Input
             placeholder="変更内容を記録してください（例: ヒアリング項目を追加）"
             value={changeComment}
-            onChange={(e) => setChangeComment(e.target.value)}
+            onChange={e => setChangeComment(e.target.value)}
           />
         </CardContent>
       </Card>
@@ -264,24 +262,20 @@ export default function EditTalkScriptPage() {
                 </p>
                 <MDEditor
                   value={openingScript}
-                  onChange={(val) => setOpeningScript(val || '')}
+                  onChange={val => setOpeningScript(val || '')}
                   height={400}
                   preview="edit"
                 />
-                <p className="text-sm text-gray-500">
-                  {openingScript.length} 文字
-                </p>
+                <p className="text-sm text-gray-500">{openingScript.length} 文字</p>
               </div>
             </TabsContent>
 
             <TabsContent value="hearing" className="mt-4">
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                   <div>
                     <Label>ヒアリング項目</Label>
-                    <p className="text-sm text-gray-600 mt-1">
-                      最大10項目まで設定できます
-                    </p>
+                    <p className="mt-1 text-sm text-gray-600">最大10項目まで設定できます</p>
                   </div>
                   <Button
                     variant="outline"
@@ -302,9 +296,7 @@ export default function EditTalkScriptPage() {
                           <div className="flex items-center gap-2">
                             <GripVertical className="h-5 w-5 text-gray-400" />
                             <span className="font-semibold">項目 {index + 1}</span>
-                            {item.is_default && (
-                              <Badge variant="secondary">デフォルト</Badge>
-                            )}
+                            {item.is_default && <Badge variant="secondary">デフォルト</Badge>}
                           </div>
                           <div className="flex gap-2">
                             <Button
@@ -341,12 +333,8 @@ export default function EditTalkScriptPage() {
                           <Input
                             placeholder="例: 現在の課題"
                             value={item.item_name}
-                            onChange={(e) =>
-                              handleUpdateHearingItem(
-                                index,
-                                'item_name',
-                                e.target.value
-                              )
+                            onChange={e =>
+                              handleUpdateHearingItem(index, 'item_name', e.target.value)
                             }
                             disabled={item.is_default}
                           />
@@ -356,12 +344,8 @@ export default function EditTalkScriptPage() {
                           <Textarea
                             placeholder="例: ご担当者様の現在の課題をお聞かせいただけますでしょうか？"
                             value={item.item_script}
-                            onChange={(e) =>
-                              handleUpdateHearingItem(
-                                index,
-                                'item_script',
-                                e.target.value
-                              )
+                            onChange={e =>
+                              handleUpdateHearingItem(index, 'item_script', e.target.value)
                             }
                             rows={3}
                           />
@@ -381,13 +365,11 @@ export default function EditTalkScriptPage() {
                 </p>
                 <MDEditor
                   value={proposalScript}
-                  onChange={(val) => setProposalScript(val || '')}
+                  onChange={val => setProposalScript(val || '')}
                   height={400}
                   preview="edit"
                 />
-                <p className="text-sm text-gray-500">
-                  {proposalScript.length} 文字
-                </p>
+                <p className="text-sm text-gray-500">{proposalScript.length} 文字</p>
               </div>
             </TabsContent>
 
@@ -399,13 +381,11 @@ export default function EditTalkScriptPage() {
                 </p>
                 <MDEditor
                   value={closingScript}
-                  onChange={(val) => setClosingScript(val || '')}
+                  onChange={val => setClosingScript(val || '')}
                   height={400}
                   preview="edit"
                 />
-                <p className="text-sm text-gray-500">
-                  {closingScript.length} 文字
-                </p>
+                <p className="text-sm text-gray-500">{closingScript.length} 文字</p>
               </div>
             </TabsContent>
           </Tabs>

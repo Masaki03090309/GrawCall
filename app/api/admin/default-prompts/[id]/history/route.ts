@@ -5,10 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
  * GET /api/admin/default-prompts/:id/history
  * Get version history of a system default prompt (owner only)
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient()
 

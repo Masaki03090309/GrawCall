@@ -32,7 +32,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     // Get call details
     const { data: call, error: callError } = await supabase
       .from('calls')
-      .select(`
+      .select(
+        `
         id,
         call_time,
         duration_seconds,
@@ -43,7 +44,8 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         project_id,
         user_id,
         user:users!calls_user_id_fkey(id, name, email)
-      `)
+      `
+      )
       .eq('id', callId)
       .single()
 

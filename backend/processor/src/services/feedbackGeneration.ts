@@ -43,8 +43,7 @@ export async function generateFeedback(
   // Generate feedback for:
   // 1. Connected calls with duration >= 60s (use 'connected' prompt with gpt-5-mini)
   // 2. Reception calls (use 'reception' prompt with gpt-5-nano)
-  const shouldGenerate =
-    (status === 'connected' && durationSeconds >= 60) || status === 'reception'
+  const shouldGenerate = (status === 'connected' && durationSeconds >= 60) || status === 'reception'
 
   if (!shouldGenerate) {
     const skipReason =

@@ -26,6 +26,7 @@
 **Zoom Phone フィードバックシステム 拡張版** - AIを活用した営業電話のフィードバックシステム
 
 **主要機能**:
+
 - ✅ Zoom Phone通話の自動録音・文字起こし（**SRT形式タイムスタンプ付き**）
 - ✅ AIによる通話状態判定（接続/受付止まり/会話なし）
 - ✅ GPT-5-miniによる営業フィードバック生成
@@ -38,15 +39,15 @@
 
 ### 現在の開発状況
 
-| フェーズ | ステータス | 完了日 | 進捗率 |
-|---------|-----------|--------|-------|
-| **Phase 1: 基盤構築** | ✅ 完了 | 2025-01-06 | 100% |
-| **Phase 2: プロンプト管理** | ✅ 完了 | 2025-01-05 | 100% |
-| **Phase 3: トークスクリプト管理** | ⏳ 未着手 | - | 0% |
-| **Phase 4: 学習資料・RAG** | ⏳ 未着手 | - | 0% |
-| **Phase 5: KPI・ダッシュボード** | ⏳ 未着手 | - | 0% |
-| **Phase 6: 音声感情分析** | ⏳ 未着手 | - | 0% |
-| **Phase 7: テスト・改善** | ⏳ 未着手 | - | 0% |
+| フェーズ                          | ステータス | 完了日     | 進捗率 |
+| --------------------------------- | ---------- | ---------- | ------ |
+| **Phase 1: 基盤構築**             | ✅ 完了    | 2025-01-06 | 100%   |
+| **Phase 2: プロンプト管理**       | ✅ 完了    | 2025-01-05 | 100%   |
+| **Phase 3: トークスクリプト管理** | ⏳ 未着手  | -          | 0%     |
+| **Phase 4: 学習資料・RAG**        | ⏳ 未着手  | -          | 0%     |
+| **Phase 5: KPI・ダッシュボード**  | ⏳ 未着手  | -          | 0%     |
+| **Phase 6: 音声感情分析**         | ⏳ 未着手  | -          | 0%     |
+| **Phase 7: テスト・改善**         | ⏳ 未着手  | -          | 0%     |
 
 **全体進捗**: 2/7フェーズ完了 = **28%**
 
@@ -62,6 +63,7 @@
 #### M1.1: 開発環境構築 ✅
 
 **成果物**:
+
 - ✅ Next.js 14プロジェクト（App Router, TypeScript, Tailwind CSS）
 - ✅ Supabaseプロジェクト（PostgreSQL + Auth + Realtime）
 - ✅ GCPプロジェクト（Cloud Run, GCS, Pub/Sub）
@@ -72,6 +74,7 @@
 #### M1.2: データベース構築 ✅
 
 **成果物**:
+
 - ✅ PostgreSQL拡張機能（uuid-ossp, pgvector, pg_cron）
 - ✅ 全11テーブル作成（users, projects, project_members, prompts, talk_scripts, talk_script_hearing_items, learning_materials, learning_material_embeddings, calls, ng_reasons, ng_reason_logs）
 - ✅ Row Level Security (RLS) ポリシー設定（全テーブル）
@@ -82,6 +85,7 @@
 #### M1.3: 認証機能実装 ✅
 
 **成果物**:
+
 - ✅ Supabase Auth設定（Google OAuth + Email/Password）
 - ✅ ログインページ（`/app/login/page.tsx`）
 - ✅ Next.js Middleware認証チェック（`middleware.ts`）
@@ -91,6 +95,7 @@
 #### M1.4: GCS・Cloud Run構築 ✅
 
 **成果物**:
+
 - ✅ GCSバケット（`zoom-phone-feedback-prod`）
 - ✅ Lifecycle設定（6ヶ月自動削除: `gcs-lifecycle.json`）
 - ✅ Cloud Run: Zoom Proxy Service（`https://zoom-proxy-421962770379.asia-northeast1.run.app`）
@@ -101,6 +106,7 @@
 #### M1.5: 基本的な通話処理フロー ✅
 
 **成果物**:
+
 - ✅ Zoom Webhook受信（`POST /webhook/zoom` - Zoom Proxy経由）
 - ✅ 音声ダウンロード（`backend/processor/src/services/audioDownloader.ts`）
 - ✅ GCS保存（`calls/{call_id}/audio.mp3`, `calls/{call_id}/transcript.txt`）
@@ -114,14 +120,17 @@
 - ✅ Slack通知（`backend/processor/src/services/slackNotification.ts`）
 
 **統合テスト完了**: 2025-01-04
+
 - Zoom Webhook → Pub/Sub → Cloud Run Processor → Whisper → GPT-5-mini → Supabase → Slack 全フロー動作確認済み
 
 **SRT形式対応追加**: 2025-01-06
+
 - Whisper API segments → Database保存 → Frontend表示（タイムスタンプ付き）全フロー動作確認済み
 
 #### M1.6: プロジェクト・ユーザー管理 ✅
 
 **成果物**:
+
 - ✅ プロジェクト一覧ページ（`/app/(dashboard)/projects/page.tsx`）
 - ✅ プロジェクト作成・編集・削除UI
 - ✅ メンバー管理UI（`/app/(dashboard)/projects/[id]/members/page.tsx`）
@@ -136,6 +145,7 @@
 - ✅ RLSによるアクセス制御（オーナー/ディレクター/ユーザー権限分離）
 
 **API実装**:
+
 - ✅ `/app/api/projects/*` - プロジェクトCRUD
 - ✅ `/app/api/projects/[id]/members/*` - メンバー管理
 - ✅ `/app/api/users/*` - ユーザー管理（Zoom User ID対応）
@@ -150,6 +160,7 @@
 #### M2.1: プロンプト管理UI ✅
 
 **成果物**:
+
 - ✅ プロンプト一覧ページ（`/app/(dashboard)/projects/[id]/prompts/page.tsx`）
   - タブ表示（connected/reception切り替え）
   - 現在のプロンプト表示
@@ -162,12 +173,14 @@
 - ✅ プロンプト編集ページ（`/app/(dashboard)/projects/[id]/prompts/[promptId]/edit/page.tsx`）
 
 **API実装**:
+
 - ✅ `/app/api/prompts/route.ts` - プロンプト一覧取得・作成
 - ✅ `/app/api/prompts/[id]/route.ts` - 個別プロンプト取得・更新・削除
 
 #### M2.2: プロンプトバージョン管理 ✅
 
 **成果物**:
+
 - ✅ プロンプト履歴ページ（`/app/(dashboard)/projects/[id]/prompts/[promptId]/history/page.tsx`）
   - タイムライン形式表示
   - バージョン番号、変更者、変更日時表示
@@ -178,6 +191,7 @@
   - 新バージョンとして保存
 
 **API実装**:
+
 - ✅ `/app/api/prompts/[id]/history/route.ts` - 履歴取得（過去10件）
 - ✅ `/app/api/prompts/[id]/restore/route.ts` - バージョン復元
 
@@ -186,6 +200,7 @@
 #### M2.3: AIプロンプトアシスタント ✅
 
 **成果物**:
+
 - ✅ 音声録音コンポーネント（`components/AudioRecorder.tsx`）
   - Web Audio API統合
   - リアルタイム録音時間表示
@@ -201,6 +216,7 @@
   - 生成されたプロンプトの編集機能
 
 **実装詳細**:
+
 - OpenAI Whisper API: `whisper-1` モデル（日本語対応）
 - OpenAI GPT-5-mini: プロンプト生成用システムプロンプト最適化
 - エラーハンドリング: 認証エラー、レート制限、バリデーションエラー対応
@@ -210,6 +226,7 @@
 #### M2.4: フィードバック生成実装 ✅
 
 **成果物**:
+
 - ✅ フィードバック生成ロジック（`backend/processor/src/services/feedbackGeneration.ts`）
   - プロンプト取得（プロジェクト固有 or デフォルト）
   - GPT-5-mini統合
@@ -227,6 +244,7 @@
   - 音声プレーヤー統合
 
 **デフォルトプロンプト作成**:
+
 - ✅ Connected用プロンプト（`supabase/migrations/20250104_001_insert_default_prompts.sql`）
 - ✅ Reception用プロンプト（`supabase/migrations/20250104_001_insert_default_prompts.sql`）
 
@@ -310,6 +328,7 @@
 #### **AIモデル統一によるコスト削減**
 
 **変更内容**:
+
 - 全ての処理を**GPT-5-mini**に統一（GPT-5の使用を完全廃止）
 - 対象機能:
   - ✅ AIプロンプトアシスタント: GPT-5 → GPT-5-mini
@@ -319,24 +338,27 @@
 
 **コスト削減効果**:
 
-| 項目 | 変更前 | 変更後 | 削減額 |
-|------|--------|--------|--------|
-| **Phase 1-2（現状）** | $48.75/月 | $48.75/月 | $0 |
-| **Phase 3-4追加** | $36.00/月 | $6.00/月 | **$30/月** |
-| **合計（全機能稼働時）** | $84.75/月 | $54.75/月 | **$30/月** |
-| **年間コスト** | $1,017 | **$657** | **$360削減（35%↓）** |
+| 項目                     | 変更前    | 変更後    | 削減額               |
+| ------------------------ | --------- | --------- | -------------------- |
+| **Phase 1-2（現状）**    | $48.75/月 | $48.75/月 | $0                   |
+| **Phase 3-4追加**        | $36.00/月 | $6.00/月  | **$30/月**           |
+| **合計（全機能稼働時）** | $84.75/月 | $54.75/月 | **$30/月**           |
+| **年間コスト**           | $1,017    | **$657**  | **$360削減（35%↓）** |
 
 **1通話あたりコスト**（1,500通話/月想定）:
+
 - 変更前: $0.0565
 - 変更後: **$0.0365**
 - 削減: $0.02/通話（35%削減）
 
 **技術的対策**:
+
 - プロンプトエンジニアリング強化（構造化プロンプト、Few-shot Learning）
 - Phase 3実装時に精度検証テスト実施予定
 - 必要に応じてハイブリッド戦略（重要通話のみGPT-5）を検討可能
 
 **期待効果**:
+
 - 中小企業にとって年間$360削減は大きな価値
 - コストパフォーマンスの高いAIフィードバックシステムを実現
 
@@ -346,46 +368,46 @@
 
 ### フロントエンド
 
-| 技術 | バージョン | 用途 |
-|-----|-----------|------|
-| Next.js | 14.2.29 | React フレームワーク（App Router） |
-| TypeScript | 5.7.3 | 型安全性 |
-| React | 19.0.0 | UIライブラリ |
-| Tailwind CSS | 3.4.17 | CSSフレームワーク |
-| shadcn/ui | - | UIコンポーネント |
-| React Markdown | 10.0.1 | Markdown表示 |
-| @uiw/react-md-editor | 4.0.4 | Markdownエディタ |
-| Zod | 3.24.1 | バリデーション |
+| 技術                 | バージョン | 用途                               |
+| -------------------- | ---------- | ---------------------------------- |
+| Next.js              | 14.2.29    | React フレームワーク（App Router） |
+| TypeScript           | 5.7.3      | 型安全性                           |
+| React                | 19.0.0     | UIライブラリ                       |
+| Tailwind CSS         | 3.4.17     | CSSフレームワーク                  |
+| shadcn/ui            | -          | UIコンポーネント                   |
+| React Markdown       | 10.0.1     | Markdown表示                       |
+| @uiw/react-md-editor | 4.0.4      | Markdownエディタ                   |
+| Zod                  | 3.24.1     | バリデーション                     |
 
 ### バックエンド
 
-| 技術 | バージョン | 用途 |
-|-----|-----------|------|
-| Node.js | 20.x | ランタイム |
-| Express.js | 4.x | Webフレームワーク |
-| Supabase | - | PostgreSQL + Auth + Realtime |
-| PostgreSQL | 15.x | データベース |
-| pgvector | 0.5.x | ベクトル検索（RAG用） |
+| 技術       | バージョン | 用途                         |
+| ---------- | ---------- | ---------------------------- |
+| Node.js    | 20.x       | ランタイム                   |
+| Express.js | 4.x        | Webフレームワーク            |
+| Supabase   | -          | PostgreSQL + Auth + Realtime |
+| PostgreSQL | 15.x       | データベース                 |
+| pgvector   | 0.5.x      | ベクトル検索（RAG用）        |
 
 ### AI/ML
 
-| サービス | モデル | 用途 |
-|---------|--------|------|
-| OpenAI Whisper API | whisper-1 | 音声文字起こし（日本語 + SRT形式） |
-| OpenAI GPT-5-mini | gpt-5-mini | **全処理に統一**（通話状態判定、フィードバック生成、プロンプト生成、トークスクリプト分析、RAG統合） |
-| OpenAI Embedding API | text-embedding-3-small | RAG実装用（Phase 4） |
+| サービス             | モデル                 | 用途                                                                                                |
+| -------------------- | ---------------------- | --------------------------------------------------------------------------------------------------- |
+| OpenAI Whisper API   | whisper-1              | 音声文字起こし（日本語 + SRT形式）                                                                  |
+| OpenAI GPT-5-mini    | gpt-5-mini             | **全処理に統一**（通話状態判定、フィードバック生成、プロンプト生成、トークスクリプト分析、RAG統合） |
+| OpenAI Embedding API | text-embedding-3-small | RAG実装用（Phase 4）                                                                                |
 
 **コスト最適化**: 全処理をGPT-5-miniに統一（2025-01-06実施）
 
 ### インフラ
 
-| サービス | 用途 |
-|---------|------|
-| Google Cloud Run | バックエンドサービス（Zoom Proxy, Backend Processor） |
-| Google Cloud Storage | 音声/文字起こしファイル保存（6ヶ月自動削除） |
-| Google Cloud Pub/Sub | 非同期メッセージング |
-| Google Secret Manager | シークレット管理 |
-| Vercel | フロントエンドホスティング（予定） |
+| サービス              | 用途                                                  |
+| --------------------- | ----------------------------------------------------- |
+| Google Cloud Run      | バックエンドサービス（Zoom Proxy, Backend Processor） |
+| Google Cloud Storage  | 音声/文字起こしファイル保存（6ヶ月自動削除）          |
+| Google Cloud Pub/Sub  | 非同期メッセージング                                  |
+| Google Secret Manager | シークレット管理                                      |
+| Vercel                | フロントエンドホスティング（予定）                    |
 
 ---
 
@@ -393,30 +415,31 @@
 
 ### ドキュメント
 
-| ファイル | 内容 | ステータス |
-|---------|------|-----------|
-| `docs/requirements_specification_v2.md` | 要件定義書（v2.2.0） | ✅ 完成 |
-| `docs/database_schema.md` | データベース設計書（11テーブル） | ✅ 完成 |
-| `docs/api_specification.md` | API仕様書 | ✅ 完成 |
-| `docs/architecture.md` | システムアーキテクチャ | ✅ 完成 |
-| `docs/implementation_plan.md` | 実装計画書（7フェーズ） | ✅ 完成 |
-| `docs/task_breakdown.md` | タスク分解（200+タスク） | ✅ 更新（Phase 1&2完了マーク） |
-| `docs/technical_guidelines.md` | 技術ガイドライン | ✅ 完成 |
-| `docs/development_setup.md` | 開発環境セットアップ手順 | ✅ 完成 |
-| `docs/security_design.md` | セキュリティ設計 | ✅ 完成 |
-| `docs/deployment_guide.md` | デプロイ手順 | ✅ 完成 |
-| `docs/testing_strategy.md` | テスト戦略 | ✅ 完成 |
-| `docs/ui_ux_design.md` | UI/UXデザイン | ✅ 完成 |
-| `docs/m1.5-integration-test-results.md` | M1.5統合テスト結果 | ✅ 完成 |
-| `docs/m1.6-completion-summary.md` | M1.6完了サマリー | ✅ 完成 |
-| `docs/m2.1-completion-summary.md` | M2.1完了サマリー | ✅ 完成 |
-| `docs/m2.3-completion-summary.md` | M2.3完了サマリー | ✅ 完成 |
-| `docs/m2.4-zoom-user-id-completion-summary.md` | M2.4完了サマリー | ✅ 完成 |
-| `docs/PROGRESS_SUMMARY.md` | プロジェクト進捗サマリー（本ドキュメント） | ✅ 新規作成 |
+| ファイル                                       | 内容                                       | ステータス                     |
+| ---------------------------------------------- | ------------------------------------------ | ------------------------------ |
+| `docs/requirements_specification_v2.md`        | 要件定義書（v2.2.0）                       | ✅ 完成                        |
+| `docs/database_schema.md`                      | データベース設計書（11テーブル）           | ✅ 完成                        |
+| `docs/api_specification.md`                    | API仕様書                                  | ✅ 完成                        |
+| `docs/architecture.md`                         | システムアーキテクチャ                     | ✅ 完成                        |
+| `docs/implementation_plan.md`                  | 実装計画書（7フェーズ）                    | ✅ 完成                        |
+| `docs/task_breakdown.md`                       | タスク分解（200+タスク）                   | ✅ 更新（Phase 1&2完了マーク） |
+| `docs/technical_guidelines.md`                 | 技術ガイドライン                           | ✅ 完成                        |
+| `docs/development_setup.md`                    | 開発環境セットアップ手順                   | ✅ 完成                        |
+| `docs/security_design.md`                      | セキュリティ設計                           | ✅ 完成                        |
+| `docs/deployment_guide.md`                     | デプロイ手順                               | ✅ 完成                        |
+| `docs/testing_strategy.md`                     | テスト戦略                                 | ✅ 完成                        |
+| `docs/ui_ux_design.md`                         | UI/UXデザイン                              | ✅ 完成                        |
+| `docs/m1.5-integration-test-results.md`        | M1.5統合テスト結果                         | ✅ 完成                        |
+| `docs/m1.6-completion-summary.md`              | M1.6完了サマリー                           | ✅ 完成                        |
+| `docs/m2.1-completion-summary.md`              | M2.1完了サマリー                           | ✅ 完成                        |
+| `docs/m2.3-completion-summary.md`              | M2.3完了サマリー                           | ✅ 完成                        |
+| `docs/m2.4-zoom-user-id-completion-summary.md` | M2.4完了サマリー                           | ✅ 完成                        |
+| `docs/PROGRESS_SUMMARY.md`                     | プロジェクト進捗サマリー（本ドキュメント） | ✅ 新規作成                    |
 
 ### コードベース
 
 **フロントエンド**:
+
 - `/app/login/page.tsx` - ログインページ
 - `/app/(dashboard)/projects/*` - プロジェクト管理ページ
 - `/app/(dashboard)/calls/*` - 通話一覧・詳細ページ
@@ -430,6 +453,7 @@
 - `middleware.ts` - 認証チェック
 
 **バックエンド**:
+
 - `backend/zoom-proxy/` - Zoom Proxy Service（Cloud Run）
 - `backend/processor/` - Backend Processor Service（Cloud Run）
   - `src/processor.ts` - メイン処理フロー
@@ -440,10 +464,12 @@
   - `src/services/slackNotification.ts` - Slack通知
 
 **データベース**:
+
 - `supabase/migrations/` - マイグレーションスクリプト（11テーブル）
 - `types/database.types.ts` - TypeScript型定義
 
 **CI/CD**:
+
 - `.github/workflows/test.yml` - 自動テスト
 - `.github/workflows/deploy-backend.yml` - 自動デプロイ
 
@@ -503,24 +529,24 @@
 
 ### コードベース統計
 
-| カテゴリ | 数量 |
-|---------|------|
-| **フロントエンドページ** | 15+ ページ |
-| **APIエンドポイント** | 25+ エンドポイント |
-| **データベーステーブル** | 11 テーブル |
+| カテゴリ                       | 数量                      |
+| ------------------------------ | ------------------------- |
+| **フロントエンドページ**       | 15+ ページ                |
+| **APIエンドポイント**          | 25+ エンドポイント        |
+| **データベーステーブル**       | 11 テーブル               |
 | **マイグレーションスクリプト** | 6 ファイル（SRT形式追加） |
-| **Cloud Runサービス** | 2 サービス |
-| **GitHub Actionsワークフロー** | 2 ワークフロー |
-| **ドキュメントファイル** | 17 ファイル |
+| **Cloud Runサービス**          | 2 サービス                |
+| **GitHub Actionsワークフロー** | 2 ワークフロー            |
+| **ドキュメントファイル**       | 17 ファイル               |
 
 ### タスク完了状況
 
-| 優先度 | 完了数 | 残数 | 完了率 |
-|-------|--------|------|-------|
-| **P0 (Critical)** | 約40タスク | 約60タスク | 40% |
-| **P1 (High)** | 約15タスク | 約45タスク | 25% |
-| **P2 (Medium)** | 約5タスク | 約25タスク | 17% |
-| **P3 (Low)** | 0タスク | 約10タスク | 0% |
+| 優先度            | 完了数     | 残数       | 完了率 |
+| ----------------- | ---------- | ---------- | ------ |
+| **P0 (Critical)** | 約40タスク | 約60タスク | 40%    |
+| **P1 (High)**     | 約15タスク | 約45タスク | 25%    |
+| **P2 (Medium)**   | 約5タスク  | 約25タスク | 17%    |
+| **P3 (Low)**      | 0タスク    | 約10タスク | 0%     |
 
 ### 技術的成果
 
@@ -538,11 +564,11 @@
 
 ### 現在のリスク
 
-| リスク | 影響度 | 発生確率 | 対策 |
-|-------|--------|---------|------|
-| **OpenAI APIコスト増加** | 中 | 中 | レート制限監視、使用量アラート設定 |
-| **Cloud Run実行時間制限** | 中 | 低 | 非同期処理、タイムアウト管理実装済み |
-| **Phase 3の実装複雑度** | 高 | 中 | GPT-5-miniセマンティック分析の精度検証必要 |
+| リスク                    | 影響度 | 発生確率 | 対策                                       |
+| ------------------------- | ------ | -------- | ------------------------------------------ |
+| **OpenAI APIコスト増加**  | 中     | 中       | レート制限監視、使用量アラート設定         |
+| **Cloud Run実行時間制限** | 中     | 低       | 非同期処理、タイムアウト管理実装済み       |
+| **Phase 3の実装複雑度**   | 高     | 中       | GPT-5-miniセマンティック分析の精度検証必要 |
 
 ### 緩和策
 
@@ -557,19 +583,19 @@
 
 ### 開発プロセス
 
-| KPI | 目標 | 実績 | 達成率 |
-|-----|------|------|-------|
+| KPI                                | 目標    | 実績                                            | 達成率  |
+| ---------------------------------- | ------- | ----------------------------------------------- | ------- |
 | **各フェーズのスケジュール遵守率** | 90%以上 | Phase 1: 100%, Phase 2: 150% (予定より早く完了) | ✅ 125% |
-| **コードレビュー完了率** | 100% | 100% (全PRレビュー実施) | ✅ 100% |
-| **テストカバレッジ** | 80%以上 | Phase 7で計測予定 | ⏳ N/A |
+| **コードレビュー完了率**           | 100%    | 100% (全PRレビュー実施)                         | ✅ 100% |
+| **テストカバレッジ**               | 80%以上 | Phase 7で計測予定                               | ⏳ N/A  |
 
 ### システム品質（Phase 7で計測予定）
 
-| KPI | 目標 | 実績 | 達成率 |
-|-----|------|------|-------|
+| KPI                  | 目標        | 実績              | 達成率 |
+| -------------------- | ----------- | ----------------- | ------ |
 | **レスポンスタイム** | p95 < 500ms | Phase 7で計測予定 | ⏳ N/A |
-| **エラーレート** | < 1% | Phase 7で計測予定 | ⏳ N/A |
-| **稼働率** | 99.9%以上 | Phase 7で計測予定 | ⏳ N/A |
+| **エラーレート**     | < 1%        | Phase 7で計測予定 | ⏳ N/A |
+| **稼働率**           | 99.9%以上   | Phase 7で計測予定 | ⏳ N/A |
 
 ---
 

@@ -125,7 +125,10 @@ export async function POST(request: NextRequest) {
     const ragResults = await searchRAG(user_message, 3, 0.3) // Top 3 results, 30% similarity threshold
 
     // Extract improvements from conversation history
-    const improvements = extractImprovements([...conversation_history, { role: 'user', content: user_message }])
+    const improvements = extractImprovements([
+      ...conversation_history,
+      { role: 'user', content: user_message },
+    ])
 
     // Call GPT-5-mini for chat
     const completion = await openai.chat.completions.create({
@@ -267,4 +270,3 @@ function extractImprovements(messages: Array<{ role: string; content: string }>)
 
   return improvements.slice(0, 5) // Max 5 improvements
 }
-

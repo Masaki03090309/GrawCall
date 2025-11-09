@@ -12,10 +12,7 @@ const UpdateHearingItemSchema = z.object({
  * PUT /api/talk-scripts/hearing-items/:itemId
  * Update a hearing item
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { itemId: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { itemId: string } }) {
   try {
     const supabase = createClient()
 
@@ -33,21 +30,17 @@ export async function PUT(
     // Get hearing item
     const { data: hearingItem, error: fetchError } = await supabase
       .from('talk_script_hearing_items')
-      .select('*, talk_script:talk_scripts!talk_script_hearing_items_talk_script_id_fkey(project_id)')
+      .select(
+        '*, talk_script:talk_scripts!talk_script_hearing_items_talk_script_id_fkey(project_id)'
+      )
       .eq('id', itemId)
       .single()
 
     if (fetchError) {
       if (fetchError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Hearing item not found' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Hearing item not found' }, { status: 404 })
       }
-      return NextResponse.json(
-        { error: 'Failed to fetch hearing item' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch hearing item' }, { status: 500 })
     }
 
     // Parse and validate request body
@@ -62,10 +55,7 @@ export async function PUT(
       .single()
 
     if (userError || !userData) {
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
     }
 
     // Check if user is owner or director of this project
@@ -79,7 +69,9 @@ export async function PUT(
 
       if (memberError || !memberData || memberData.role === 'user') {
         return NextResponse.json(
-          { error: 'Insufficient permissions. Only owners and directors can update hearing items.' },
+          {
+            error: 'Insufficient permissions. Only owners and directors can update hearing items.',
+          },
           { status: 403 }
         )
       }
@@ -106,10 +98,7 @@ export async function PUT(
 
     if (updateError) {
       console.error('Error updating hearing item:', updateError)
-      return NextResponse.json(
-        { error: 'Failed to update hearing item' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to update hearing item' }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -128,10 +117,7 @@ export async function PUT(
     }
 
     console.error('Error in PUT /api/talk-scripts/hearing-items/:itemId:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -139,10 +125,7 @@ export async function PUT(
  * DELETE /api/talk-scripts/hearing-items/:itemId
  * Delete a hearing item (only if not default)
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { itemId: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { itemId: string } }) {
   try {
     const supabase = createClient()
 
@@ -160,29 +143,22 @@ export async function DELETE(
     // Get hearing item
     const { data: hearingItem, error: fetchError } = await supabase
       .from('talk_script_hearing_items')
-      .select('is_default, talk_script:talk_scripts!talk_script_hearing_items_talk_script_id_fkey(project_id)')
+      .select(
+        'is_default, talk_script:talk_scripts!talk_script_hearing_items_talk_script_id_fkey(project_id)'
+      )
       .eq('id', itemId)
       .single()
 
     if (fetchError) {
       if (fetchError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Hearing item not found' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Hearing item not found' }, { status: 404 })
       }
-      return NextResponse.json(
-        { error: 'Failed to fetch hearing item' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch hearing item' }, { status: 500 })
     }
 
     // Check if default item
     if (hearingItem.is_default) {
-      return NextResponse.json(
-        { error: 'Cannot delete default hearing item' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Cannot delete default hearing item' }, { status: 400 })
     }
 
     // Check user role (owner or director)
@@ -193,10 +169,7 @@ export async function DELETE(
       .single()
 
     if (userError || !userData) {
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
     }
 
     // Check if user is owner or director of this project
@@ -210,7 +183,9 @@ export async function DELETE(
 
       if (memberError || !memberData || memberData.role === 'user') {
         return NextResponse.json(
-          { error: 'Insufficient permissions. Only owners and directors can delete hearing items.' },
+          {
+            error: 'Insufficient permissions. Only owners and directors can delete hearing items.',
+          },
           { status: 403 }
         )
       }
@@ -224,10 +199,7 @@ export async function DELETE(
 
     if (deleteError) {
       console.error('Error deleting hearing item:', deleteError)
-      return NextResponse.json(
-        { error: 'Failed to delete hearing item' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to delete hearing item' }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -235,9 +207,6 @@ export async function DELETE(
     })
   } catch (error) {
     console.error('Error in DELETE /api/talk-scripts/hearing-items/:itemId:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

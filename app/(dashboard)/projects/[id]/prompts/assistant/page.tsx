@@ -169,7 +169,9 @@ export default function PromptAssistantPage() {
           size="lg"
           onClick={handleGeneratePrompt}
           disabled={!isReadyToGenerate || isGenerating}
-          className={isReadyToGenerate ? 'animate-pulse bg-gradient-to-r from-purple-600 to-blue-600' : ''}
+          className={
+            isReadyToGenerate ? 'animate-pulse bg-gradient-to-r from-purple-600 to-blue-600' : ''
+          }
         >
           {isGenerating ? (
             <>
@@ -206,9 +208,7 @@ export default function PromptAssistantPage() {
                   >
                     <div
                       className={`max-w-[80%] rounded-lg p-4 ${
-                        msg.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
+                        msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'
                       }`}
                     >
                       <div className="mb-1 text-xs opacity-70">

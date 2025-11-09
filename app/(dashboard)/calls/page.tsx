@@ -195,7 +195,7 @@ export default function CallsListPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全てのプロジェクト</SelectItem>
-                    {projects.map((project) => (
+                    {projects.map(project => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
                       </SelectItem>

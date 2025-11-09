@@ -10,10 +10,7 @@ const RestoreVersionSchema = z.object({
  * POST /api/admin/default-prompts/:id/restore
  * Restore a previous version of system default prompt (owner only)
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient()
 

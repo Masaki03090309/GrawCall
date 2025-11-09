@@ -1,13 +1,15 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.detectCallStatus = detectCallStatus;
-const openai_1 = __importDefault(require("openai"));
+'use strict'
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod }
+  }
+Object.defineProperty(exports, '__esModule', { value: true })
+exports.detectCallStatus = detectCallStatus
+const openai_1 = __importDefault(require('openai'))
 const openai = new openai_1.default({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+  apiKey: process.env.OPENAI_API_KEY,
+})
 /**
  * Detect call status using GPT-5-nano
  *
@@ -17,33 +19,33 @@ const openai = new openai_1.default({
  * - no_conversation: No meaningful conversation (too short, voicemail, etc.)
  */
 async function detectCallStatus(transcript, duration) {
-    console.log('Detecting call status with GPT-5-nano...');
-    // Rule-based pre-filtering
-    if (duration < 10 || transcript.length < 20) {
-        return {
-            status: 'no_conversation',
-            confidence: 1.0,
-            reason: '通話時間が短すぎる、または文字起こしが短すぎる',
-        };
+  console.log('Detecting call status with GPT-5-nano...')
+  // Rule-based pre-filtering
+  if (duration < 10 || transcript.length < 20) {
+    return {
+      status: 'no_conversation',
+      confidence: 1.0,
+      reason: '通話時間が短すぎる、または文字起こしが短すぎる',
     }
-    // Keywords for quick detection
-    const receptionKeywords = ['受付', '受け付け', '担当者', '代わります', '繋ぎます', 'お繋ぎ'];
-    const hasReceptionKeyword = receptionKeywords.some(kw => transcript.includes(kw));
-    if (hasReceptionKeyword && duration < 60) {
-        return {
-            status: 'reception',
-            confidence: 0.9,
-            reason: '受付キーワードが検出され、短い通話時間',
-        };
+  }
+  // Keywords for quick detection
+  const receptionKeywords = ['受付', '受け付け', '担当者', '代わります', '繋ぎます', 'お繋ぎ']
+  const hasReceptionKeyword = receptionKeywords.some(kw => transcript.includes(kw))
+  if (hasReceptionKeyword && duration < 60) {
+    return {
+      status: 'reception',
+      confidence: 0.9,
+      reason: '受付キーワードが検出され、短い通話時間',
     }
-    try {
-        // Use GPT-5-nano for classification with strict prompt
-        const response = await openai.chat.completions.create({
-            model: 'gpt-5-nano',
-            messages: [
-                {
-                    role: 'system',
-                    content: `あなたはインサイドセールスの通話を3分類する専門家です。文字起こしのみを根拠に判定し、JSONオブジェクト1個のみを出力します。
+  }
+  try {
+    // Use GPT-5-nano for classification with strict prompt
+    const response = await openai.chat.completions.create({
+      model: 'gpt-5-nano',
+      messages: [
+        {
+          role: 'system',
+          content: `あなたはインサイドセールスの通話を3分類する専門家です。文字起こしのみを根拠に判定し、JSONオブジェクト1個のみを出力します。
 
 # 3分類の定義
 - "connected": 担当者本人と要件の会話をした（アポ獲得・断られた両方含む）
@@ -118,44 +120,42 @@ async function detectCallStatus(transcript, duration) {
 - connected: 一人称発言複数=0.85-0.95、一人称1つ=0.70-0.85、本人確認のみ=0.60-0.75
 - reception: 明確な不在=0.90-0.95、曖昧=0.60-0.80
 - no_conversation: 留守電・即切れ=0.95-1.0`,
-                },
-                {
-                    role: 'user',
-                    content: `以下の通話内容を分析してください。
+        },
+        {
+          role: 'user',
+          content: `以下の通話内容を分析してください。
 
 通話時間: ${duration}秒
 文字起こし:
 ${transcript}`,
-                },
-            ],
-            // Note: GPT-5-mini does not support temperature parameter (removed per CLAUDE.md guidelines)
-        });
-        const content = response.choices[0]?.message?.content || '{}';
-        const result = JSON.parse(content);
-        console.log('Status detection result:', result);
-        return {
-            status: result.status || 'no_conversation',
-            confidence: result.confidence || 0.5,
-            reason: result.reason || 'AI判定',
-        };
+        },
+      ],
+      // Note: GPT-5-mini does not support temperature parameter (removed per CLAUDE.md guidelines)
+    })
+    const content = response.choices[0]?.message?.content || '{}'
+    const result = JSON.parse(content)
+    console.log('Status detection result:', result)
+    return {
+      status: result.status || 'no_conversation',
+      confidence: result.confidence || 0.5,
+      reason: result.reason || 'AI判定',
     }
-    catch (error) {
-        console.error('Error detecting status with GPT-5-nano:', error.message);
-        // Fallback to rule-based detection
-        if (duration >= 60) {
-            return {
-                status: 'connected',
-                confidence: 0.6,
-                reason: 'GPT-5-nano判定失敗。通話時間に基づく推定。',
-            };
-        }
-        else {
-            return {
-                status: 'no_conversation',
-                confidence: 0.6,
-                reason: 'GPT-5-nano判定失敗。通話時間に基づく推定。',
-            };
-        }
+  } catch (error) {
+    console.error('Error detecting status with GPT-5-nano:', error.message)
+    // Fallback to rule-based detection
+    if (duration >= 60) {
+      return {
+        status: 'connected',
+        confidence: 0.6,
+        reason: 'GPT-5-nano判定失敗。通話時間に基づく推定。',
+      }
+    } else {
+      return {
+        status: 'no_conversation',
+        confidence: 0.6,
+        reason: 'GPT-5-nano判定失敗。通話時間に基づく推定。',
+      }
     }
+  }
 }
 //# sourceMappingURL=statusDetection.js.map

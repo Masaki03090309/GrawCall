@@ -65,3 +65,6 @@ nul
 *temp*.txt
 *temp*.json
 [C-Z]:temp*
+env-vars.yaml
+vercel-deploy.log
+check-fukase-setup.js

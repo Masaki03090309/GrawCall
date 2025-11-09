@@ -309,9 +309,7 @@ export default function CallDetailPage() {
                 <div className="space-y-6">
                   {/* Overall Match Rate */}
                   <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                    <div className="mb-2 text-sm font-medium text-gray-700">
-                      総合一致率
-                    </div>
+                    <div className="mb-2 text-sm font-medium text-gray-700">総合一致率</div>
                     <div className="text-3xl font-bold text-blue-600">
                       {Math.round(
                         (call.phase_match_rates.opening +
@@ -326,24 +324,20 @@ export default function CallDetailPage() {
 
                   {/* Phase Match Rates */}
                   <div>
-                    <h3 className="mb-3 text-sm font-semibold text-gray-700">
-                      フェーズ別一致率
-                    </h3>
+                    <h3 className="mb-3 text-sm font-semibold text-gray-700">フェーズ別一致率</h3>
                     <div className="space-y-3">
                       {[
                         { key: 'opening', label: '📝 オープニング', color: 'bg-purple-500' },
                         { key: 'hearing', label: '🎤 ヒアリング', color: 'bg-green-500' },
                         { key: 'proposal', label: '💡 提案', color: 'bg-yellow-500' },
                         { key: 'closing', label: '🤝 クロージング', color: 'bg-blue-500' },
-                      ].map((phase) => {
+                      ].map(phase => {
                         const rate = call.phase_match_rates![phase.key as keyof PhaseMatchRates]
                         const status = rate >= 70 ? '✅' : rate >= 50 ? '⚠️' : '❌'
                         return (
                           <div key={phase.key} className="rounded-md border bg-white p-3">
                             <div className="mb-2 flex items-center justify-between">
-                              <span className="text-sm font-medium">
-                                {phase.label}
-                              </span>
+                              <span className="text-sm font-medium">{phase.label}</span>
                               <span className="text-lg">
                                 {status} {rate}%
                               </span>
@@ -377,9 +371,7 @@ export default function CallDetailPage() {
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="text-lg">
-                                {coverage.covered ? '✅' : '❌'}
-                              </span>
+                              <span className="text-lg">{coverage.covered ? '✅' : '❌'}</span>
                               <span className="font-medium">{itemName}</span>
                             </div>
                             <span
@@ -401,15 +393,13 @@ export default function CallDetailPage() {
                       ヒアリング項目カバー率:{' '}
                       <strong>
                         {Math.round(
-                          (Object.values(call.hearing_item_coverage).filter((c) => c.covered)
-                            .length /
+                          (Object.values(call.hearing_item_coverage).filter(c => c.covered).length /
                             Object.keys(call.hearing_item_coverage).length) *
                             100
                         )}
                         %
                       </strong>{' '}
-                      (
-                      {Object.values(call.hearing_item_coverage).filter((c) => c.covered).length}/
+                      ({Object.values(call.hearing_item_coverage).filter(c => c.covered).length}/
                       {Object.keys(call.hearing_item_coverage).length}項目)
                     </div>
                   </div>
@@ -418,9 +408,7 @@ export default function CallDetailPage() {
                   <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
                     <p className="mb-2 font-medium">💡 一致率について</p>
                     <ul className="list-inside list-disc space-y-1 text-xs">
-                      <li>
-                        70%以上: 良好 ✅（表現が異なっても意図が伝わっていれば高評価）
-                      </li>
+                      <li>70%以上: 良好 ✅（表現が異なっても意図が伝わっていれば高評価）</li>
                       <li>50-69%: 改善の余地あり ⚠️</li>
                       <li>50%未満: 要改善 ❌</li>
                     </ul>
@@ -447,7 +435,7 @@ export default function CallDetailPage() {
                   <div className="mb-4 text-sm font-medium text-gray-700">
                     タイムスタンプ付き文字起こし（SRT形式）
                   </div>
-                  {call.transcript_segments.map((segment) => (
+                  {call.transcript_segments.map(segment => (
                     <div key={segment.id} className="border-l-4 border-blue-500 bg-white p-3">
                       <div className="mb-1 font-mono text-xs text-gray-500">
                         {formatTimestamp(segment.start)} → {formatTimestamp(segment.end)}

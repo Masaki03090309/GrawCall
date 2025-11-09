@@ -1,9 +1,9 @@
-import { TalkScriptAnalysisResult } from './talkScriptAnalysis';
+import { TalkScriptAnalysisResult } from './talkScriptAnalysis'
 interface FeedbackGenerationResult {
-    feedback_text: string | null;
-    prompt_version_id: string | null;
-    should_generate: boolean;
-    skip_reason?: string;
+  feedback_text: string | null
+  prompt_version_id: string | null
+  should_generate: boolean
+  skip_reason?: string
 }
 /**
  * Generate feedback for a call using GPT model
@@ -17,6 +17,12 @@ interface FeedbackGenerationResult {
  * @param analysisResult - Talk script analysis result (optional, M3.3)
  * @returns FeedbackGenerationResult
  */
-export declare function generateFeedback(transcriptText: string, status: string, durationSeconds: number, projectId: string | null, analysisResult?: TalkScriptAnalysisResult): Promise<FeedbackGenerationResult>;
-export {};
+export declare function generateFeedback(
+  transcriptText: string,
+  status: string,
+  durationSeconds: number,
+  projectId: string | null,
+  analysisResult?: TalkScriptAnalysisResult
+): Promise<FeedbackGenerationResult>
+export {}
 //# sourceMappingURL=feedbackGeneration.d.ts.map

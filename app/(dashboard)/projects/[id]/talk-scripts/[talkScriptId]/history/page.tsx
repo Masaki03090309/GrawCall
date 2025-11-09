@@ -115,9 +115,9 @@ export default function TalkScriptHistoryPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-gray-400" />
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-gray-400" />
           <p className="mt-4 text-gray-600">Loading history...</p>
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function TalkScriptHistoryPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-red-600">Error: {error}</p>
           <Button onClick={fetchHistory} className="mt-4">
@@ -139,10 +139,10 @@ export default function TalkScriptHistoryPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">トークスクリプト履歴</h1>
-          <p className="text-gray-600 mt-2">過去10バージョンの変更履歴</p>
+          <p className="mt-2 text-gray-600">過去10バージョンの変更履歴</p>
         </div>
         <Button
           variant="outline"
@@ -158,12 +158,8 @@ export default function TalkScriptHistoryPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="text-2xl font-bold text-gray-400">
-                    v{version.version}
-                  </div>
-                  {version.is_active && (
-                    <Badge variant="default">Current Version</Badge>
-                  )}
+                  <div className="text-2xl font-bold text-gray-400">v{version.version}</div>
+                  {version.is_active && <Badge variant="default">Current Version</Badge>}
                   {version.diff && (
                     <div className="flex gap-2">
                       {version.diff.opening_changed && (
@@ -190,11 +186,7 @@ export default function TalkScriptHistoryPage() {
                   )}
                 </div>
                 {!version.is_active && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRestoreClick(version)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => handleRestoreClick(version)}>
                     <RotateCcw className="mr-2 h-4 w-4" />
                     復元
                   </Button>
@@ -227,13 +219,11 @@ export default function TalkScriptHistoryPage() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t">
+                <div className="grid grid-cols-2 gap-3 border-t pt-3 md:grid-cols-4">
                   <div className="text-sm">
                     <div className="text-gray-600">オープニング</div>
                     <div className="font-medium">
-                      {version.opening_script
-                        ? `${version.opening_script.length} 文字`
-                        : '未設定'}
+                      {version.opening_script ? `${version.opening_script.length} 文字` : '未設定'}
                     </div>
                   </div>
                   <div className="text-sm">
@@ -251,20 +241,16 @@ export default function TalkScriptHistoryPage() {
                   <div className="text-sm">
                     <div className="text-gray-600">クロージング</div>
                     <div className="font-medium">
-                      {version.closing_script
-                        ? `${version.closing_script.length} 文字`
-                        : '未設定'}
+                      {version.closing_script ? `${version.closing_script.length} 文字` : '未設定'}
                     </div>
                   </div>
                 </div>
 
                 {index < history.length - 1 && (
-                  <div className="pt-3 border-t">
+                  <div className="border-t pt-3">
                     <div className="flex items-center text-sm text-gray-600">
                       <ChevronRight className="mr-1 h-4 w-4" />
-                      <span>
-                        v{history[index + 1].version} からの変更
-                      </span>
+                      <span>v{history[index + 1].version} からの変更</span>
                     </div>
                   </div>
                 )}
@@ -281,7 +267,8 @@ export default function TalkScriptHistoryPage() {
             <AlertDialogDescription>
               {selectedVersion && (
                 <>
-                  バージョン {selectedVersion.version} を復元すると、新しいバージョンとして保存されます。
+                  バージョン {selectedVersion.version}{' '}
+                  を復元すると、新しいバージョンとして保存されます。
                   現在のバージョンは履歴に残ります。
                 </>
               )}

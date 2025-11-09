@@ -131,7 +131,10 @@ export default function PromptsPage() {
               <div className="mb-4 flex items-center gap-2">
                 <Badge variant="default">カスタマイズ済み</Badge>
                 <span className="text-sm text-muted-foreground">
-                  最終更新: {displayPrompt ? new Date(displayPrompt.created_at).toLocaleDateString('ja-JP') : ''}
+                  最終更新:{' '}
+                  {displayPrompt
+                    ? new Date(displayPrompt.created_at).toLocaleDateString('ja-JP')
+                    : ''}
                 </span>
               </div>
 

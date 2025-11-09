@@ -133,18 +133,14 @@ export default function ProjectSettingsPage() {
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold">プロジェクト設定</h1>
-        <p className="mt-2 text-muted-foreground">
-          プロジェクト名やSlack連携の設定を変更できます
-        </p>
+        <p className="mt-2 text-muted-foreground">プロジェクト名やSlack連携の設定を変更できます</p>
       </div>
 
       <form onSubmit={handleSave}>
         <Card>
           <CardHeader>
             <CardTitle>基本設定</CardTitle>
-            <CardDescription>
-              プロジェクトの基本情報を編集します
-            </CardDescription>
+            <CardDescription>プロジェクトの基本情報を編集します</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Success Message */}
@@ -170,26 +166,22 @@ export default function ProjectSettingsPage() {
                 id="name"
                 type="text"
                 value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
+                onChange={e => setProjectName(e.target.value)}
                 placeholder="例: 新規事業開拓プロジェクト"
                 required
                 disabled={saving}
               />
-              <p className="text-sm text-muted-foreground">
-                プロジェクトを識別するための名前です
-              </p>
+              <p className="text-sm text-muted-foreground">プロジェクトを識別するための名前です</p>
             </div>
 
             {/* Slack Webhook URL */}
             <div className="space-y-2">
-              <Label htmlFor="slack_webhook_url">
-                Slack Webhook URL（任意）
-              </Label>
+              <Label htmlFor="slack_webhook_url">Slack Webhook URL（任意）</Label>
               <Input
                 id="slack_webhook_url"
                 type="url"
                 value={slackWebhookUrl}
-                onChange={(e) => setSlackWebhookUrl(e.target.value)}
+                onChange={e => setSlackWebhookUrl(e.target.value)}
                 placeholder="https://hooks.slack.com/services/..."
                 disabled={saving}
               />

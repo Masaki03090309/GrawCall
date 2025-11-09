@@ -5,10 +5,7 @@ import { createClient } from '@/lib/supabase/server'
  * GET /api/talk-scripts/:id/history
  * Get version history for a talk script (last 10 versions)
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createClient()
 
@@ -32,15 +29,9 @@ export async function GET(
 
     if (fetchError) {
       if (fetchError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Talk script not found' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Talk script not found' }, { status: 404 })
       }
-      return NextResponse.json(
-        { error: 'Failed to fetch talk script' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch talk script' }, { status: 500 })
     }
 
     // Get version history (last 10 versions)
@@ -66,10 +57,7 @@ export async function GET(
 
     if (historyError) {
       console.error('Error fetching talk script history:', historyError)
-      return NextResponse.json(
-        { error: 'Failed to fetch history' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch history' }, { status: 500 })
     }
 
     // Format history data
@@ -87,7 +75,8 @@ export async function GET(
           opening_changed: version.opening_script !== previousVersion.opening_script,
           proposal_changed: version.proposal_script !== previousVersion.proposal_script,
           closing_changed: version.closing_script !== previousVersion.closing_script,
-          hearing_items_changed: JSON.stringify(version.hearing_items) !== JSON.stringify(previousVersion.hearing_items),
+          hearing_items_changed:
+            JSON.stringify(version.hearing_items) !== JSON.stringify(previousVersion.hearing_items),
         }
       }
 
@@ -114,9 +103,6 @@ export async function GET(
     })
   } catch (error) {
     console.error('Error in GET /api/talk-scripts/:id/history:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -59,9 +59,8 @@ export async function GET(request: NextRequest) {
       }
 
       // Extract Zoom User IDs from members
-      memberZoomUserIds = members
-        ?.map(m => (m.users as any)?.zoom_user_id)
-        .filter(zoomId => zoomId != null) || []
+      memberZoomUserIds =
+        members?.map(m => (m.users as any)?.zoom_user_id).filter(zoomId => zoomId != null) || []
 
       // If no members have Zoom IDs, return empty list
       if (memberZoomUserIds.length === 0) {

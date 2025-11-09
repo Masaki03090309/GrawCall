@@ -220,7 +220,9 @@ export default function DefaultPromptsPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle>Reception通話用プロンプト</CardTitle>
-                    <CardDescription>受付止まり通話に使用されるフィードバックプロンプト</CardDescription>
+                    <CardDescription>
+                      受付止まり通話に使用されるフィードバックプロンプト
+                    </CardDescription>
                   </div>
                   <div className="flex gap-2">
                     <Button

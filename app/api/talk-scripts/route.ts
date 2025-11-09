@@ -45,10 +45,7 @@ export async function GET(request: NextRequest) {
     const project_id = searchParams.get('project_id')
 
     if (!project_id) {
-      return NextResponse.json(
-        { error: 'project_id is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'project_id is required' }, { status: 400 })
     }
 
     const validated = GetTalkScriptSchema.parse({ project_id })
@@ -81,10 +78,7 @@ export async function GET(request: NextRequest) {
         )
       }
       console.error('Error fetching talk script:', talkScriptError)
-      return NextResponse.json(
-        { error: 'Failed to fetch talk script' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch talk script' }, { status: 500 })
     }
 
     // Sort hearing items by display_order
@@ -118,10 +112,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.error('Error in GET /api/talk-scripts:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -154,10 +145,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (userError || !userData) {
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
     }
 
     // Check if user is owner or director of this project
@@ -186,10 +174,7 @@ export async function POST(request: NextRequest) {
 
     if (deactivateError) {
       console.error('Error deactivating previous versions:', deactivateError)
-      return NextResponse.json(
-        { error: 'Failed to deactivate previous versions' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to deactivate previous versions' }, { status: 500 })
     }
 
     // Get next version number
@@ -221,15 +206,12 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('Error inserting talk script:', insertError)
-      return NextResponse.json(
-        { error: 'Failed to create talk script' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to create talk script' }, { status: 500 })
     }
 
     // Insert hearing items
     if (validated.hearing_items && validated.hearing_items.length > 0) {
-      const hearingItemsToInsert = validated.hearing_items.map((item) => ({
+      const hearingItemsToInsert = validated.hearing_items.map(item => ({
         talk_script_id: newTalkScript.id,
         item_name: item.item_name,
         item_script: item.item_script,
@@ -245,10 +227,7 @@ export async function POST(request: NextRequest) {
         console.error('Error inserting hearing items:', hearingItemsError)
         // Rollback talk script
         await supabase.from('talk_scripts').delete().eq('id', newTalkScript.id)
-        return NextResponse.json(
-          { error: 'Failed to create hearing items' },
-          { status: 500 }
-        )
+        return NextResponse.json({ error: 'Failed to create hearing items' }, { status: 500 })
       }
     }
 
@@ -272,9 +251,6 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Error in POST /api/talk-scripts:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

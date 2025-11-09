@@ -21,10 +21,7 @@ const UpdateTalkScriptSchema = z.object({
  * GET /api/talk-scripts/:id
  * Get specific talk script version by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createClient()
 
@@ -54,16 +51,10 @@ export async function GET(
 
     if (talkScriptError) {
       if (talkScriptError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Talk script not found' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Talk script not found' }, { status: 404 })
       }
       console.error('Error fetching talk script:', talkScriptError)
-      return NextResponse.json(
-        { error: 'Failed to fetch talk script' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch talk script' }, { status: 500 })
     }
 
     // Sort hearing items by display_order
@@ -89,10 +80,7 @@ export async function GET(
     })
   } catch (error) {
     console.error('Error in GET /api/talk-scripts/:id:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -100,10 +88,7 @@ export async function GET(
  * PUT /api/talk-scripts/:id
  * Update talk script (creates new version)
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createClient()
 
@@ -127,15 +112,9 @@ export async function PUT(
 
     if (fetchError) {
       if (fetchError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Talk script not found' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Talk script not found' }, { status: 404 })
       }
-      return NextResponse.json(
-        { error: 'Failed to fetch talk script' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch talk script' }, { status: 500 })
     }
 
     // Parse and validate request body
@@ -150,10 +129,7 @@ export async function PUT(
       .single()
 
     if (userError || !userData) {
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
     }
 
     // Check if user is owner or director of this project
@@ -182,10 +158,7 @@ export async function PUT(
 
     if (deactivateError) {
       console.error('Error deactivating previous versions:', deactivateError)
-      return NextResponse.json(
-        { error: 'Failed to deactivate previous versions' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to deactivate previous versions' }, { status: 500 })
     }
 
     // Get next version number
@@ -217,15 +190,12 @@ export async function PUT(
 
     if (insertError) {
       console.error('Error inserting new talk script version:', insertError)
-      return NextResponse.json(
-        { error: 'Failed to create new version' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to create new version' }, { status: 500 })
     }
 
     // Insert hearing items if provided
     if (validated.hearing_items && validated.hearing_items.length > 0) {
-      const hearingItemsToInsert = validated.hearing_items.map((item) => ({
+      const hearingItemsToInsert = validated.hearing_items.map(item => ({
         talk_script_id: newTalkScript.id,
         item_name: item.item_name,
         item_script: item.item_script,
@@ -242,14 +212,8 @@ export async function PUT(
         // Rollback new version
         await supabase.from('talk_scripts').delete().eq('id', newTalkScript.id)
         // Re-activate previous version
-        await supabase
-          .from('talk_scripts')
-          .update({ is_active: true })
-          .eq('id', id)
-        return NextResponse.json(
-          { error: 'Failed to create hearing items' },
-          { status: 500 }
-        )
+        await supabase.from('talk_scripts').update({ is_active: true }).eq('id', id)
+        return NextResponse.json({ error: 'Failed to create hearing items' }, { status: 500 })
       }
     }
 
@@ -273,10 +237,7 @@ export async function PUT(
     }
 
     console.error('Error in PUT /api/talk-scripts/:id:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -284,10 +245,7 @@ export async function PUT(
  * DELETE /api/talk-scripts/:id
  * Delete talk script (only if not used in any calls)
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = createClient()
 
@@ -311,15 +269,9 @@ export async function DELETE(
 
     if (fetchError) {
       if (fetchError.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Talk script not found' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Talk script not found' }, { status: 404 })
       }
-      return NextResponse.json(
-        { error: 'Failed to fetch talk script' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch talk script' }, { status: 500 })
     }
 
     // Check user role (owner or director)
@@ -330,10 +282,7 @@ export async function DELETE(
       .single()
 
     if (userError || !userData) {
-      return NextResponse.json(
-        { error: 'Failed to fetch user data' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 })
     }
 
     // Check if user is owner or director of this project
@@ -375,17 +324,11 @@ export async function DELETE(
     }
 
     // Delete talk script (CASCADE will delete hearing items)
-    const { error: deleteError } = await supabase
-      .from('talk_scripts')
-      .delete()
-      .eq('id', id)
+    const { error: deleteError } = await supabase.from('talk_scripts').delete().eq('id', id)
 
     if (deleteError) {
       console.error('Error deleting talk script:', deleteError)
-      return NextResponse.json(
-        { error: 'Failed to delete talk script' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to delete talk script' }, { status: 500 })
     }
 
     return NextResponse.json({
@@ -393,9 +336,6 @@ export async function DELETE(
     })
   } catch (error) {
     console.error('Error in DELETE /api/talk-scripts/:id:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

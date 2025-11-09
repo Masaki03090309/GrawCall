@@ -5,15 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import {
-  ArrowLeft,
-  FileText,
-  MessageSquare,
-  Users,
-  Settings,
-  Phone,
-  Send
-} from 'lucide-react'
+import { ArrowLeft, FileText, MessageSquare, Users, Settings, Phone, Send } from 'lucide-react'
 
 interface Project {
   id: string
@@ -173,11 +165,7 @@ export default function ProjectDetailPage() {
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8">
-        <Button
-          variant="ghost"
-          onClick={() => router.push('/projects')}
-          className="mb-4"
-        >
+        <Button variant="ghost" onClick={() => router.push('/projects')} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />
           プロジェクト一覧に戻る
         </Button>
@@ -185,16 +173,10 @@ export default function ProjectDetailPage() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold">{project.name}</h1>
-            <p className="mt-2 text-muted-foreground">
-              プロジェクトの管理メニュー
-            </p>
+            <p className="mt-2 text-muted-foreground">プロジェクトの管理メニュー</p>
           </div>
           {project.slack_webhook_url && (
-            <Button
-              variant="outline"
-              onClick={testWebhook}
-              disabled={testingWebhook}
-            >
+            <Button variant="outline" onClick={testWebhook} disabled={testingWebhook}>
               <Send className="mr-2 h-4 w-4" />
               {testingWebhook ? 'テスト送信中...' : 'Webhook テスト送信'}
             </Button>
@@ -203,10 +185,10 @@ export default function ProjectDetailPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {menuItems.map((item) => (
+        {menuItems.map(item => (
           <Card
             key={item.href}
-            className="cursor-pointer transition-all hover:shadow-lg hover:scale-105"
+            className="cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
             onClick={() => router.push(item.href)}
           >
             <CardHeader>
@@ -216,9 +198,7 @@ export default function ProjectDetailPage() {
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-lg">{item.title}</CardTitle>
-                  <CardDescription className="mt-2">
-                    {item.description}
-                  </CardDescription>
+                  <CardDescription className="mt-2">{item.description}</CardDescription>
                 </div>
               </div>
             </CardHeader>

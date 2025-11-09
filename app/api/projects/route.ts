@@ -163,7 +163,8 @@ export async function POST(request: NextRequest) {
           success: false,
           error: {
             code: 'FORBIDDEN',
-            message: 'プロジェクトを作成する権限がありません。オーナーのみがプロジェクトを作成できます。',
+            message:
+              'プロジェクトを作成する権限がありません。オーナーのみがプロジェクトを作成できます。',
           },
         },
         { status: 403 }

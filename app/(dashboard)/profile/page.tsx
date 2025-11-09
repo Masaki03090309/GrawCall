@@ -37,7 +37,10 @@ export default function ProfilePage() {
       setLoading(true)
       const supabase = createClient()
 
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+      const {
+        data: { user: authUser },
+        error: authError,
+      } = await supabase.auth.getUser()
       if (authError || !authUser) {
         router.push('/login')
         return
@@ -140,7 +143,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto py-8 max-w-2xl">
+    <div className="container mx-auto max-w-2xl py-8">
       {/* Header */}
       <div className="mb-6">
         <Button variant="ghost" onClick={() => router.back()}>
@@ -165,13 +168,7 @@ export default function ProfilePage() {
             {/* Email (Read-only) */}
             <div className="space-y-2">
               <Label htmlFor="email">メールアドレス</Label>
-              <Input
-                id="email"
-                type="email"
-                value={user.email}
-                disabled
-                className="bg-gray-50"
-              />
+              <Input id="email" type="email" value={user.email} disabled className="bg-gray-50" />
               <p className="text-sm text-gray-500">メールアドレスは変更できません</p>
             </div>
 
@@ -184,7 +181,7 @@ export default function ProfilePage() {
                 id="name"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder="山田 太郎"
                 required
                 maxLength={255}
@@ -203,15 +200,8 @@ export default function ProfilePage() {
             {user.zoom_user_id && (
               <div className="space-y-2">
                 <Label>Zoom User ID</Label>
-                <Input
-                  type="text"
-                  value={user.zoom_user_id}
-                  disabled
-                  className="bg-gray-50"
-                />
-                <p className="text-sm text-gray-500">
-                  Zoom Phoneアカウントとの連携ID
-                </p>
+                <Input type="text" value={user.zoom_user_id} disabled className="bg-gray-50" />
+                <p className="text-sm text-gray-500">Zoom Phoneアカウントとの連携ID</p>
               </div>
             )}
 
@@ -227,11 +217,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Error Message */}
-            {error && (
-              <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
-                {error}
-              </div>
-            )}
+            {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
 
             {/* Success Message */}
             {success && (
@@ -242,11 +228,7 @@ export default function ProfilePage() {
 
             {/* Submit Button */}
             <div className="flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-              >
+              <Button type="button" variant="outline" onClick={() => router.back()}>
                 キャンセル
               </Button>
               <Button type="submit" disabled={saving}>
