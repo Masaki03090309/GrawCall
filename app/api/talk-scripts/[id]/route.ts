@@ -303,7 +303,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     // Check if talk script is used in any calls
-    const { data: callsCount, error: callsError } = await supabase
+    const { count: callsCount, error: callsError } = await supabase
       .from('calls')
       .select('id', { count: 'exact', head: true })
       .eq('talk_script_version_id', id)
@@ -316,7 +316,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       )
     }
 
-    if (callsCount && callsCount > 0) {
+    if (callsCount !== null && callsCount > 0) {
       return NextResponse.json(
         { error: 'Cannot delete talk script that is used in calls' },
         { status: 400 }
