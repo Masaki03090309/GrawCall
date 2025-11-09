@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Clock, User, RotateCcw, AlertCircle, Loader2, ChevronRight } from 'lucide-react'
+import { Clock, User, RotateCcw, Loader2, ChevronRight } from 'lucide-react'
 
 interface HearingItem {
   id: string
