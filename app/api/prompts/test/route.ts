@@ -1,11 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+import { getOpenAIClient } from '@/lib/openaiClient'
 
 // Validation schema
 const TestPromptSchema = z.object({
@@ -105,6 +101,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Call OpenAI API with GPT-5-nano
+    const openai = getOpenAIClient()
     const completion = await openai.chat.completions.create({
       model: 'gpt-5-nano',
       messages: [

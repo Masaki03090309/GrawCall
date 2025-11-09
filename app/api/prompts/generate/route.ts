@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import OpenAI from 'openai'
+import { getOpenAIClient } from '@/lib/openaiClient'
 import { z } from 'zod'
 
 /**
@@ -20,13 +20,10 @@ const GeneratePromptSchema = z.object({
   additional_context: z.string().optional(),
 })
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
+    const openai = getOpenAIClient()
 
     // Get authenticated user
     const {

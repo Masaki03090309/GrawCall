@@ -139,7 +139,8 @@
       "Bash(vercel login)",
       "Bash(vercel whoami:*)",
       "Bash(vercel:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(.gitignore)"
     ],
     "deny": [],
     "ask": []

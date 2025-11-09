@@ -1,10 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+import { getOpenAIClient } from './openaiClient'
 
 interface RAGSection {
   title: string
@@ -61,6 +57,7 @@ export function splitMarkdownIntoSections(markdownContent: string): RAGSection[]
  */
 export async function generateEmbeddings(sections: RAGSection[]): Promise<RAGSection[]> {
   console.log(`[RAG] Generating embeddings for ${sections.length} sections...`)
+  const openai = getOpenAIClient()
 
   const embeddingsPromises = sections.map(async section => {
     const text = `${section.title}\n\n${section.content}`
@@ -119,6 +116,8 @@ export async function searchRAG(
   topK: number = 3,
   similarityThreshold: number = 0.5
 ): Promise<string[]> {
+  const openai = getOpenAIClient()
+
   // Load and cache sections on first call
   if (!cachedSections) {
     console.log('[RAG] Loading RAG material from file...')
