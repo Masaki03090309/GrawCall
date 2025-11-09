@@ -59,7 +59,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     // Sort hearing items by display_order
     const sortedHearingItems = (talkScript.hearing_items || []).sort(
-      (a, b) => a.display_order - b.display_order
+      (a: any, b: any) => a.display_order - b.display_order
     )
 
     return NextResponse.json({
