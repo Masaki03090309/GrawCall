@@ -115,7 +115,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     // Insert hearing items from old version
     if (versionToRestore.hearing_items && versionToRestore.hearing_items.length > 0) {
-      const hearingItemsToInsert = versionToRestore.hearing_items.map(item => ({
+      const hearingItemsToInsert = versionToRestore.hearing_items.map((item: any) => ({
         talk_script_id: newTalkScript.id,
         item_name: item.item_name,
         item_script: item.item_script,
