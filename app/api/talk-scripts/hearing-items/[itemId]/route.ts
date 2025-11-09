@@ -63,7 +63,7 @@ export async function PUT(request: NextRequest, { params }: { params: { itemId: 
       const { data: memberData, error: memberError } = await supabase
         .from('project_members')
         .select('role')
-        .eq('project_id', hearingItem.talk_script.project_id)
+        .eq('project_id', (hearingItem.talk_script as any).project_id || (hearingItem.talk_script as any)[0]?.project_id)
         .eq('user_id', user.id)
         .single()
 
@@ -177,7 +177,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { itemI
       const { data: memberData, error: memberError } = await supabase
         .from('project_members')
         .select('role')
-        .eq('project_id', hearingItem.talk_script.project_id)
+        .eq('project_id', (hearingItem.talk_script as any).project_id || (hearingItem.talk_script as any)[0]?.project_id)
         .eq('user_id', user.id)
         .single()
 
