@@ -64,29 +64,13 @@ export async function sendSlackNotification(
 }
 
 /**
- * Determine call outcome based on status and feedback content
+ * Determine call outcome based on status only
+ * Status is determined by GPT-5-nano status detection
  */
 function determineCallOutcome(data: SlackNotificationData): string {
-  // Use the actual status from status detection
   switch (data.status) {
     case 'connected':
-      // For connected calls, check if there's appointment confirmation
-      if (data.feedbackText) {
-        const lowerFeedback = data.feedbackText.toLowerCase()
-
-        // Check for explicit appointment confirmation keywords
-        const hasAppointmentConfirmation =
-          lowerFeedback.includes('アポイント獲得') ||
-          lowerFeedback.includes('アポ獲得') ||
-          lowerFeedback.includes('面談の約束') ||
-          lowerFeedback.includes('訪問の約束') ||
-          (lowerFeedback.includes('日程') && lowerFeedback.includes('確定'))
-
-        if (hasAppointmentConfirmation) {
-          return 'アポイント獲得'
-        }
-      }
-      return 'つながっただけ'
+      return 'つながった'
 
     case 'reception':
       return '受付に当たっただけ'
@@ -95,7 +79,7 @@ function determineCallOutcome(data: SlackNotificationData): string {
       return '会話なし'
 
     default:
-      return 'つながっただけ'
+      return 'つながった'
   }
 }
 
