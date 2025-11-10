@@ -64,31 +64,39 @@ export async function sendSlackNotification(
 }
 
 /**
- * Determine call outcome based on feedback content and duration
+ * Determine call outcome based on status and feedback content
  */
 function determineCallOutcome(data: SlackNotificationData): string {
-  // If there's feedback text with meaningful content, check for appointment indicators
-  if (data.feedbackText) {
-    const lowerFeedback = data.feedbackText.toLowerCase()
+  // Use the actual status from status detection
+  switch (data.status) {
+    case 'connected':
+      // For connected calls, check if there's appointment confirmation
+      if (data.feedbackText) {
+        const lowerFeedback = data.feedbackText.toLowerCase()
 
-    // Check for appointment-related keywords
-    if (
-      lowerFeedback.includes('アポ') ||
-      lowerFeedback.includes('約束') ||
-      lowerFeedback.includes('面談') ||
-      lowerFeedback.includes('訪問') ||
-      lowerFeedback.includes('次回') ||
-      lowerFeedback.includes('日程')
-    ) {
-      return 'アポイント獲得'
-    }
+        // Check for explicit appointment confirmation keywords
+        const hasAppointmentConfirmation =
+          lowerFeedback.includes('アポイント獲得') ||
+          lowerFeedback.includes('アポ獲得') ||
+          lowerFeedback.includes('面談の約束') ||
+          lowerFeedback.includes('訪問の約束') ||
+          (lowerFeedback.includes('日程') && lowerFeedback.includes('確定'))
 
-    // If feedback exists but no appointment indicators, it's just connected
-    return 'つながっただけ'
+        if (hasAppointmentConfirmation) {
+          return 'アポイント獲得'
+        }
+      }
+      return 'つながっただけ'
+
+    case 'reception':
+      return '受付に当たっただけ'
+
+    case 'no_conversation':
+      return '会話なし'
+
+    default:
+      return 'つながっただけ'
   }
-
-  // No feedback means just connected
-  return 'つながっただけ'
 }
 
 function getStatusEmoji(status: CallStatus): string {

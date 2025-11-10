@@ -140,7 +140,10 @@
       "Bash(vercel whoami:*)",
       "Bash(vercel:*)",
       "Bash(tee:*)",
-      "Bash(.gitignore)"
+      "Bash(.gitignore)",
+      "WebFetch(domain:grawcall-lslstjhp0-masaf0406-gmailcoms-projects.vercel.app)",
+      "Bash(chmod:*)",
+      "Bash(README.md)"
     ],
     "deny": [],
     "ask": []
