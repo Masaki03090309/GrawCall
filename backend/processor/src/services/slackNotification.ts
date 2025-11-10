@@ -64,23 +64,11 @@ export async function sendSlackNotification(
 }
 
 /**
- * Determine call outcome based on status only
+ * Determine call outcome - return English status in uppercase
  * Status is determined by GPT-5-nano status detection
  */
 function determineCallOutcome(data: SlackNotificationData): string {
-  switch (data.status) {
-    case 'connected':
-      return 'つながった'
-
-    case 'reception':
-      return '受付に当たっただけ'
-
-    case 'no_conversation':
-      return '会話なし'
-
-    default:
-      return 'つながった'
-  }
+  return data.status.toUpperCase()
 }
 
 function getStatusEmoji(status: CallStatus): string {
