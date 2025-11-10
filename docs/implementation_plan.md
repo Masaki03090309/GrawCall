@@ -361,6 +361,34 @@
 
 ---
 
+### Phase 1 & 2 デプロイ後の改善・バグ修正
+
+#### 2025-11-10: Cloud Runサービス特定とSlack通知改善
+
+**問題**:
+- 2つのCloud Runサービス（`backend-processor`と`zoom-phone-processor`）が存在
+- Pub/Subは`zoom-phone-processor`にメッセージを送信していたが、`backend-processor`を更新していた
+- Slack通知のURL表記にハイフン（`graw-call.vercel.app`）が含まれていた
+- ステータス判定が甘く、受付との会話も`connected`と判定されていた
+
+**修正内容**:
+- [x] 正しいサービス（`zoom-phone-processor`）を特定し、最新コードをデプロイ
+- [x] 環境変数 `NEXT_PUBLIC_APP_URL` を `https://grawcall.vercel.app` に修正
+- [x] Slack通知の通話ステータスを英語表記に変更（`CONNECTED`, `RECEPTION`, `NO_CONVERSATION`）
+- [x] ステータス判定プロンプト改善：
+  - 優先順位付き判定ステップ追加（担当者不在シグナルを最優先チェック）
+  - 受付判定の精度向上（「不在」「外出」「会議中」明言時は必ず`reception`）
+  - 実務会話の有無を明確化（在席確認のみは`reception`）
+  - 新しい例を3つ追加（担当者不在・在席確認、部署移動）
+
+**影響範囲**:
+- Cloud Run: `zoom-phone-processor` リビジョン00019
+- ファイル: `backend/processor/src/services/statusDetection.ts`, `backend/processor/src/services/slackNotification.ts`
+
+**完了日**: 2025-11-10
+
+---
+
 ## フェーズ3: トークスクリプト管理
 
 **期間**: 1ヶ月
@@ -453,11 +481,11 @@
 
 ### フェーズ3完了条件
 
-- [ ] トークスクリプトの作成・編集ができる
-- [ ] PDFから自動的にフェーズ判定できる
-- [ ] トークスクリプト一致率が計算される
-- [ ] 因果関係を考慮したフィードバックが生成される
-- [ ] 通話詳細ページに分析結果が表示される
+- [x] トークスクリプトの作成・編集ができる ✅ M3.1完了
+- [ ] PDFから自動的にフェーズ判定できる ⚠️ M3.2未実装
+- [x] トークスクリプト一致率が計算される ✅ M3.3バックエンド完了（2025-01-07）
+- [x] 因果関係を考慮したフィードバックが生成される ✅ M3.4完了（2025-01-07）
+- [ ] 通話詳細ページに分析結果が表示される ⚠️ フロントエンド未実装
 - [ ] 統合テストがパス
 
 ---
