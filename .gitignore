@@ -31,6 +31,9 @@ yarn-error.log*
 # MCP Configuration (contains sensitive tokens)
 .mcp.json
 
+# Serena MCP cache
+.serena/
+
 # Vercel
 .vercel
 

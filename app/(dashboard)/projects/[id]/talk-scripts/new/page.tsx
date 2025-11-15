@@ -10,7 +10,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Plus, Trash2, Save, AlertCircle, GripVertical } from 'lucide-react'
+import { Plus, Trash2, Save, AlertCircle, GripVertical, FileUp, Loader2 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 import dynamic from 'next/dynamic'
 
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false })
@@ -42,6 +43,9 @@ export default function NewTalkScriptPage() {
   const [changeComment, setChangeComment] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [importing, setImporting] = useState(false)
+  const { toast } = useToast()
 
   const handleAddHearingItem = () => {
     if (hearingItems.length >= 10) {
@@ -111,6 +115,75 @@ export default function NewTalkScriptPage() {
     }))
 
     setHearingItems(reorderedItems)
+  }
+
+  const handlePDFImport = async () => {
+    if (!pdfFile) {
+      toast({
+        title: 'エラー',
+        description: 'PDFファイルを選択してください',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    try {
+      setImporting(true)
+      setError(null)
+
+      const formData = new FormData()
+      formData.append('file', pdfFile)
+      formData.append('project_id', projectId)
+
+      const response = await fetch('/api/talk-scripts/import-pdf', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'PDF取り込みに失敗しました')
+      }
+
+      // Auto-fill form with extracted data
+      if (data.data.opening_script) {
+        setOpeningScript(data.data.opening_script)
+      }
+      if (data.data.proposal_script) {
+        setProposalScript(data.data.proposal_script)
+      }
+      if (data.data.closing_script) {
+        setClosingScript(data.data.closing_script)
+      }
+      if (data.data.hearing_items && data.data.hearing_items.length > 0) {
+        const importedItems = data.data.hearing_items.map((item: any, index: number) => ({
+          item_name: item.item_name,
+          item_script: item.item_script,
+          is_default: item.item_name === '現在の課題',
+          display_order: index + 1,
+        }))
+        setHearingItems(importedItems)
+      }
+
+      toast({
+        title: 'PDF取り込み成功',
+        description: 'PDFから自動抽出しました。内容を確認・編集してください。',
+      })
+
+      // Clear PDF file
+      setPdfFile(null)
+    } catch (err: any) {
+      console.error('PDF import error:', err)
+      setError(err.message || 'PDF取り込みに失敗しました')
+      toast({
+        title: 'PDF取り込み失敗',
+        description: err.message || 'PDF取り込みに失敗しました',
+        variant: 'destructive',
+      })
+    } finally {
+      setImporting(false)
+    }
   }
 
   const validateForm = (): boolean => {
@@ -197,6 +270,64 @@ export default function NewTalkScriptPage() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileUp className="h-5 w-5" />
+            PDFから自動取り込み
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                トークスクリプトのPDFをアップロードすると、GPT-5
+                Vision APIが自動的に4つのフェーズに分類し、ヒアリング項目を抽出します。
+                抽出後、内容を確認・編集してから保存してください。
+              </AlertDescription>
+            </Alert>
+
+            <div className="flex items-end gap-4">
+              <div className="flex-1">
+                <Label htmlFor="pdf-upload">PDFファイル（最大10MB）</Label>
+                <Input
+                  id="pdf-upload"
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      setPdfFile(file)
+                    }
+                  }}
+                  disabled={importing}
+                  className="mt-2"
+                />
+                {pdfFile && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    選択中: {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)
+                  </p>
+                )}
+              </div>
+              <Button onClick={handlePDFImport} disabled={!pdfFile || importing}>
+                {importing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    取り込み中...
+                  </>
+                ) : (
+                  <>
+                    <FileUp className="mr-2 h-4 w-4" />
+                    PDF取り込み
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="mb-6">
         <CardHeader>
